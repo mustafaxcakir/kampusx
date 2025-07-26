@@ -2,6 +2,10 @@ import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 
+interface RegisterProps {
+    universities: University[];
+}
+
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
@@ -24,8 +28,7 @@ type RegisterForm = {
     university_id?: number;
 };
 
-export default function Register() {
-    const [universities, setUniversities] = useState<University[]>([]);
+export default function Register({ universities }: RegisterProps) {
     const [selectedUniversity, setSelectedUniversity] = useState<University | null>(null);
     const [emailError, setEmailError] = useState<string>('');
 
@@ -36,14 +39,6 @@ export default function Register() {
         password_confirmation: '',
         university_id: undefined,
     });
-
-    // Üniversiteleri yükle
-    useEffect(() => {
-        fetch('/api/universities')
-            .then(res => res.json())
-            .then(setUniversities)
-            .catch(console.error);
-    }, []);
 
     // E-posta değiştiğinde üniversiteyi bul
     useEffect(() => {

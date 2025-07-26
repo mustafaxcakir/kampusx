@@ -16,5 +16,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
 
-// API Routes
-Route::get('/api/universities', [App\Http\Controllers\Api\UniversityController::class, 'index']);
+
