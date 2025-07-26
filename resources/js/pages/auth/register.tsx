@@ -22,6 +22,7 @@ type University = {
 
 type RegisterForm = {
     name: string;
+    surname: string;
     email: string;
     password: string;
     password_confirmation: string;
@@ -34,6 +35,7 @@ export default function Register({ universities }: RegisterProps) {
 
     const { data, setData, post, processing, errors, reset } = useForm<RegisterForm>({
         name: '',
+        surname: '',
         email: '',
         password: '',
         password_confirmation: '',
@@ -62,6 +64,15 @@ export default function Register({ universities }: RegisterProps) {
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         
+        // Ad ve soyad kontrolü
+        if (!data.name.trim()) {
+            return;
+        }
+        
+        if (!data.surname.trim()) {
+            return;
+        }
+        
         if (!data.email.endsWith('.edu.tr')) {
             setEmailError('Sadece .edu.tr uzantılı e-posta adresleri kabul edilir.');
             return;
@@ -82,35 +93,53 @@ export default function Register({ universities }: RegisterProps) {
             <Head title="Register" />
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-6">
-                    <div className="grid gap-2">
-                        <Label htmlFor="name">Name</Label>
-                        <Input
-                            id="name"
-                            type="text"
-                            required
-                            autoFocus
-                            tabIndex={1}
-                            autoComplete="name"
-                            value={data.name}
-                            onChange={(e) => setData('name', e.target.value)}
-                            disabled={processing}
-                            placeholder="Full name"
-                        />
-                        <InputError message={errors.name} className="mt-2" />
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="name">Ad *</Label>
+                            <Input
+                                id="name"
+                                type="text"
+                                required
+                                autoFocus
+                                tabIndex={1}
+                                autoComplete="given-name"
+                                value={data.name}
+                                onChange={(e) => setData('name', e.target.value)}
+                                disabled={processing}
+                                placeholder="Adınız"
+                            />
+                            <InputError message={errors.name} className="mt-2" />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="surname">Soyad *</Label>
+                            <Input
+                                id="surname"
+                                type="text"
+                                required
+                                tabIndex={2}
+                                autoComplete="family-name"
+                                value={data.surname}
+                                onChange={(e) => setData('surname', e.target.value)}
+                                disabled={processing}
+                                placeholder="Soyadınız"
+                            />
+                            <InputError message={errors.surname} className="mt-2" />
+                        </div>
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="email">Email address</Label>
+                        <Label htmlFor="email">E-posta adresi</Label>
                         <Input
                             id="email"
                             type="email"
                             required
-                            tabIndex={2}
+                            tabIndex={3}
                             autoComplete="email"
                             value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
                             disabled={processing}
-                            placeholder="email@example.com"
+                            placeholder="email@ornek.edu.tr"
                         />
                         <InputError message={errors.email || emailError} />
                         {data.email && !data.email.endsWith('.edu.tr') && (
@@ -147,47 +176,47 @@ export default function Register({ universities }: RegisterProps) {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="password">Password</Label>
+                        <Label htmlFor="password">Şifre</Label>
                         <Input
                             id="password"
                             type="password"
                             required
-                            tabIndex={3}
+                            tabIndex={4}
                             autoComplete="new-password"
                             value={data.password}
                             onChange={(e) => setData('password', e.target.value)}
                             disabled={processing}
-                            placeholder="Password"
+                            placeholder="Şifre"
                         />
                         <InputError message={errors.password} />
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="password_confirmation">Confirm password</Label>
+                        <Label htmlFor="password_confirmation">Şifre tekrarı</Label>
                         <Input
                             id="password_confirmation"
                             type="password"
                             required
-                            tabIndex={4}
+                            tabIndex={5}
                             autoComplete="new-password"
                             value={data.password_confirmation}
                             onChange={(e) => setData('password_confirmation', e.target.value)}
                             disabled={processing}
-                            placeholder="Confirm password"
+                            placeholder="Şifre tekrarı"
                         />
                         <InputError message={errors.password_confirmation} />
                     </div>
 
-                    <Button type="submit" className="mt-2 w-full" tabIndex={5} disabled={processing}>
+                    <Button type="submit" className="mt-2 w-full" tabIndex={6} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                        Create account
+                        Hesap oluştur
                     </Button>
                 </div>
 
                 <div className="text-center text-sm text-muted-foreground">
-                    Already have an account?{' '}
-                    <TextLink href={route('login')} tabIndex={6}>
-                        Log in
+                    Zaten hesabınız var mı?{' '}
+                    <TextLink href={route('login')} tabIndex={7}>
+                        Giriş yap
                     </TextLink>
                 </div>
             </form>

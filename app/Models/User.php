@@ -19,9 +19,11 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'surname',
         'email',
         'password',
         'university_id',
+        'unique_id',
     ];
 
     /**
@@ -50,5 +52,17 @@ class User extends Authenticatable
     public function university()
     {
         return $this->belongsTo(University::class);
+    }
+
+    /**
+     * Generate a unique 10-digit ID
+     */
+    public static function generateUniqueId(): string
+    {
+        do {
+            $uniqueId = str_pad(mt_rand(0, 9999999999), 10, '0', STR_PAD_LEFT);
+        } while (self::where('unique_id', $uniqueId)->exists());
+
+        return $uniqueId;
     }
 }
