@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\University;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -34,12 +35,24 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'university_id' => 'required|exists:universities,id',
         ]);
+
+        // E-posta domainini kontrol et
+        $emailDomain = substr(strrchr($request->email, '@'), 1);
+        $university = University::find($request->university_id);
+        
+        if (!$university || $university->email_domain !== $emailDomain) {
+            return back()->withErrors([
+                'email' => 'E-posta adresi seçilen üniversite ile uyuşmuyor.',
+            ]);
+        }
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'university_id' => $request->university_id,
         ]);
 
         event(new Registered($user));
