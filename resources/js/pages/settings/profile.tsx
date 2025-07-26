@@ -21,7 +21,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 type ProfileForm = {
     name: string;
-    email: string;
+    surname: string;
 };
 
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
@@ -29,7 +29,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
         name: auth.user.name,
-        email: auth.user.email,
+        surname: auth.user.surname as string,
     });
 
     const submit: FormEventHandler = (e) => {
@@ -46,40 +46,58 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Profile information" description="Update your name and email address" />
+                    <HeadingSmall title="Profil bilgileri" description="Ad ve soyad bilgilerinizi güncelleyin" />
 
                     <form onSubmit={submit} className="space-y-6">
-                        <div className="grid gap-2">
-                            <Label htmlFor="name">Name</Label>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="name">Ad</Label>
 
-                            <Input
-                                id="name"
-                                className="mt-1 block w-full"
-                                value={data.name}
-                                onChange={(e) => setData('name', e.target.value)}
-                                required
-                                autoComplete="name"
-                                placeholder="Full name"
-                            />
+                                <Input
+                                    id="name"
+                                    className="mt-1 block w-full"
+                                    value={data.name}
+                                    onChange={(e) => setData('name', e.target.value)}
+                                    required
+                                    autoComplete="given-name"
+                                    placeholder="Adınız"
+                                />
 
-                            <InputError className="mt-2" message={errors.name} />
+                                <InputError className="mt-2" message={errors.name} />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="surname">Soyad</Label>
+
+                                <Input
+                                    id="surname"
+                                    className="mt-1 block w-full"
+                                    value={data.surname}
+                                    onChange={(e) => setData('surname', e.target.value)}
+                                    required
+                                    autoComplete="family-name"
+                                    placeholder="Soyadınız"
+                                />
+
+                                <InputError className="mt-2" message={errors.surname} />
+                            </div>
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="email">Email address</Label>
+                            <Label htmlFor="email">E-posta adresi</Label>
 
                             <Input
                                 id="email"
                                 type="email"
-                                className="mt-1 block w-full"
-                                value={data.email}
-                                onChange={(e) => setData('email', e.target.value)}
-                                required
-                                autoComplete="username"
-                                placeholder="Email address"
+                                className="mt-1 block w-full bg-muted"
+                                value={auth.user.email}
+                                disabled
+                                readOnly
+                                placeholder="E-posta adresi değiştirilemez"
                             />
-
-                            <InputError className="mt-2" message={errors.email} />
+                            <p className="text-sm text-muted-foreground">
+                                E-posta adresi güvenlik nedeniyle değiştirilemez
+                            </p>
                         </div>
 
                         {mustVerifyEmail && auth.user.email_verified_at === null && (
@@ -105,7 +123,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                         )}
 
                         <div className="flex items-center gap-4">
-                            <Button disabled={processing}>Save</Button>
+                            <Button disabled={processing}>Kaydet</Button>
 
                             <Transition
                                 show={recentlySuccessful}
@@ -114,7 +132,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                 leave="transition ease-in-out"
                                 leaveTo="opacity-0"
                             >
-                                <p className="text-sm text-neutral-600">Saved</p>
+                                <p className="text-sm text-neutral-600">Kaydedildi</p>
                             </Transition>
                         </div>
                     </form>
