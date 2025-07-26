@@ -14,7 +14,7 @@ import SettingsLayout from '@/layouts/settings/layout';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Profile settings',
+        title: 'Profil ayarları',
         href: '/settings/profile',
     },
 ];
@@ -22,6 +22,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 type ProfileForm = {
     name: string;
     surname: string;
+    email: string;
 };
 
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
@@ -29,11 +30,21 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
         name: auth.user.name,
-        surname: auth.user.surname as string,
+        surname: (auth.user as any).surname || '',
+        email: auth.user.email,
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
+
+        // Ad ve soyad kontrolü
+        if (!data.name.trim()) {
+            return;
+        }
+        
+        if (!data.surname.trim()) {
+            return;
+        }
 
         patch(route('profile.update'), {
             preserveScroll: true,
@@ -42,16 +53,16 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Profile settings" />
+            <Head title="Profil ayarları" />
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Profil bilgileri" description="Ad ve soyad bilgilerinizi güncelleyin" />
+                    <HeadingSmall title="Profil bilgileri" description="Adınızı ve soyadınızı güncelleyebilirsiniz." />
 
                     <form onSubmit={submit} className="space-y-6">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Ad</Label>
+                                <Label htmlFor="name">Ad *</Label>
 
                                 <Input
                                     id="name"
@@ -67,7 +78,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="surname">Soyad</Label>
+                                <Label htmlFor="surname">Soyad *</Label>
 
                                 <Input
                                     id="surname"
@@ -90,33 +101,35 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                 id="email"
                                 type="email"
                                 className="mt-1 block w-full bg-muted"
-                                value={auth.user.email}
-                                disabled
+                                value={data.email}
                                 readOnly
-                                placeholder="E-posta adresi değiştirilemez"
+                                disabled
+                                autoComplete="username"
+                                placeholder="E-posta adresi"
                             />
+
                             <p className="text-sm text-muted-foreground">
-                                E-posta adresi güvenlik nedeniyle değiştirilemez
+                                E-posta adresi değiştirilemez. Güvenlik nedeniyle bu alan kilitlidir.
                             </p>
                         </div>
 
                         {mustVerifyEmail && auth.user.email_verified_at === null && (
                             <div>
                                 <p className="-mt-4 text-sm text-muted-foreground">
-                                    Your email address is unverified.{' '}
+                                    E-posta adresiniz doğrulanmamış.{' '}
                                     <Link
                                         href={route('verification.send')}
                                         method="post"
                                         as="button"
                                         className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
                                     >
-                                        Click here to resend the verification email.
+                                        Doğrulama e-postasını tekrar göndermek için tıklayın.
                                     </Link>
                                 </p>
 
                                 {status === 'verification-link-sent' && (
                                     <div className="mt-2 text-sm font-medium text-green-600">
-                                        A new verification link has been sent to your email address.
+                                        Yeni bir doğrulama bağlantısı e-posta adresinize gönderildi.
                                     </div>
                                 )}
                             </div>
