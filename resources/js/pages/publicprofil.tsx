@@ -160,66 +160,64 @@ export default function PublicProfile() {
                         <div className="p-6">
 
                             
-                            <div className="flex flex-col md:flex-row gap-6">
-                                {/* First - Profile Photo */}
-                                <div className="flex flex-col items-center md:items-start">
-                                    <div className="w-32 h-32 bg-[#075B5E] rounded-full flex items-center justify-center mb-4">
-                                        <span className="text-white font-bold text-3xl">
+                            <div className="flex flex-col lg:flex-row gap-6">
+                                {/* Profile Photo */}
+                                <div className="flex flex-col items-center lg:items-start">
+                                    <div className="w-24 h-24 lg:w-28 lg:h-28 bg-[#075B5E] rounded-full flex items-center justify-center mb-4 flex-shrink-0">
+                                        <span className="text-white font-bold text-2xl lg:text-3xl">
                                             {user.name.charAt(0).toUpperCase()}
                                         </span>
                                     </div>
                                 </div>
 
-                                {/* Second - Name and Info */}
-                                <div className="flex flex-col items-start">
-                                    <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                                {/* Name and Info */}
+                                <div className="flex-1">
+                                    <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-4">
                                         {user.name} {user.surname}
                                     </h1>
-                                    <div className="space-y-3">
+                                    <div className="space-y-2">
                                         <div className="flex items-center gap-2 text-sm text-gray-600">
-                                            <User className="w-4 h-4" />
+                                            <User className="w-4 h-4 flex-shrink-0" />
                                             <span>@{user.unique_id}</span>
                                         </div>
                                         {user.university_name && (
                                             <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                <GraduationCap className="w-4 h-4" />
+                                                <GraduationCap className="w-4 h-4 flex-shrink-0" />
                                                 <span>{user.university_name}</span>
                                                 {user.privacy_info && getPrivacyIcon(user.privacy_info.university_privacy)}
                                             </div>
                                         )}
                                         {user.email && (
                                             <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                <Mail className="w-4 h-4" />
+                                                <Mail className="w-4 h-4 flex-shrink-0" />
                                                 <span>{user.email}</span>
                                                 {user.privacy_info && getPrivacyIcon(user.privacy_info.email_privacy)}
                                             </div>
                                         )}
                                         {user.phone && (
                                             <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                <Phone className="w-4 h-4" />
+                                                <Phone className="w-4 h-4 flex-shrink-0" />
                                                 <span>{user.phone}</span>
                                                 {user.privacy_info && getPrivacyIcon(user.privacy_info.phone_privacy)}
                                             </div>
                                         )}
                                         <div className="flex items-center gap-2 text-sm text-gray-600">
-                                            <Calendar className="w-4 h-4" />
+                                            <Calendar className="w-4 h-4 flex-shrink-0" />
                                             <span>Üye olma: {new Date(user.created_at).toLocaleDateString('tr-TR')}</span>
                                         </div>
                                     </div>
                                 </div>
-
-                                {/* Third - About */}
-                                {user.about && (
-                                    <div className="flex flex-col items-start">
-                                        <div>
-                                            <h3 className="font-semibold text-lg mb-2">Hakkında</h3>
-                                            <p className="text-gray-600 text-sm leading-relaxed">
-                                                {user.about.length > 250 ? user.about.substring(0, 250) + '...' : user.about}
-                                            </p>
-                                        </div>
-                                    </div>
-                                )}
                             </div>
+
+                            {/* About Section - Separate */}
+                            {user.about && (
+                                <div className="mt-6 pt-6 border-t border-gray-200">
+                                    <h3 className="font-semibold text-lg mb-3 text-gray-900">Hakkında</h3>
+                                    <p className="text-gray-600 text-sm leading-relaxed">
+                                        {user.about.length > 300 ? user.about.substring(0, 300) + '...' : user.about}
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </div>
 
