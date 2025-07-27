@@ -11,7 +11,7 @@ import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search, Plus, ClipboardList, Heart } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Menu, Search, Plus, ClipboardList, Heart, User } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 
@@ -35,6 +35,11 @@ const mainNavItems: NavItem[] = [
         title: 'Favorilerim',
         href: '/favorilerim',
         icon: Heart,
+    },
+    {
+        title: 'Profilime Git',
+        href: '/profil',
+        icon: User,
     },
 ];
 
