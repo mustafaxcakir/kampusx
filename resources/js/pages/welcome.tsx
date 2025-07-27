@@ -1,5 +1,6 @@
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
+import { Heart, Truck, Shield } from 'lucide-react';
 
 export default function Welcome() {
     const { auth } = usePage<SharedData>().props;
@@ -12,160 +13,259 @@ export default function Welcome() {
             </Head>
             
             {/* HEADER */}
-            <header className="bg-white shadow-sm border-b border-gray-200 dark:bg-gray-900 dark:border-gray-700">
+            <header className="bg-white shadow-sm border-b border-gray-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
+                    <div className="flex items-center h-16 gap-4">
+                        {/* Logo */}
                         <div className="flex items-center space-x-3">
-                            <div className="h-10 w-10 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center">
-                                <span className="text-white font-bold text-xl">K</span>
-                            </div>
-                            <span className="font-bold text-2xl text-gray-900 dark:text-white">KampusX</span>
+                            <span className="font-bold text-2xl text-gray-900">KampusX</span>
                         </div>
+
+                        <div className="flex-1"></div>
+
                         <div className="flex items-center space-x-4">
                             {auth.user ? (
                                 <Link
                                     href={route('dashboard')}
-                                    className="inline-block rounded-lg border border-blue-200 bg-white px-5 py-2 text-sm font-medium text-gray-700 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:border-gray-500 dark:hover:bg-gray-700"
+                                    className="bg-[#075B5E] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#064A4D] transition-colors duration-200 shadow-sm"
                                 >
                                     Dashboard
                                 </Link>
                             ) : (
-                                <>
+                                <div className="flex items-center space-x-3">
                                     <Link
                                         href={route('login')}
-                                        className="inline-block rounded-lg border border-transparent px-5 py-2 text-sm font-medium text-gray-700 hover:border-blue-200 dark:text-gray-200 dark:hover:border-gray-600"
+                                        className="border border-gray-300 text-gray-700 px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50 hover:border-gray-400 transition-colors duration-200"
                                     >
                                         Giriş Yap
                                     </Link>
                                     <Link
                                         href={route('register')}
-                                        className="inline-block rounded-lg border border-blue-600 bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:border-blue-700 hover:bg-blue-700 dark:border-blue-500 dark:bg-blue-500 dark:hover:border-blue-400 dark:hover:bg-blue-400"
+                                        className="bg-[#FF3F33] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#E6392E] transition-colors duration-200 shadow-sm"
                                     >
                                         Üye Ol
                                     </Link>
-                                </>
+                                </div>
                             )}
                         </div>
                     </div>
                 </div>
             </header>
 
-            {/* HERO SECTION */}
-            <section className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-20">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-                        Kampüsüne Özel
-                        <span className="block text-blue-600 dark:text-blue-400">İkinci El ve Yardımlaşma Platformu</span>
-                    </h1>
-                    <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
-                        Sadece öğrenci e-posta adresinizle güvenli bir şekilde giriş yapın. 
-                        Kitap, elektronik, giyim ve daha fazlasını kampüs içinde alıp satın.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Link
-                            href={route('register')}
-                            className="inline-block rounded-lg border border-blue-600 bg-blue-600 px-8 py-4 text-lg font-medium text-white hover:border-blue-700 hover:bg-blue-700 dark:border-blue-500 dark:bg-blue-500 dark:hover:border-blue-400 dark:hover:bg-blue-400"
-                        >
-                            Hemen Başla
+            {/* CATEGORIES NAVIGATION */}
+            <nav className="bg-white border-b border-gray-200">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center space-x-8 py-3">
+                        <button className="text-sm font-medium text-gray-600 hover:text-gray-900">
+                            TÜM KATEGORİLER
+                        </button>
+                        <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900">
+                            Kitap
                         </Link>
-                        <Link
-                            href={route('login')}
-                            className="inline-block rounded-lg border border-gray-300 bg-white px-8 py-4 text-lg font-medium text-gray-700 hover:border-gray-400 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:border-gray-500 dark:hover:bg-gray-700"
-                        >
-                            Öğrenci Mailiyle Giriş Yap
+                        <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900">
+                            Elektronik
+                        </Link>
+                        <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900">
+                            Giyim
+                        </Link>
+                        <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900">
+                            Spor
+                        </Link>
+                        <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900">
+                            Ev & Yaşam
+                        </Link>
+                        <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900">
+                            Takas
                         </Link>
                     </div>
                 </div>
-            </section>
+            </nav>
 
-            {/* NASIL ÇALIŞIR? */}
-            <section className="py-20 bg-white dark:bg-gray-900">
+            {/* HERO BANNER */}
+            <section className="bg-[#075B5E] py-12">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">
-                        Nasıl Çalışır?
-                    </h2>
-                    <div className="grid md:grid-cols-3 gap-8">
-                        <div className="text-center">
-                            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 dark:bg-blue-900">
-                                <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">①</span>
-                            </div>
-                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Üye Ol</h3>
-                            <p className="text-gray-600 dark:text-gray-300">Öğrenci e-posta adresinizle hızlıca üye olun</p>
+                    <div className="flex items-center justify-between">
+                        <div className="text-white">
+                            <h1 className="text-3xl font-bold mb-2">
+                                KampusX ile hızlı sat!
+                            </h1>
+                            <p className="text-xl mb-4">
+                                İlanını öne çıkar, daha çok alıcıya ulaş.
+                            </p>
+                            <button className="bg-[#FF3F33] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#E6392E]">
+                                Premium İlan Ver
+                            </button>
                         </div>
-                        <div className="text-center">
-                            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 dark:bg-green-900">
-                                <span className="text-2xl font-bold text-green-600 dark:text-green-400">②</span>
+                        <div className="hidden md:block">
+                            <div className="bg-white rounded-lg p-4 shadow-lg">
+                                <div className="w-32 h-32 bg-gray-200 rounded-lg mb-2"></div>
+                                <p className="text-sm text-gray-600">Tertemiz, az kullanılmış</p>
+                                <p className="text-sm font-medium">MacBook Pro</p>
                             </div>
-                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">İlan Ver veya Göz At</h3>
-                            <p className="text-gray-600 dark:text-gray-300">Ürünlerinizi satın veya ihtiyacınız olanı bulun</p>
-                        </div>
-                        <div className="text-center">
-                            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 dark:bg-purple-900">
-                                <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">③</span>
-                            </div>
-                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Kampüs İçinde Buluş</h3>
-                            <p className="text-gray-600 dark:text-gray-300">Güvenli bir şekilde kampüs içinde buluşup alışveriş yapın</p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* ÖNE ÇIKAN İLANLAR */}
-            <section className="py-20 bg-gray-50 dark:bg-gray-800">
+            {/* PRODUCTS GRID */}
+            <section className="py-8 bg-gray-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">
-                        Öne Çıkan İlanlar
-                    </h2>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div className="bg-white rounded-lg shadow-md p-6 dark:bg-gray-700">
-                            <div className="w-full h-32 bg-gray-200 rounded-lg mb-4 dark:bg-gray-600"></div>
-                            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Matematik Kitabı</h3>
-                            <p className="text-green-600 font-bold text-lg">30 TL</p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">İstanbul Üniversitesi</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {/* Product Card 1 */}
+                        <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                            <div className="relative">
+                                <div className="w-full h-48 bg-gray-200"></div>
+                                <div className="absolute top-2 left-2">
+                                    <span className="bg-yellow-400 text-yellow-900 text-xs px-2 py-1 rounded font-medium">
+                                        • ÖNE ÇIKAN
+                                    </span>
+                                </div>
+                                <button className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-sm">
+                                    <Heart className="h-5 w-5 text-gray-400" />
+                                </button>
+                            </div>
+                            <div className="p-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Shield className="h-4 w-4 text-green-600" />
+                                    <span className="text-xs text-green-600 font-medium">Cüzdanım Güvende</span>
+                                </div>
+                                <h3 className="font-semibold text-gray-900 mb-1">MacBook Pro M2 Garantili</h3>
+                                <p className="text-2xl font-bold text-gray-900 mb-2">30.500 TL</p>
+                                <div className="flex items-center justify-between text-sm text-gray-500">
+                                    <span>Beyoğlu, İstanbul</span>
+                                    <span>BUGÜN</span>
+                                </div>
+                            </div>
                         </div>
-                        <div className="bg-white rounded-lg shadow-md p-6 dark:bg-gray-700">
-                            <div className="w-full h-32 bg-gray-200 rounded-lg mb-4 dark:bg-gray-600"></div>
-                            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Laptop</h3>
-                            <p className="text-blue-600 font-bold text-lg">Takaslık</p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Boğaziçi Üniversitesi</p>
-                        </div>
-                        <div className="bg-white rounded-lg shadow-md p-6 dark:bg-gray-700">
-                            <div className="w-full h-32 bg-gray-200 rounded-lg mb-4 dark:bg-gray-600"></div>
-                            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Bisiklet</h3>
-                            <p className="text-green-600 font-bold text-lg">500 TL</p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">ODTÜ</p>
-                        </div>
-                        <div className="bg-white rounded-lg shadow-md p-6 dark:bg-gray-700">
-                            <div className="w-full h-32 bg-gray-200 rounded-lg mb-4 dark:bg-gray-600"></div>
-                            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Kulaklık</h3>
-                            <p className="text-green-600 font-bold text-lg">150 TL</p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">İTÜ</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
 
-            {/* NEDEN BU PLATFORM? */}
-            <section className="py-20 bg-white dark:bg-gray-900">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">
-                        Neden Bu Platform?
-                    </h2>
-                    <div className="grid md:grid-cols-3 gap-8">
-                        <div className="text-center">
-                            <div className="text-4xl mb-4">♻️</div>
-                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Sürdürülebilirlik</h3>
-                            <p className="text-gray-600 dark:text-gray-300">İkinci el ürünlerle çevreye katkı sağlayın</p>
+                        {/* Product Card 2 */}
+                        <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                            <div className="relative">
+                                <div className="w-full h-48 bg-gray-200"></div>
+                                <button className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-sm">
+                                    <Heart className="h-5 w-5 text-gray-400" />
+                                </button>
+                            </div>
+                            <div className="p-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Truck className="h-4 w-4 text-blue-600" />
+                                    <span className="text-xs text-blue-600 font-medium">Ücretsiz Kargo</span>
+                                </div>
+                                <h3 className="font-semibold text-gray-900 mb-1">iPhone 16 Pro 128GB</h3>
+                                <p className="text-2xl font-bold text-gray-900 mb-2">59.000 TL</p>
+                                <div className="flex items-center justify-between text-sm text-gray-500">
+                                    <span>Kadıköy, İstanbul</span>
+                                    <span>DÜN</span>
+                                </div>
+                            </div>
                         </div>
-                        <div className="text-center">
-                            <div className="text-4xl mb-4">💸</div>
-                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Öğrenci Dostu Ekonomi</h3>
-                            <p className="text-gray-600 dark:text-gray-300">Bütçenize uygun fiyatlarla alışveriş yapın</p>
+
+                        {/* Product Card 3 */}
+                        <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                            <div className="relative">
+                                <div className="w-full h-48 bg-gray-200"></div>
+                                <button className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-sm">
+                                    <Heart className="h-5 w-5 text-gray-400" />
+                                </button>
+                            </div>
+                            <div className="p-4">
+                                <h3 className="font-semibold text-gray-900 mb-1">Matematik Ders Kitabı</h3>
+                                <p className="text-2xl font-bold text-gray-900 mb-2">50 TL</p>
+                                <div className="flex items-center justify-between text-sm text-gray-500">
+                                    <span>Beşiktaş, İstanbul</span>
+                                    <span>3 GÜN ÖNCE</span>
+                                </div>
+                            </div>
                         </div>
-                        <div className="text-center">
-                            <div className="text-4xl mb-4">🧑‍🎓</div>
-                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Kampüs Topluluğu</h3>
-                            <p className="text-gray-600 dark:text-gray-300">Güvenilir öğrenci topluluğu içinde yer alın</p>
+
+                        {/* Product Card 4 */}
+                        <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                            <div className="relative">
+                                <div className="w-full h-48 bg-gray-200"></div>
+                                <button className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-sm">
+                                    <Heart className="h-5 w-5 text-gray-400" />
+                                </button>
+                            </div>
+                            <div className="p-4">
+                                <h3 className="font-semibold text-gray-900 mb-1">Bisiklet (Takaslık)</h3>
+                                <p className="text-2xl font-bold text-blue-600 mb-2">Takas</p>
+                                <div className="flex items-center justify-between text-sm text-gray-500">
+                                    <span>Şişli, İstanbul</span>
+                                    <span>1 HAFTA ÖNCE</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Product Card 5 */}
+                        <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                            <div className="relative">
+                                <div className="w-full h-48 bg-gray-200"></div>
+                                <button className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-sm">
+                                    <Heart className="h-5 w-5 text-gray-400" />
+                                </button>
+                            </div>
+                            <div className="p-4">
+                                <h3 className="font-semibold text-gray-900 mb-1">Kulaklık Sony WH-1000XM4</h3>
+                                <p className="text-2xl font-bold text-gray-900 mb-2">1.200 TL</p>
+                                <div className="flex items-center justify-between text-sm text-gray-500">
+                                    <span>Üsküdar, İstanbul</span>
+                                    <span>BUGÜN</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Product Card 6 */}
+                        <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                            <div className="relative">
+                                <div className="w-full h-48 bg-gray-200"></div>
+                                <button className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-sm">
+                                    <Heart className="h-5 w-5 text-gray-400" />
+                                </button>
+                            </div>
+                            <div className="p-4">
+                                <h3 className="font-semibold text-gray-900 mb-1">Kampüs Kartı (Yüklü)</h3>
+                                <p className="text-2xl font-bold text-gray-900 mb-2">200 TL</p>
+                                <div className="flex items-center justify-between text-sm text-gray-500">
+                                    <span>Fatih, İstanbul</span>
+                                    <span>DÜN</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Product Card 7 */}
+                        <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                            <div className="relative">
+                                <div className="w-full h-48 bg-gray-200"></div>
+                                <button className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-sm">
+                                    <Heart className="h-5 w-5 text-gray-400" />
+                                </button>
+                            </div>
+                            <div className="p-4">
+                                <h3 className="font-semibold text-gray-900 mb-1">Spor Ayakkabı Nike</h3>
+                                <p className="text-2xl font-bold text-gray-900 mb-2">350 TL</p>
+                                <div className="flex items-center justify-between text-sm text-gray-500">
+                                    <span>Bakırköy, İstanbul</span>
+                                    <span>2 GÜN ÖNCE</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Product Card 8 */}
+                        <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                            <div className="relative">
+                                <div className="w-full h-48 bg-gray-200"></div>
+                                <button className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-sm">
+                                    <Heart className="h-5 w-5 text-gray-400" />
+                                </button>
+                            </div>
+                            <div className="p-4">
+                                <h3 className="font-semibold text-gray-900 mb-1">Kitaplık (Montajlı)</h3>
+                                <p className="text-2xl font-bold text-gray-900 mb-2">150 TL</p>
+                                <div className="flex items-center justify-between text-sm text-gray-500">
+                                    <span>Maltepe, İstanbul</span>
+                                    <span>1 HAFTA ÖNCE</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
