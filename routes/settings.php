@@ -21,4 +21,8 @@ Route::middleware('auth')->group(function () {
     Route::get('ayarlar/gorunum', function () {
         return Inertia::render('settings/appearance');
     })->name('appearance');
+
+    Route::get('ayarlar/hesap-sil', function () {
+        return Inertia::render('settings/hesap-sil');
+    })->name('hesap-sil');
 });

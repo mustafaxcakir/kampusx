@@ -22,6 +22,11 @@ const sidebarNavItems: NavItem[] = [
         href: '/ayarlar/gorunum',
         icon: null,
     },
+    {
+        title: 'Hesap Sil',
+        href: '/ayarlar/hesap-sil',
+        icon: null,
+    },
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
