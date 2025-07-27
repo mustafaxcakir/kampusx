@@ -1,6 +1,6 @@
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { Heart, Truck, Shield, MapPin, Calendar, User, Mail, MoreVertical, Star, Users, GraduationCap, Eye, Plus, Edit, Trash2, Phone } from 'lucide-react';
+import { Heart, Truck, Shield, MapPin, Calendar, User, Mail, MoreVertical, Star, Users, GraduationCap, Eye, Plus, Edit, Trash2, Phone, Globe, Lock, Users as UsersIcon } from 'lucide-react';
 import { useState } from 'react';
 
 export default function PublicProfile() {
@@ -57,6 +57,20 @@ export default function PublicProfile() {
                 return "bg-blue-100 text-blue-800";
             default:
                 return "bg-gray-100 text-gray-800";
+        }
+    };
+
+    // Gizlilik ikonunu render eder
+    const getPrivacyIcon = (privacy: string) => {
+        switch (privacy) {
+            case 'public':
+                return <Globe className="w-4 h-4 text-green-600" />;
+            case 'members':
+                return <UsersIcon className="w-4 h-4 text-blue-600" />;
+            case 'private':
+                return <Lock className="w-4 h-4 text-red-600" />;
+            default:
+                return null;
         }
     };
 
@@ -144,6 +158,8 @@ export default function PublicProfile() {
                     {/* Profile Header Card */}
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                         <div className="p-6">
+
+                            
                             <div className="flex flex-col md:flex-row gap-6">
                                 {/* First - Profile Photo */}
                                 <div className="flex flex-col items-center md:items-start">
@@ -164,18 +180,25 @@ export default function PublicProfile() {
                                             <User className="w-4 h-4" />
                                             <span>@{user.unique_id}</span>
                                         </div>
-                                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                                            <GraduationCap className="w-4 h-4" />
-                                            <span>{user.university_name || 'Üniversite bilgisi belirtilmemiş'}</span>
-                                        </div>
-                                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                                            <Mail className="w-4 h-4" />
-                                            <span>{user.email}</span>
-                                        </div>
+                                        {user.university_name && (
+                                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                <GraduationCap className="w-4 h-4" />
+                                                <span>{user.university_name}</span>
+                                                {user.privacy_info && getPrivacyIcon(user.privacy_info.university_privacy)}
+                                            </div>
+                                        )}
+                                        {user.email && (
+                                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                <Mail className="w-4 h-4" />
+                                                <span>{user.email}</span>
+                                                {user.privacy_info && getPrivacyIcon(user.privacy_info.email_privacy)}
+                                            </div>
+                                        )}
                                         {user.phone && (
                                             <div className="flex items-center gap-2 text-sm text-gray-600">
                                                 <Phone className="w-4 h-4" />
                                                 <span>{user.phone}</span>
+                                                {user.privacy_info && getPrivacyIcon(user.privacy_info.phone_privacy)}
                                             </div>
                                         )}
                                         <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -186,14 +209,16 @@ export default function PublicProfile() {
                                 </div>
 
                                 {/* Third - About */}
-                                <div className="flex flex-col items-start">
-                                                                            <div>
+                                {user.about && (
+                                    <div className="flex flex-col items-start">
+                                        <div>
                                             <h3 className="font-semibold text-lg mb-2">Hakkında</h3>
                                             <p className="text-gray-600 text-sm leading-relaxed">
-                                                {user.about ? (user.about.length > 250 ? user.about.substring(0, 250) + '...' : user.about) : 'Hakkında bilgisi belirtilmemiş'}
+                                                {user.about.length > 250 ? user.about.substring(0, 250) + '...' : user.about}
                                             </p>
                                         </div>
-                                </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

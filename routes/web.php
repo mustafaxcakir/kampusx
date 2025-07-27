@@ -44,6 +44,9 @@ Route::get('profil/{unique_id}', function ($unique_id) {
         abort(404, 'Kullanıcı bulunamadı: ' . $unique_id);
     }
     
+    // Görüntüleyen kullanıcı (auth varsa)
+    $viewer = auth()->user();
+    
     // İlanlar henüz yok, boş array döndürüyoruz
     $ads = [];
     
@@ -53,16 +56,23 @@ Route::get('profil/{unique_id}', function ($unique_id) {
             'surname' => $user->surname,
             'unique_id' => $user->unique_id,
             'about' => $user->about,
-            'phone' => $user->phone,
-            'email' => $user->email,
+            'phone' => $user->isFieldVisible('phone', $viewer) ? $user->phone : null,
+            'email' => $user->isFieldVisible('email', $viewer) ? $user->email : null,
             'university_id' => $user->university_id,
-            'university_name' => $user->university ? $user->university->name : null,
+            'university_name' => $user->isFieldVisible('university', $viewer) ? ($user->university ? $user->university->name : null) : null,
             'created_at' => $user->created_at,
             'stats' => [
                 'ratings' => 0,
                 'followers' => 0,
                 'following' => 0
-            ]
+            ],
+            // Gizlilik bilgileri (sadece kendi profilinde gösterilir)
+            'privacy_info' => $viewer && $viewer->id === $user->id ? [
+                'email_privacy' => $user->email_privacy,
+                'phone_privacy' => $user->phone_privacy,
+
+                'university_privacy' => $user->university_privacy,
+            ] : null
         ],
         'ads' => $ads
     ]);

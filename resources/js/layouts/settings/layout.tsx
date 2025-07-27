@@ -13,6 +13,11 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
+        title: 'Gizlilik',
+        href: '/ayarlar/gizlilik',
+        icon: null,
+    },
+    {
         title: 'Şifre',
         href: '/ayarlar/sifre',
         icon: null,

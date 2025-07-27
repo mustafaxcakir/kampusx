@@ -26,6 +26,9 @@ class User extends Authenticatable
         'password',
         'university_id',
         'unique_id',
+        'email_privacy',
+        'phone_privacy',
+        'university_privacy',
     ];
 
     /**
@@ -54,6 +57,29 @@ class User extends Authenticatable
     public function university()
     {
         return $this->belongsTo(University::class);
+    }
+
+    /**
+     * Belirli bir alanın görünürlüğünü kontrol eder
+     */
+    public function isFieldVisible(string $field, ?User $viewer = null): bool
+    {
+        $privacyField = $field . '_privacy';
+        
+        if (!isset($this->$privacyField)) {
+            return true; // Gizlilik ayarı yoksa varsayılan olarak görünür
+        }
+
+        switch ($this->$privacyField) {
+            case 'public':
+                return true;
+            case 'members':
+                return $viewer !== null; // Sadece üyeler görebilir
+            case 'private':
+                return $viewer && $viewer->id === $this->id; // Sadece kendisi görebilir
+            default:
+                return false;
+        }
     }
 
     /**
