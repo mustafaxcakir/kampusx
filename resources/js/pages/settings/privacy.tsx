@@ -42,7 +42,7 @@ export default function Privacy() {
         { value: 'members', label: 'Sadece Üyeler' },
         { value: 'private', label: 'Gizli' },
     ];
-
+x
     return (
         <AppLayout>
             <Head title="Gizlilik ayarları" />

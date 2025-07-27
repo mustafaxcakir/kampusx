@@ -50,13 +50,13 @@ export default function PublicProfile() {
     const getStatusColor = (status: string) => {
         switch (status) {
             case "Satılıyor":
-                return "bg-green-100 text-green-800";
+                return "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200";
             case "Satıldı":
-                return "bg-gray-100 text-gray-800";
+                return "bg-muted text-muted-foreground";
             case "Kiralık":
-                return "bg-blue-100 text-blue-800";
+                return "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200";
             default:
-                return "bg-gray-100 text-gray-800";
+                return "bg-muted text-muted-foreground";
         }
     };
 
@@ -82,12 +82,12 @@ export default function PublicProfile() {
             </Head>
             
             {/* HEADER */}
-            <header className="bg-white shadow-sm border-b border-gray-200">
+            <header className="bg-background shadow-sm border-b border-sidebar-border/70">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center h-16 gap-4">
                         {/* Logo */}
                         <div className="flex items-center space-x-3">
-                            <Link href="/" className="font-bold text-2xl text-gray-900 hover:text-gray-700">
+                            <Link href="/" className="font-bold text-2xl text-foreground hover:text-muted-foreground">
                                 KampusX
                             </Link>
                         </div>
@@ -106,7 +106,7 @@ export default function PublicProfile() {
                                 <div className="flex items-center space-x-3">
                                     <Link
                                         href={route('login')}
-                                        className="border border-gray-300 text-gray-700 px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50 hover:border-gray-400 transition-colors duration-200"
+                                        className="border border-sidebar-border text-foreground px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-accent hover:border-sidebar-border/80 transition-colors duration-200"
                                     >
                                         Giriş Yap
                                     </Link>
@@ -124,29 +124,29 @@ export default function PublicProfile() {
             </header>
 
             {/* CATEGORIES NAVIGATION */}
-            <nav className="bg-white border-b border-gray-200">
+            <nav className="bg-background border-b border-sidebar-border/70">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center overflow-x-auto py-3 scrollbar-hide">
                         <div className="flex items-center space-x-6 min-w-max">
-                            <button className="text-sm font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap">
+                            <button className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
                                 TÜM KATEGORİLER
                             </button>
-                            <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap">
+                            <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
                                 Kitap
                             </Link>
-                            <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap">
+                            <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
                                 Elektronik
                             </Link>
-                            <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap">
+                            <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
                                 Giyim
                             </Link>
-                            <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap">
+                            <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
                                 Spor
                             </Link>
-                            <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap">
+                            <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
                                 Ev & Yaşam
                             </Link>
-                            <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap">
+                            <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
                                 Takas
                             </Link>
                         </div>
@@ -155,10 +155,10 @@ export default function PublicProfile() {
             </nav>
 
             {/* MAIN CONTENT */}
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-muted/50">
                 <div className="max-w-6xl mx-auto p-4 space-y-6">
                     {/* Profile Header Card */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <div className="bg-card rounded-lg shadow-sm border border-sidebar-border/70">
                         <div className="p-6">
 
                             
@@ -174,36 +174,36 @@ export default function PublicProfile() {
 
                                 {/* Name and Info */}
                                 <div className="flex-1">
-                                    <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-4">
+                                    <h1 className="text-2xl lg:text-3xl font-bold text-card-foreground mb-4">
                                         {user.name} {user.surname}
                                     </h1>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                             <User className="w-4 h-4 flex-shrink-0" />
                                             <span>@{user.unique_id}</span>
                                         </div>
                                         {user.university_name && (
-                                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                                 <GraduationCap className="w-4 h-4 flex-shrink-0" />
                                                 <span>{user.university_name}</span>
                                                 {user.privacy_info && getPrivacyIcon(user.privacy_info.university_privacy)}
                                             </div>
                                         )}
                                         {user.email && (
-                                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                                 <Mail className="w-4 h-4 flex-shrink-0" />
                                                 <span>{user.email}</span>
                                                 {user.privacy_info && getPrivacyIcon(user.privacy_info.email_privacy)}
                                             </div>
                                         )}
                                         {user.phone && (
-                                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                                 <Phone className="w-4 h-4 flex-shrink-0" />
                                                 <span>{user.phone}</span>
                                                 {user.privacy_info && getPrivacyIcon(user.privacy_info.phone_privacy)}
                                             </div>
                                         )}
-                                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                             <Calendar className="w-4 h-4 flex-shrink-0" />
                                             <span>Üye olma: {new Date(user.created_at).toLocaleDateString('tr-TR')}</span>
                                         </div>
@@ -213,9 +213,9 @@ export default function PublicProfile() {
 
                             {/* About Section - Separate */}
                             {user.about && (
-                                <div className="mt-6 pt-6 border-t border-gray-200">
-                                    <h3 className="font-semibold text-lg mb-3 text-gray-900">Hakkında</h3>
-                                    <p className="text-gray-600 text-sm leading-relaxed">
+                                <div className="mt-6 pt-6 border-t border-sidebar-border/70">
+                                    <h3 className="font-semibold text-lg mb-3 text-card-foreground">Hakkında</h3>
+                                    <p className="text-muted-foreground text-sm leading-relaxed">
                                         {user.about.length > 300 ? user.about.substring(0, 300) + '...' : user.about}
                                     </p>
                                 </div>
@@ -224,19 +224,19 @@ export default function PublicProfile() {
                     </div>
 
                     {/* Listings Section */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <div className="bg-card rounded-lg shadow-sm border border-sidebar-border/70">
                         <div className="p-6">
                             <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
-                                <h2 className="text-2xl font-bold text-gray-900">İlanlar</h2>
+                                <h2 className="text-2xl font-bold text-card-foreground">İlanlar</h2>
 
                                 {/* Filter Tabs */}
-                                <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
+                                <div className="flex space-x-1 bg-muted rounded-lg p-1">
                                     <button
                                         onClick={() => setActiveFilter('all')}
                                         className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                                             activeFilter === 'all'
-                                                ? 'bg-white text-gray-900 shadow-sm'
-                                                : 'text-gray-600 hover:text-gray-900'
+                                                ? 'bg-card text-card-foreground shadow-sm'
+                                                : 'text-muted-foreground hover:text-foreground'
                                         }`}
                                     >
                                         Tümü
@@ -245,8 +245,8 @@ export default function PublicProfile() {
                                         onClick={() => setActiveFilter('active')}
                                         className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                                             activeFilter === 'active'
-                                                ? 'bg-white text-gray-900 shadow-sm'
-                                                : 'text-gray-600 hover:text-gray-900'
+                                                ? 'bg-card text-card-foreground shadow-sm'
+                                                : 'text-muted-foreground hover:text-foreground'
                                         }`}
                                     >
                                         Aktif
@@ -255,8 +255,8 @@ export default function PublicProfile() {
                                         onClick={() => setActiveFilter('sold')}
                                         className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                                             activeFilter === 'sold'
-                                                ? 'bg-white text-gray-900 shadow-sm'
-                                                : 'text-gray-600 hover:text-gray-900'
+                                                ? 'bg-card text-card-foreground shadow-sm'
+                                                : 'text-muted-foreground hover:text-foreground'
                                         }`}
                                     >
                                         Satıldı
@@ -265,8 +265,8 @@ export default function PublicProfile() {
                                         onClick={() => setActiveFilter('rental')}
                                         className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                                             activeFilter === 'rental'
-                                                ? 'bg-white text-gray-900 shadow-sm'
-                                                : 'text-gray-600 hover:text-gray-900'
+                                                ? 'bg-card text-card-foreground shadow-sm'
+                                                : 'text-muted-foreground hover:text-foreground'
                                         }`}
                                     >
                                         Kiralık
@@ -278,10 +278,10 @@ export default function PublicProfile() {
                             {filteredListings.length > 0 ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {filteredListings.map((listing) => (
-                                        <div key={listing.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+                                        <div key={listing.id} className="bg-card border border-sidebar-border/70 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                                             <div className="relative">
-                                                <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
-                                                    <span className="text-gray-400">Resim</span>
+                                                <div className="w-full h-48 bg-muted flex items-center justify-center">
+                                                    <span className="text-muted-foreground">Resim</span>
                                                 </div>
                                                 <span className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(listing.status)}`}>
                                                     {listing.status}
@@ -289,19 +289,19 @@ export default function PublicProfile() {
                                             </div>
 
                                             <div className="p-4">
-                                                <h3 className="font-semibold text-lg mb-2 line-clamp-2">{listing.title}</h3>
-                                                <p className="text-2xl font-bold text-green-600 mb-2">{listing.price}</p>
-                                                <div className="flex justify-between items-center text-sm text-gray-500 mb-3">
+                                                <h3 className="font-semibold text-lg mb-2 line-clamp-2 text-card-foreground">{listing.title}</h3>
+                                                <p className="text-2xl font-bold text-green-600 dark:text-green-400 mb-2">{listing.price}</p>
+                                                <div className="flex justify-between items-center text-sm text-muted-foreground mb-3">
                                                     <span>{listing.category}</span>
                                                     <span>{listing.date}</span>
                                                 </div>
 
                                                 <div className="flex gap-2">
-                                                    <button className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 transition-colors">
+                                                    <button className="flex-1 px-3 py-2 border border-sidebar-border rounded-md text-sm hover:bg-accent transition-colors text-foreground">
                                                         <Edit className="w-4 h-4 mr-1 inline" />
                                                         Düzenle
                                                     </button>
-                                                    <button className="px-3 py-2 border border-gray-300 rounded-md text-sm text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors">
+                                                    <button className="px-3 py-2 border border-sidebar-border rounded-md text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
                                                 </div>
@@ -311,13 +311,13 @@ export default function PublicProfile() {
                                 </div>
                             ) : (
                                 <div className="text-center py-12">
-                                    <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <User className="h-12 w-12 text-gray-400" />
+                                    <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <User className="h-12 w-12 text-muted-foreground" />
                                     </div>
-                                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                                    <h3 className="text-xl font-semibold text-card-foreground mb-2">
                                         Henüz bir İlanın yok
                                     </h3>
-                                    <p className="text-gray-600 mb-8">
+                                    <p className="text-muted-foreground mb-8">
                                         Artık kullanmadığın eşyaları elden çıkar
                                     </p>
                                     
