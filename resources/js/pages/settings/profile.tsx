@@ -127,8 +127,12 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                 value={data.phone}
                                 onChange={(e) => setData('phone', e.target.value)}
                                 autoComplete="tel"
-                                placeholder="+90 5XX XXX XX XX"
+                                placeholder="Örn: 0555 123 12 34 veya +90 555 123 12 34"
                             />
+
+                            <p className="text-sm text-muted-foreground">
+                                Telefon numaranızı giriniz. Örnek: 0555 123 12 34, +90 555 123 12 34, +1 555 123 4567
+                            </p>
 
                             <InputError className="mt-2" message={errors.phone} />
                         </div>
@@ -142,10 +146,16 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                 value={data.about}
                                 onChange={(e) => setData('about', e.target.value)}
                                 rows={4}
-                                placeholder="Kendiniz hakkında kısa bir bilgi yazabilirsiniz..."
+                                maxLength={250}
+                                placeholder="Kendiniz hakkında kısa bir bilgi yazabilirsiniz... (maksimum 250 karakter)"
                             />
 
-                            <InputError className="mt-2" message={errors.about} />
+                            <div className="flex justify-between items-center text-sm text-muted-foreground">
+                                <InputError message={errors.about} />
+                                <span className={`${data.about.length > 200 ? 'text-orange-500' : ''} ${data.about.length > 240 ? 'text-red-500' : ''}`}>
+                                    {data.about.length}/250
+                                </span>
+                            </div>
                         </div>
 
                         {mustVerifyEmail && auth.user.email_verified_at === null && (
