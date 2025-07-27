@@ -11,6 +11,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
+    
+    Route::get('ilanver', function () {
+        return Inertia::render('ilanver');
+    })->name('ilanver');
+    
+    Route::get('ilanlarim', function () {
+        return Inertia::render('ilanlarim');
+    })->name('ilanlarim');
 });
 
 require __DIR__.'/settings.php';
