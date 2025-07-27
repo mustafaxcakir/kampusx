@@ -175,7 +175,7 @@ export default function PublicProfile() {
                                     <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-4">
                                         {user.name} {user.surname}
                                     </h1>
-                                    <div className="space-y-2">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                         <div className="flex items-center gap-2 text-sm text-gray-600">
                                             <User className="w-4 h-4 flex-shrink-0" />
                                             <span>@{user.unique_id}</span>
@@ -201,7 +201,7 @@ export default function PublicProfile() {
                                                 {user.privacy_info && getPrivacyIcon(user.privacy_info.phone_privacy)}
                                             </div>
                                         )}
-                                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                                        <div className="flex items-center gap-2 text-sm text-gray-500">
                                             <Calendar className="w-4 h-4 flex-shrink-0" />
                                             <span>Üye olma: {new Date(user.created_at).toLocaleDateString('tr-TR')}</span>
                                         </div>
