@@ -4,7 +4,8 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { LayoutGrid, Plus, ClipboardList } from 'lucide-react';
+import { LayoutGrid, Plus, ClipboardList, HelpCircle } from 'lucide-react';
+import { FaXTwitter, FaInstagram, FaLinkedin, FaTiktok } from 'react-icons/fa6';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -25,7 +26,37 @@ const mainNavItems: NavItem[] = [
     },
 ];
 
-const footerNavItems: NavItem[] = [];
+const footerNavItems: NavItem[] = [
+    {
+        title: 'Yardım Merkezi',
+        href: '/yardim',
+        icon: HelpCircle,
+    },
+];
+
+const socialNavItems: NavItem[] = [
+    {
+        title: 'X',
+        href: 'https://twitter.com/kampusx',
+        icon: FaXTwitter,
+    },
+    {
+        title: 'Instagram',
+        href: 'https://instagram.com/kampusx',
+        icon: FaInstagram,
+    },
+    {
+        title: 'LinkedIn',
+        href: 'https://linkedin.com/company/kampusx',
+        icon: FaLinkedin,
+    },
+    {
+        title: 'TikTok',
+        href: 'https://tiktok.com/@kampusx',
+        icon: FaTiktok,
+    },
+];
+
 
 export function AppSidebar() {
     return (
@@ -48,6 +79,7 @@ export function AppSidebar() {
 
             <SidebarFooter>
                 <NavFooter items={footerNavItems} className="mt-auto" />
+                <NavFooter items={socialNavItems} className="mt-2" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>
