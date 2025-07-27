@@ -23,12 +23,14 @@ const breadcrumbs = [
 export default function Privacy() {
     const { privacySettings } = usePage<{ privacySettings: any }>().props;
     
-    const { data, setData, patch, processing, errors } = useForm<any>({
+    const form = useForm<any>({
         email_privacy: privacySettings?.email_privacy || 'private',
         phone_privacy: privacySettings?.phone_privacy || 'private',
-
         university_privacy: privacySettings?.university_privacy || 'public',
     });
+    
+    const { data, patch, processing, errors } = form as any;
+    const setData = (key: string, value: any) => (form as any).setData(key, value);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
