@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('surname');
             $table->string('email')->unique();
+            $table->text('about')->nullable(); // Hakkımda (isteğe bağlı)
+            $table->string('phone')->nullable(); // Cep telefon numarası
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

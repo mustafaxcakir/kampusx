@@ -31,9 +31,11 @@ class ProfileController extends Controller
     {
         $user = $request->user();
         
-        // Sadece name ve surname güncellenebilir, email değiştirilemez
+        // Profil bilgilerini güncelle
         $user->name = $request->validated('name');
         $user->surname = $request->validated('surname');
+        $user->about = $request->validated('about');
+        $user->phone = $request->validated('phone');
         
         $user->save();
 

@@ -23,15 +23,19 @@ type ProfileForm = {
     name: string;
     surname: string;
     email: string;
+    about: string;
+    phone: string;
 };
 
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
     const { auth } = usePage<SharedData>().props;
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
+    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<ProfileForm>({
         name: auth.user.name,
         surname: (auth.user as any).surname || '',
         email: auth.user.email,
+        about: (auth.user as any).about || '',
+        phone: (auth.user as any).phone || '',
     });
 
     const submit: FormEventHandler = (e) => {
@@ -111,6 +115,37 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                             <p className="text-sm text-muted-foreground">
                                 E-posta adresi değiştirilemez. Güvenlik nedeniyle bu alan kilitlidir.
                             </p>
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="phone">Cep telefon numarası</Label>
+
+                            <Input
+                                id="phone"
+                                type="tel"
+                                className="mt-1 block w-full"
+                                value={data.phone}
+                                onChange={(e) => setData('phone', e.target.value)}
+                                autoComplete="tel"
+                                placeholder="+90 5XX XXX XX XX"
+                            />
+
+                            <InputError className="mt-2" message={errors.phone} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="about">Hakkımda (isteğe bağlı)</Label>
+
+                            <textarea
+                                id="about"
+                                className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                value={data.about}
+                                onChange={(e) => setData('about', e.target.value)}
+                                rows={4}
+                                placeholder="Kendiniz hakkında kısa bir bilgi yazabilirsiniz..."
+                            />
+
+                            <InputError className="mt-2" message={errors.about} />
                         </div>
 
                         {mustVerifyEmail && auth.user.email_verified_at === null && (

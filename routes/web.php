@@ -19,6 +19,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('ilanlarim', function () {
         return Inertia::render('ilanlarim');
     })->name('ilanlarim');
+    
+    Route::get('favorilerim', function () {
+        return Inertia::render('favorilerim');
+    })->name('favorilerim');
 });
 
 require __DIR__.'/settings.php';

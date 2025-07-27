@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { LayoutGrid, Plus, ClipboardList, HelpCircle } from 'lucide-react';
+import { LayoutGrid, Plus, ClipboardList, HelpCircle, Heart } from 'lucide-react';
 import { FaXTwitter, FaInstagram, FaLinkedin, FaTiktok } from 'react-icons/fa6';
 import AppLogo from './app-logo';
 
@@ -23,6 +23,11 @@ const mainNavItems: NavItem[] = [
         title: 'İlanlarım',
         href: '/ilanlarim',
         icon: ClipboardList,
+    },
+    {
+        title: 'Favorilerim',
+        href: '/favorilerim',
+        icon: Heart,
     },
 ];
 
