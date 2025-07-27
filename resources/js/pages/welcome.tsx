@@ -55,28 +55,30 @@ export default function Welcome() {
             {/* CATEGORIES NAVIGATION */}
             <nav className="bg-white border-b border-gray-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center space-x-8 py-3">
-                        <button className="text-sm font-medium text-gray-600 hover:text-gray-900">
-                            TÜM KATEGORİLER
-                        </button>
-                        <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900">
-                            Kitap
-                        </Link>
-                        <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900">
-                            Elektronik
-                        </Link>
-                        <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900">
-                            Giyim
-                        </Link>
-                        <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900">
-                            Spor
-                        </Link>
-                        <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900">
-                            Ev & Yaşam
-                        </Link>
-                        <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900">
-                            Takas
-                        </Link>
+                    <div className="flex items-center overflow-x-auto py-3 scrollbar-hide">
+                        <div className="flex items-center space-x-6 min-w-max">
+                            <button className="text-sm font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap">
+                                TÜM KATEGORİLER
+                            </button>
+                            <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap">
+                                Kitap
+                            </Link>
+                            <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap">
+                                Elektronik
+                            </Link>
+                            <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap">
+                                Giyim
+                            </Link>
+                            <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap">
+                                Spor
+                            </Link>
+                            <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap">
+                                Ev & Yaşam
+                            </Link>
+                            <Link href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap">
+                                Takas
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </nav>
