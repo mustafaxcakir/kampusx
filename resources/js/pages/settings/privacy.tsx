@@ -42,23 +42,23 @@ export default function Privacy() {
         { value: 'members', label: 'Sadece Üyeler' },
         { value: 'private', label: 'Gizli' },
     ];
-x
+
     return (
         <AppLayout>
             <Head title="Gizlilik ayarları" />
             <SettingsLayout>
                 <div className="space-y-6">
                     <div>
-                        <h2 className="text-lg font-medium text-gray-900">Gizlilik Ayarları</h2>
-                        <p className="mt-1 text-sm text-gray-600">
+                        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Gizlilik Ayarları</h2>
+                        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                             Profil bilgilerinizin kimler tarafından görülebileceğini belirleyin.
                         </p>
-                        <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                            <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
+                        <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 mb-2">
                                 <Shield className="w-4 h-4" />
                                 <span className="font-medium">Gizlilik Seviyeleri</span>
                             </div>
-                            <div className="flex items-center gap-6 text-xs text-gray-600">
+                            <div className="flex items-center gap-6 text-xs text-gray-600 dark:text-gray-400">
                                 <div className="flex items-center gap-1">
                                     <Globe className="w-3 h-3 text-green-600" />
                                     <span>Herkese Açık</span>
@@ -78,7 +78,7 @@ x
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Üniversite Gizliliği */}
                         <div className="space-y-2">
-                            <Label htmlFor="university_privacy">Üniversite</Label>
+                            <Label htmlFor="university_privacy" className="text-gray-900 dark:text-gray-100">Üniversite</Label>
                             <Select
                                 value={data.university_privacy}
                                 onValueChange={(value: 'public' | 'members' | 'private') => 
@@ -106,7 +106,7 @@ x
 
                         {/* E-posta Gizliliği */}
                         <div className="space-y-2">
-                            <Label htmlFor="email_privacy">E-posta Adresi</Label>
+                            <Label htmlFor="email_privacy" className="text-gray-900 dark:text-gray-100">E-posta Adresi</Label>
                             <Select
                                 value={data.email_privacy}
                                 onValueChange={(value: 'public' | 'members' | 'private') => 
@@ -134,7 +134,7 @@ x
 
                         {/* Telefon Gizliliği */}
                         <div className="space-y-2">
-                            <Label htmlFor="phone_privacy">Telefon Numarası</Label>
+                            <Label htmlFor="phone_privacy" className="text-gray-900 dark:text-gray-100">Telefon Numarası</Label>
                             <Select
                                 value={data.phone_privacy}
                                 onValueChange={(value: 'public' | 'members' | 'private') => 
