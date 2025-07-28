@@ -130,8 +130,8 @@ Route::get('profil/{unique_id}', function ($unique_id) {
     // Görüntüleyen kullanıcı (auth varsa)
     $viewer = auth()->user();
     
-    // İlanlar henüz yok, boş array döndürüyoruz
-    $ads = [];
+    // Kullanıcının ürünlerini getir
+    $ads = $user->products()->latest()->get();
     
     return Inertia::render('publicprofil', [
         'user' => [

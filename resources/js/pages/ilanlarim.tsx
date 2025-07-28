@@ -44,6 +44,8 @@ export default function Ilanlarim() {
     const [loading, setLoading] = useState(true);
     const [editModal, setEditModal] = useState(false);
     const [editProduct, setEditProduct] = useState<any>(null);
+    const [deleteModal, setDeleteModal] = useState(false);
+    const [deleteProduct, setDeleteProduct] = useState<any>(null);
     
     const form = useForm({
         title: '',
@@ -96,16 +98,27 @@ export default function Ilanlarim() {
         });
     };
 
-    const handleDelete = (id: number) => {
-        if (!confirm('Bu ilanı silmek istediğinize emin misiniz?')) return;
+    const openDeleteModal = (product: any) => {
+        setDeleteProduct(product);
+        setDeleteModal(true);
+    };
+
+    const closeDeleteModal = () => {
+        setDeleteModal(false);
+        setDeleteProduct(null);
+    };
+
+    const handleDelete = () => {
+        if (!deleteProduct) return;
         
-        console.log('Silme işlemi başlatılıyor:', id);
+        console.log('Silme işlemi başlatılıyor:', deleteProduct.id);
         
         // Inertia.js ile silme
-        deleteForm.post(`/products/${id}/delete`, {
+        deleteForm.post(`/products/${deleteProduct.id}/delete`, {
             onSuccess: () => {
                 console.log('İlan başarıyla silindi');
-                setProducts(products.filter(p => p.id !== id));
+                setProducts(products.filter(p => p.id !== deleteProduct.id));
+                closeDeleteModal();
             },
             onError: (errors) => {
                 console.log('Silme hatası:', errors);
@@ -149,7 +162,7 @@ export default function Ilanlarim() {
                                         <Button size="sm" variant="outline" onClick={() => openEditModal(product)}>
                                             <Pencil className="w-4 h-4 mr-1" /> Düzenle
                                         </Button>
-                                        <Button size="sm" variant="destructive" onClick={() => handleDelete(product.id)}>
+                                        <Button size="sm" variant="destructive" onClick={() => openDeleteModal(product)}>
                                             <Trash2 className="w-4 h-4 mr-1" /> Sil
                                         </Button>
                                     </div>
@@ -255,6 +268,52 @@ export default function Ilanlarim() {
                             </Button>
                         </DialogFooter>
                     </form>
+                </DialogContent>
+            </Dialog>
+
+            {/* Silme Modalı */}
+            <Dialog open={deleteModal} onOpenChange={setDeleteModal}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Trash2 className="h-5 w-5 text-red-500" />
+                            İlanı Sil
+                        </DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        <div className="text-center">
+                            <p className="text-gray-600 dark:text-gray-400 mb-2">
+                                Bu ilanı silmek istediğinize emin misiniz?
+                            </p>
+                            {deleteProduct && (
+                                <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                                    <h4 className="font-medium text-gray-900 dark:text-gray-100">{deleteProduct.title}</h4>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                                        {Number(deleteProduct.price) % 1 === 0 
+                                            ? Number(deleteProduct.price).toFixed(0) 
+                                            : Number(deleteProduct.price).toFixed(2)
+                                        } ₺
+                                    </p>
+                                </div>
+                            )}
+                            <p className="text-sm text-red-600 dark:text-red-400 mt-2">
+                                Bu işlem geri alınamaz!
+                            </p>
+                        </div>
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={closeDeleteModal}>
+                                Vazgeç
+                            </Button>
+                            <Button 
+                                type="button" 
+                                variant="destructive" 
+                                onClick={handleDelete}
+                                disabled={deleteForm.processing}
+                            >
+                                {deleteForm.processing ? 'Siliniyor...' : 'Evet, Sil'}
+                            </Button>
+                        </DialogFooter>
+                    </div>
                 </DialogContent>
             </Dialog>
         </AppLayout>

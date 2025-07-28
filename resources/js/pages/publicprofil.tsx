@@ -8,40 +8,24 @@ export default function PublicProfile() {
     const { user, ads } = usePage<{ user: any; ads: any[] }>().props;
     const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'sold' | 'rental'>('all');
     
-    // Mock listings for now (will be replaced with real ads)
-    const listings = [
-        {
-            id: 1,
-            title: 'MacBook Pro 13" 2020',
-            price: "25,000 TL",
-            status: "Satılıyor",
-            image: "/placeholder.svg?height=200&width=300",
-            category: "Elektronik",
-            date: "2 gün önce",
-        },
-        {
-            id: 2,
-            title: "Calculus Kitabı - Stewart",
-            price: "150 TL",
-            status: "Satıldı",
-            image: "/placeholder.svg?height=200&width=300",
-            category: "Kitap",
-            date: "1 hafta önce",
-        },
-        {
-            id: 3,
-            title: 'Bisiklet - Trek 26"',
-            price: "2,500 TL",
-            status: "Kiralık",
-            image: "/placeholder.svg?height=200&width=300",
-            category: "Spor",
-            date: "3 gün önce",
-        },
-    ];
+    // Gerçek ürünleri kullan
+    const listings = ads.map(ad => ({
+        id: ad.id,
+        title: ad.title,
+        price: Number(ad.price) % 1 === 0 
+            ? Number(ad.price).toFixed(0) + ' ₺'
+            : Number(ad.price).toFixed(2) + ' ₺',
+        status: ad.is_active ? "Satılıyor" : "Satıldı",
+        image: ad.images && ad.images.length > 0 ? `/storage/${ad.images[0]}` : null,
+        category: ad.category,
+        date: new Date(ad.created_at).toLocaleDateString('tr-TR'),
+        condition: ad.condition,
+        location: ad.location,
+    }));
 
     const filteredListings = listings.filter((listing) => {
         if (activeFilter === "all") return true;
-        if (activeFilter === "active") return listing.status === "Satılıyor" || listing.status === "Kiralık";
+        if (activeFilter === "active") return listing.status === "Satılıyor";
         if (activeFilter === "sold") return listing.status === "Satıldı";
         if (activeFilter === "rental") return listing.status === "Kiralık";
         return true;
@@ -280,9 +264,17 @@ export default function PublicProfile() {
                                     {filteredListings.map((listing) => (
                                         <div key={listing.id} className="bg-card border border-sidebar-border/70 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                                             <div className="relative">
-                                                <div className="w-full h-48 bg-muted flex items-center justify-center">
-                                                    <span className="text-muted-foreground">Resim</span>
-                                                </div>
+                                                {listing.image ? (
+                                                    <img 
+                                                        src={listing.image} 
+                                                        alt={listing.title}
+                                                        className="w-full h-48 object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-48 bg-muted flex items-center justify-center">
+                                                        <span className="text-muted-foreground">Fotoğraf Yok</span>
+                                                    </div>
+                                                )}
                                                 <span className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(listing.status)}`}>
                                                     {listing.status}
                                                 </span>
@@ -291,20 +283,38 @@ export default function PublicProfile() {
                                             <div className="p-4">
                                                 <h3 className="font-semibold text-lg mb-2 line-clamp-2 text-card-foreground">{listing.title}</h3>
                                                 <p className="text-2xl font-bold text-green-600 dark:text-green-400 mb-2">{listing.price}</p>
-                                                <div className="flex justify-between items-center text-sm text-muted-foreground mb-3">
-                                                    <span>{listing.category}</span>
+                                                <div className="flex justify-between items-center text-sm text-muted-foreground mb-2">
+                                                    <span className="capitalize">{listing.category}</span>
                                                     <span>{listing.date}</span>
                                                 </div>
-
-                                                <div className="flex gap-2">
-                                                    <button className="flex-1 px-3 py-2 border border-sidebar-border rounded-md text-sm hover:bg-accent transition-colors text-foreground">
-                                                        <Edit className="w-4 h-4 mr-1 inline" />
-                                                        Düzenle
-                                                    </button>
-                                                    <button className="px-3 py-2 border border-sidebar-border rounded-md text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
+                                                <div className="flex justify-between items-center text-sm text-muted-foreground mb-3">
+                                                    <span className="capitalize">{listing.condition}</span>
+                                                    {listing.location && (
+                                                        <span className="flex items-center gap-1">
+                                                            <MapPin className="w-3 h-3" />
+                                                            {listing.location}
+                                                        </span>
+                                                    )}
                                                 </div>
+
+                                                {/* Sadece kendi profilinde düzenleme butonları göster */}
+                                                {auth.user && auth.user.id === user.id && (
+                                                    <div className="flex gap-2">
+                                                        <Link 
+                                                            href={route('ilanlarim')}
+                                                            className="flex-1 px-3 py-2 border border-sidebar-border rounded-md text-sm hover:bg-accent transition-colors text-foreground text-center"
+                                                        >
+                                                            <Edit className="w-4 h-4 mr-1 inline" />
+                                                            Düzenle
+                                                        </Link>
+                                                        <Link 
+                                                            href={route('ilanlarim')}
+                                                            className="px-3 py-2 border border-sidebar-border rounded-md text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </Link>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     ))}
