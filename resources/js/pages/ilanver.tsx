@@ -211,7 +211,7 @@ export default function IlanVer() {
                                                 step="0.01"
                                                 value={form.data.price}
                                                 onChange={(e) => form.setData('price', e.target.value)}
-                                                placeholder="0.00"
+                                                placeholder="100"
                                                 className="dark:bg-gray-800 dark:border-gray-700"
                                             />
                                             <InputError message={form.errors.price} className="mt-1" />

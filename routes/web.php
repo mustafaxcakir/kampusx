@@ -65,6 +65,47 @@ Route::middleware('auth')->group(function () {
 
         return redirect()->route('dashboard')->with('success', 'İlanınız başarıyla oluşturuldu!');
     })->name('products.store');
+
+    // Kullanıcının kendi ilanlarını getir
+    Route::get('/my-products', function () {
+        $user = auth()->user();
+        $products = $user->products()->latest()->get();
+        return response()->json($products);
+    })->name('products.mine');
+
+    // İlan güncelle
+    Route::patch('/products/{product}', function ($productId) {
+        $user = auth()->user();
+        $product = $user->products()->findOrFail($productId);
+        $validated = request()->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'category' => 'required|string',
+            'condition' => 'required|string|in:new,like_new,used',
+            'location' => 'nullable|string|max:255',
+        ]);
+        $product->update($validated);
+        
+        if (request()->wantsJson()) {
+            return response()->json($product);
+        }
+        
+        return back()->with('success', 'İlan başarıyla güncellendi!');
+    })->name('products.update');
+
+    // İlan sil
+    Route::delete('/products/{product}', function ($productId) {
+        $user = auth()->user();
+        $product = $user->products()->findOrFail($productId);
+        $product->delete();
+        
+        if (request()->wantsJson()) {
+            return response()->json(['success' => true]);
+        }
+        
+        return back()->with('success', 'İlan başarıyla silindi!');
+    })->name('products.delete');
 });
 
 require __DIR__.'/settings.php';
