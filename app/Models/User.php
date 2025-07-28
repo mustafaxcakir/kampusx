@@ -59,6 +59,11 @@ class User extends Authenticatable
         return $this->belongsTo(University::class);
     }
 
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
     /**
      * Belirli bir alanın görünürlüğünü kontrol eder
      */

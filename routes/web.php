@@ -7,7 +7,7 @@ Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware('auth')->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
@@ -31,6 +31,40 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Kendi profil sayfasına yönlendir
         return redirect()->route('public.profile', ['unique_id' => $user->unique_id]);
     })->name('profil');
+    
+    Route::post('/products', function () {
+        $validated = request()->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'category' => 'required|string',
+            'condition' => 'required|string|in:new,like_new,used',
+            'location' => 'nullable|string|max:255',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $user = auth()->user();
+        $product = $user->products()->create([
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'price' => $validated['price'],
+            'category' => $validated['category'],
+            'condition' => $validated['condition'],
+            'location' => $validated['location'],
+        ]);
+
+        // Fotoğrafları kaydet
+        if (request()->hasFile('images')) {
+            $images = [];
+            foreach (request()->file('images') as $image) {
+                $path = $image->store('products', 'public');
+                $images[] = $path;
+            }
+            $product->update(['images' => $images]);
+        }
+
+        return redirect()->route('dashboard')->with('success', 'İlanınız başarıyla oluşturuldu!');
+    })->name('products.store');
 });
 
 require __DIR__.'/settings.php';
