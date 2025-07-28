@@ -53,6 +53,8 @@ export default function Ilanlarim() {
         condition: '',
         location: '',
     });
+    
+    const deleteForm = useForm({});
 
     useEffect(() => {
         fetch('/my-products')
@@ -97,11 +99,16 @@ export default function Ilanlarim() {
     const handleDelete = (id: number) => {
         if (!confirm('Bu ilanı silmek istediğinize emin misiniz?')) return;
         
+        console.log('Silme işlemi başlatılıyor:', id);
+        
         // Inertia.js ile silme
-        const deleteForm = useForm({});
-        deleteForm.delete(`/products/${id}`, {
+        deleteForm.post(`/products/${id}/delete`, {
             onSuccess: () => {
+                console.log('İlan başarıyla silindi');
                 setProducts(products.filter(p => p.id !== id));
+            },
+            onError: (errors) => {
+                console.log('Silme hatası:', errors);
             },
         });
     };
@@ -218,9 +225,17 @@ export default function Ilanlarim() {
                             <Label htmlFor="price">Fiyat (₺)</Label>
                             <Input 
                                 id="price" 
-                                type="number" 
+                                type="number"
+                                min="0"
+                                max="99999999"
+                                step="0.01"
                                 value={form.data.price} 
-                                onChange={e => form.setData('price', e.target.value)} 
+                                onChange={e => {
+                                    const value = parseFloat(e.target.value);
+                                    if (value >= 0 && value <= 99999999) {
+                                        form.setData('price', e.target.value);
+                                    }
+                                }} 
                             />
                             <InputError message={form.errors.price} />
                         </div>

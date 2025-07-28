@@ -208,9 +208,16 @@ export default function IlanVer() {
                                             <Input
                                                 id="price"
                                                 type="number"
+                                                min="0"
+                                                max="99999999"
                                                 step="0.01"
                                                 value={form.data.price}
-                                                onChange={(e) => form.setData('price', e.target.value)}
+                                                onChange={(e) => {
+                                                    const value = parseFloat(e.target.value);
+                                                    if (value >= 0 && value <= 99999999) {
+                                                        form.setData('price', e.target.value);
+                                                    }
+                                                }}
                                                 placeholder="100"
                                                 className="dark:bg-gray-800 dark:border-gray-700"
                                             />

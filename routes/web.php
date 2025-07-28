@@ -36,7 +36,7 @@ Route::middleware('auth')->group(function () {
         $validated = request()->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
+            'price' => 'required|numeric|min:0|max:99999999',
             'category' => 'required|string',
             'condition' => 'required|string|in:new,like_new,used',
             'location' => 'nullable|string|max:255',
@@ -80,7 +80,7 @@ Route::middleware('auth')->group(function () {
         $validated = request()->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
+            'price' => 'required|numeric|min:0|max:99999999',
             'category' => 'required|string',
             'condition' => 'required|string|in:new,like_new,used',
             'location' => 'nullable|string|max:255',
@@ -95,16 +95,24 @@ Route::middleware('auth')->group(function () {
     })->name('products.update');
 
     // İlan sil
-    Route::delete('/products/{product}', function ($productId) {
-        $user = auth()->user();
-        $product = $user->products()->findOrFail($productId);
-        $product->delete();
-        
-        if (request()->wantsJson()) {
-            return response()->json(['success' => true]);
+    Route::post('/products/{product}/delete', function ($productId) {
+        try {
+            $user = auth()->user();
+            $product = $user->products()->findOrFail($productId);
+            $product->delete();
+            
+            if (request()->wantsJson()) {
+                return response()->json(['success' => true, 'message' => 'İlan silindi']);
+            }
+            
+            return back()->with('success', 'İlan başarıyla silindi!');
+        } catch (\Exception $e) {
+            if (request()->wantsJson()) {
+                return response()->json(['error' => $e->getMessage()], 500);
+            }
+            
+            return back()->with('error', 'İlan silinirken hata oluştu!');
         }
-        
-        return back()->with('success', 'İlan başarıyla silindi!');
     })->name('products.delete');
 });
 
