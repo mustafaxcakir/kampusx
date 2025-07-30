@@ -161,4 +161,29 @@ Route::get('profil/{unique_id}', function ($unique_id) {
     ]);
 })->name('public.profile');
 
+// Ürün detay sayfası
+Route::get('/urun/{id}', function ($id) {
+    $product = \App\Models\Product::with('user.university')->findOrFail($id);
+    $viewer = auth()->user();
+    
+    // Satıcı bilgileri
+    $seller = $product->user;
+    $sellerData = [
+        'name' => $seller->name,
+        'surname' => $seller->surname,
+        'unique_id' => $seller->unique_id,
+        'about' => $seller->about,
+        'phone' => $seller->isFieldVisible('phone', $viewer) ? $seller->phone : null,
+        'email' => $seller->isFieldVisible('email', $viewer) ? $seller->email : null,
+        'university_name' => $seller->isFieldVisible('university', $viewer) ? ($seller->university ? $seller->university->name : null) : null,
+        'created_at' => $seller->created_at,
+    ];
+    
+    return Inertia::render('urun', [
+        'product' => $product,
+        'seller' => $sellerData,
+        'viewer' => $viewer,
+    ]);
+})->name('product.show');
+
 

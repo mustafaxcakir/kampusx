@@ -262,7 +262,11 @@ export default function PublicProfile() {
                             {filteredListings.length > 0 ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {filteredListings.map((listing) => (
-                                        <div key={listing.id} className="bg-card border border-sidebar-border/70 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+                                        <Link 
+                                            key={listing.id} 
+                                            href={route('product.show', { id: listing.id })}
+                                            className="bg-card border border-sidebar-border/70 rounded-lg overflow-hidden hover:shadow-lg transition-shadow block"
+                                        >
                                             <div className="relative">
                                                 {listing.image ? (
                                                     <img 
@@ -299,7 +303,7 @@ export default function PublicProfile() {
 
                                                 {/* Sadece kendi profilinde düzenleme butonları göster */}
                                                 {auth.user && auth.user.id === user.id && (
-                                                    <div className="flex gap-2">
+                                                    <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                                                         <Link 
                                                             href={route('ilanlarim')}
                                                             className="flex-1 px-3 py-2 border border-sidebar-border rounded-md text-sm hover:bg-accent transition-colors text-foreground text-center"
@@ -316,7 +320,7 @@ export default function PublicProfile() {
                                                     </div>
                                                 )}
                                             </div>
-                                        </div>
+                                        </Link>
                                     ))}
                                 </div>
                             ) : (
