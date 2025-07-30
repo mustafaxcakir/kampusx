@@ -114,6 +114,65 @@ Route::middleware('auth')->group(function () {
             return back()->with('error', 'İlan silinirken hata oluştu!');
         }
     })->name('products.delete');
+
+    // Soru-cevap route'ları
+    Route::post('/products/{product}/questions', function ($productId) {
+        $validated = request()->validate([
+            'question' => 'required|string|max:1000',
+        ]);
+
+        $user = auth()->user();
+        $product = \App\Models\Product::findOrFail($productId);
+
+        // Kendi ürününe soru soramaz
+        if ($product->user_id === $user->id) {
+            return back()->with('error', 'Kendi ürününüze soru soramazsınız!');
+        }
+
+        $question = $product->questions()->create([
+            'asked_by_user_id' => $user->id,
+            'question' => $validated['question'],
+        ]);
+
+        return back()->with('success', 'Sorunuz başarıyla gönderildi!');
+    })->name('questions.store');
+
+    // Soruya cevap ver (sadece ürün sahibi)
+    Route::post('/questions/{question}/answer', function ($questionId) {
+        $validated = request()->validate([
+            'answer' => 'required|string|max:1000',
+        ]);
+
+        $user = auth()->user();
+        $question = \App\Models\ProductQuestion::with('product')->findOrFail($questionId);
+
+        // Sadece ürün sahibi cevap verebilir
+        if ($question->product->user_id !== $user->id) {
+            abort(403, 'Bu soruya cevap verme yetkiniz yok!');
+        }
+
+        $question->update([
+            'answer' => $validated['answer'],
+            'answered_at' => now(),
+        ]);
+
+        return back()->with('success', 'Cevabınız başarıyla gönderildi!');
+    })->name('questions.answer');
+
+    // Soruyu sil (sadece soruyu soran kişi)
+    Route::delete('/questions/{question}', function ($questionId) {
+        $user = auth()->user();
+        $question = \App\Models\ProductQuestion::findOrFail($questionId);
+
+        // Sadece soruyu soran kişi silebilir
+        if ($question->asked_by_user_id !== $user->id) {
+            abort(403, 'Bu soruyu silme yetkiniz yok!');
+        }
+
+        $question->delete();
+
+        return back()->with('success', 'Sorunuz silindi!');
+    })->name('questions.delete');
 });
 
 require __DIR__.'/settings.php';
@@ -163,7 +222,8 @@ Route::get('profil/{unique_id}', function ($unique_id) {
 
 // Ürün detay sayfası
 Route::get('/urun/{id}', function ($id) {
-    $product = \App\Models\Product::with('user.university')->findOrFail($id);
+    $page = request()->get('page', 1);
+    $product = \App\Models\Product::with(['user.university', 'questions.askedBy'])->findOrFail($id);
     $viewer = auth()->user();
     
     // Satıcı bilgileri
@@ -178,11 +238,30 @@ Route::get('/urun/{id}', function ($id) {
         'university_name' => $seller->isFieldVisible('university', $viewer) ? ($seller->university ? $seller->university->name : null) : null,
         'created_at' => $seller->created_at,
     ];
+
+    // Soruları hazırla (pagination ile)
+    $questionsQuery = $product->publicQuestions()->with('askedBy');
+    $questions = $questionsQuery->paginate(5, ['*'], 'page', $page)->through(function ($question) {
+        return [
+            'id' => $question->id,
+            'question' => $question->question,
+            'answer' => $question->answer,
+            'answered_at' => $question->answered_at,
+            'created_at' => $question->created_at,
+            'asked_by' => [
+                'name' => $question->askedBy->name,
+                'surname' => $question->askedBy->surname,
+                'unique_id' => $question->askedBy->unique_id,
+            ],
+            'is_answered' => $question->isAnswered(),
+        ];
+    });
     
     return Inertia::render('urun', [
         'product' => $product,
         'seller' => $sellerData,
         'viewer' => $viewer,
+        'questions' => $questions,
     ]);
 })->name('product.show');
 

@@ -32,6 +32,26 @@ class Product extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function questions()
+    {
+        return $this->hasMany(ProductQuestion::class)->orderBy('created_at', 'desc');
+    }
+
+    public function publicQuestions()
+    {
+        return $this->questions()->public();
+    }
+
+    public function unansweredQuestions()
+    {
+        return $this->questions()->unanswered();
+    }
+
+    public function answeredQuestions()
+    {
+        return $this->questions()->answered();
+    }
+
     public function getFormattedPriceAttribute()
     {
         return number_format($this->price, 2) . ' ₺';
