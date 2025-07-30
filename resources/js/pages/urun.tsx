@@ -1,6 +1,6 @@
 import { type SharedData } from '@/types';
 import { Head, Link, usePage, useForm } from '@inertiajs/react';
-import { Heart, Truck, Shield, MapPin, Calendar, User, Mail, MoreVertical, Star, Users, GraduationCap, Eye, Plus, Edit, Trash2, Phone, Globe, Lock, Users as UsersIcon, ArrowLeft, Share2, MessageCircle, Tag, CheckCircle, Image as ImageIcon, HelpCircle, Send, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Heart, Truck, Shield, MapPin, Calendar, User, Mail, MoreVertical, Star, Users, GraduationCap, Eye, Plus, Edit, Trash2, Phone, Globe, Lock, Users as UsersIcon, ArrowLeft, Share2, MessageCircle, Tag, CheckCircle, Image as ImageIcon, HelpCircle, Send, X, ChevronLeft, ChevronRight, Flag } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Urun() {
@@ -145,12 +145,12 @@ export default function Urun() {
             </nav>
 
             {/* MAIN CONTENT */}
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-                <div className="max-w-7xl mx-auto p-6">
-                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            <div className="min-h-screen bg-muted/50">
+                <div className="max-w-6xl mx-auto p-4 space-y-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {/* Left Column - Product Images */}
-                        <div className="xl:col-span-2">
-                            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                        <div className="lg:col-span-2">
+                            <div className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 overflow-hidden">
                                 <div className="relative">
                                     {product.images && product.images.length > 0 ? (
                                         <img 
@@ -168,18 +168,18 @@ export default function Urun() {
                                     )}
                                     
                                     {/* Floating Action Buttons */}
-                                    <div className="absolute top-6 right-6 flex gap-3">
-                                        <button className="p-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-gray-700 dark:text-gray-300 rounded-full hover:bg-white dark:hover:bg-gray-800 transition-all duration-200 shadow-lg">
-                                            <Heart className="w-5 h-5" />
+                                    <div className="absolute top-4 right-4 flex gap-2">
+                                        <button className="p-2 bg-card/90 backdrop-blur-sm text-muted-foreground rounded-lg hover:bg-card transition-all duration-200 shadow-sm border border-sidebar-border/70">
+                                            <Heart className="w-4 h-4" />
                                         </button>
-                                        <button className="p-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-gray-700 dark:text-gray-300 rounded-full hover:bg-white dark:hover:bg-gray-800 transition-all duration-200 shadow-lg">
-                                            <Share2 className="w-5 h-5" />
+                                        <button className="p-2 bg-card/90 backdrop-blur-sm text-muted-foreground rounded-lg hover:bg-card transition-all duration-200 shadow-sm border border-sidebar-border/70">
+                                            <Share2 className="w-4 h-4" />
                                         </button>
                                     </div>
 
                                     {/* Image Counter */}
                                     {product.images && product.images.length > 1 && (
-                                        <div className="absolute bottom-6 left-6 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
+                                        <div className="absolute bottom-4 left-4 bg-black/70 text-white px-2 py-1 rounded-lg text-xs">
                                             {selectedImage + 1} / {product.images.length}
                                         </div>
                                     )}
@@ -187,16 +187,16 @@ export default function Urun() {
 
                                 {/* Thumbnail Gallery */}
                                 {product.images && product.images.length > 1 && (
-                                    <div className="p-6 bg-gray-50 dark:bg-gray-900">
-                                        <div className="flex gap-3 overflow-x-auto">
+                                    <div className="p-4 bg-muted/30">
+                                        <div className="flex gap-2 overflow-x-auto">
                                             {product.images.map((image: string, index: number) => (
                                                 <button
                                                     key={index}
                                                     onClick={() => setSelectedImage(index)}
-                                                    className={`flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden border-2 transition-all duration-200 ${
+                                                    className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
                                                         selectedImage === index 
-                                                            ? 'border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800' 
-                                                            : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+                                                            ? 'border-foreground ring-2 ring-foreground/20' 
+                                                            : 'border-sidebar-border/70 hover:border-sidebar-border'
                                                     }`}
                                                 >
                                                     <img 
@@ -424,89 +424,63 @@ export default function Urun() {
                         {/* Right Column - Product Info & Seller */}
                         <div className="space-y-6">
                             {/* Product Info Card */}
-                            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8">
+                            <div className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 p-6">
                                 <div className="space-y-6">
-                                    {/* Title & Price */}
+                                    {/* Price & Title */}
                                     <div>
-                                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-3 leading-tight">
-                                            {product.title}
-                                        </h1>
-                                        <div className="flex items-baseline gap-2">
-                                            <span className="text-4xl font-bold text-green-600 dark:text-green-400">
+                                        <div className="flex items-baseline gap-2 mb-3">
+                                            <span className="text-3xl font-bold text-card-foreground">
                                                 {formatPrice(product.price)}
                                             </span>
-                                            <span className="text-sm text-gray-500 dark:text-gray-400">TL</span>
                                         </div>
+                                        <h1 className="text-2xl font-bold text-card-foreground leading-tight">
+                                            {product.title}
+                                        </h1>
                                     </div>
 
-                                    {/* Quick Info Grid */}
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                                                    <Tag className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs text-gray-500 dark:text-gray-400">Kategori</p>
-                                                    <p className="font-semibold text-gray-900 dark:text-white">{getCategoryText(product.category)}</p>
-                                                </div>
+                                    {/* İlan Özellikleri */}
+                                    <div>
+                                        <h3 className="text-base font-medium text-card-foreground mb-3">İlan Özellikleri</h3>
+                                        <div className="space-y-3">
+                                            <div className="flex items-center justify-between py-2 border-b border-sidebar-border/30">
+                                                <span className="text-sm text-muted-foreground">Kategori</span>
+                                                <span className="text-sm font-medium text-card-foreground">{getCategoryText(product.category)}</span>
                                             </div>
-                                        </div>
-                                        <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                                                    <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs text-gray-500 dark:text-gray-400">Durum</p>
-                                                    <p className="font-semibold text-gray-900 dark:text-white">{getConditionText(product.condition)}</p>
-                                                </div>
+                                            <div className="flex items-center justify-between py-2 border-b border-sidebar-border/30">
+                                                <span className="text-sm text-muted-foreground">Durum</span>
+                                                <span className="text-sm font-medium text-card-foreground">{getConditionText(product.condition)}</span>
                                             </div>
-                                        </div>
-                                        {product.location && (
-                                            <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-                                                        <MapPin className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-xs text-gray-500 dark:text-gray-400">Konum</p>
-                                                        <p className="font-semibold text-gray-900 dark:text-white">{product.location}</p>
-                                                    </div>
+                                            {product.location && (
+                                                <div className="flex items-center justify-between py-2 border-b border-sidebar-border/30">
+                                                    <span className="text-sm text-muted-foreground">Konum</span>
+                                                    <span className="text-sm font-medium text-card-foreground">{product.location}</span>
                                                 </div>
-                                            </div>
-                                        )}
-                                        <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
-                                                    <Calendar className="w-5 h-5 text-orange-600 dark:text-orange-400" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs text-gray-500 dark:text-gray-400">İlan Tarihi</p>
-                                                    <p className="font-semibold text-gray-900 dark:text-white">
-                                                        {new Date(product.created_at).toLocaleDateString('tr-TR')}
-                                                    </p>
-                                                </div>
+                                            )}
+                                            <div className="flex items-center justify-between py-2">
+                                                <span className="text-sm text-muted-foreground">İlan Tarihi</span>
+                                                <span className="text-sm font-medium text-card-foreground">
+                                                    {new Date(product.created_at).toLocaleDateString('tr-TR')}
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* Description */}
                                     <div>
-                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Açıklama</h3>
-                                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                                        <h3 className="text-base font-medium text-card-foreground mb-2">Açıklama</h3>
+                                        <p className="text-sm text-muted-foreground leading-relaxed">
                                             {product.description}
                                         </p>
                                     </div>
 
                                     {/* Action Buttons */}
-                                    <div className="space-y-3">
-                                        <button className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl">
-                                            <MessageCircle className="w-5 h-5" />
+                                    <div className="space-y-2">
+                                        <button className="w-full bg-[#FF3F33] text-white font-medium py-3 px-4 rounded-lg hover:bg-[#E6392E] transition-colors duration-200 flex items-center justify-center gap-2">
+                                            <MessageCircle className="w-4 h-4" />
                                             Satıcı ile İletişim
                                         </button>
-                                        <button className="w-full border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold py-4 px-6 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 flex items-center justify-center gap-3">
-                                            <Heart className="w-5 h-5" />
+                                        <button className="w-full border border-sidebar-border text-card-foreground font-medium py-3 px-4 rounded-lg hover:bg-muted/50 transition-colors duration-200 flex items-center justify-center gap-2">
+                                            <Heart className="w-4 h-4" />
                                             Favorilere Ekle
                                         </button>
                                     </div>
@@ -514,21 +488,21 @@ export default function Urun() {
                             </div>
 
                             {/* Seller Info Card */}
-                            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6">
-                                <div className="flex items-center gap-4 mb-6">
+                            <div className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 p-6">
+                                <div className="flex items-center gap-4 mb-4">
                                     <div className="relative">
-                                        <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg">
-                                            <span className="text-white font-bold text-xl">
+                                        <div className="w-12 h-12 bg-[#075B5E] rounded-lg flex items-center justify-center">
+                                            <span className="text-white font-bold text-lg">
                                                 {seller.name.charAt(0).toUpperCase()}
                                             </span>
                                         </div>
-                                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
+                                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-card"></div>
                                     </div>
                                     <div className="flex-1">
-                                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                                        <h3 className="text-lg font-bold text-card-foreground">
                                             {seller.name} {seller.surname}
                                         </h3>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">@{seller.unique_id}</p>
+                                        <p className="text-sm text-muted-foreground">@{seller.unique_id}</p>
                                         {seller.university_name && (
                                             <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
                                                 {seller.university_name}
@@ -537,28 +511,39 @@ export default function Urun() {
                                     </div>
                                 </div>
 
-                                <div className="space-y-3 mb-6">
+                                <div className="space-y-2 mb-4">
                                     {seller.email && (
-                                        <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-xl">
-                                            <Mail className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                                            <span className="text-sm text-gray-700 dark:text-gray-300">{seller.email}</span>
+                                        <div className="flex items-center gap-3 p-2 bg-muted/50 rounded-lg">
+                                            <Mail className="w-4 h-4 text-muted-foreground" />
+                                            <span className="text-sm text-card-foreground">{seller.email}</span>
                                         </div>
                                     )}
                                     {seller.phone && (
-                                        <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-xl">
-                                            <Phone className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                                            <span className="text-sm text-gray-700 dark:text-gray-300">{seller.phone}</span>
+                                        <div className="flex items-center gap-3 p-2 bg-muted/50 rounded-lg">
+                                            <Phone className="w-4 h-4 text-muted-foreground" />
+                                            <span className="text-sm text-card-foreground">{seller.phone}</span>
                                         </div>
                                     )}
                                 </div>
 
                                 <Link
                                     href={route('public.profile', { unique_id: seller.unique_id })}
-                                    className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+                                    className="w-full bg-[#075B5E] text-white font-medium py-3 px-4 rounded-lg hover:bg-[#064A4D] transition-colors duration-200 flex items-center justify-center gap-2"
                                 >
                                     <User className="w-4 h-4" />
                                     Profili Görüntüle
                                 </Link>
+                            </div>
+
+                            {/* Şikayet Butonu */}
+                            <div className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 p-4">
+                                <button 
+                                    className="w-full text-red-600 dark:text-red-400 font-medium py-2 px-4 rounded-lg border border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 flex items-center justify-center gap-2"
+                                    disabled
+                                >
+                                    <Flag className="w-4 h-4" />
+                                    İlanı Bildir
+                                </button>
                             </div>
                         </div>
                     </div>
