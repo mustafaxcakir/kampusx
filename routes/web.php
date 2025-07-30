@@ -4,7 +4,15 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    $products = \App\Models\Product::with('user')
+        ->where('is_active', true)
+        ->latest()
+        ->take(8)
+        ->get();
+    
+    return Inertia::render('welcome', [
+        'products' => $products
+    ]);
 })->name('home');
 
 Route::middleware('auth')->group(function () {

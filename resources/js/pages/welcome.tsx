@@ -4,6 +4,26 @@ import { Heart, Truck, Shield } from 'lucide-react';
 
 export default function Welcome() {
     const { auth } = usePage<SharedData>().props;
+    const { products } = usePage<{ products: any[] }>().props;
+
+    const formatPrice = (price: number) => {
+        return Number(price) % 1 === 0 
+            ? Number(price).toFixed(0) + ' ₺'
+            : Number(price).toFixed(2) + ' ₺';
+    };
+
+    const getCategoryText = (category: string) => {
+        const categories: { [key: string]: string } = {
+            'electronics': 'Elektronik',
+            'books': 'Kitap',
+            'clothing': 'Giyim',
+            'sports': 'Spor',
+            'home': 'Ev & Yaşam',
+            'automotive': 'Otomotiv',
+            'other': 'Diğer'
+        };
+        return categories[category] || category;
+    };
 
     return (
         <>
@@ -112,164 +132,79 @@ export default function Welcome() {
             {/* PRODUCTS GRID */}
             <section className="py-8 bg-muted/50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {/* Product Card 1 */}
-                        <div className="bg-card rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow border border-sidebar-border/70">
-                            <div className="relative">
-                                <div className="w-full h-48 bg-muted"></div>
-                                <div className="absolute top-2 left-2">
-                                    <span className="bg-yellow-400 text-yellow-900 text-xs px-2 py-1 rounded font-medium">
-                                        • ÖNE ÇIKAN
-                                    </span>
-                                </div>
-                                <button className="absolute top-2 right-2 p-1 bg-card rounded-full shadow-sm border border-sidebar-border/70">
-                                    <Heart className="h-5 w-5 text-muted-foreground" />
-                                </button>
-                            </div>
-                            <div className="p-4">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <Shield className="h-4 w-4 text-green-600" />
-                                    <span className="text-xs text-green-600 font-medium">Cüzdanım Güvende</span>
-                                </div>
-                                <h3 className="font-semibold text-card-foreground mb-1">MacBook Pro M2 Garantili</h3>
-                                <p className="text-2xl font-bold text-card-foreground mb-2">30.500 TL</p>
-                                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                                    <span>Beyoğlu, İstanbul</span>
-                                    <span>BUGÜN</span>
-                                </div>
+                    {products && products.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {products.map((product) => (
+                                <Link 
+                                    key={product.id} 
+                                    href={route('product.show', { id: product.id })}
+                                    className="bg-card rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow border border-sidebar-border/70 cursor-pointer"
+                                >
+                                    <div className="relative">
+                                        {product.images && product.images.length > 0 ? (
+                                            <img 
+                                                src={`/storage/${product.images[0]}`}
+                                                alt={product.title}
+                                                className="w-full h-48 object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-48 bg-muted flex items-center justify-center">
+                                                <span className="text-muted-foreground text-sm">Fotoğraf Yok</span>
+                                            </div>
+                                        )}
+                                        <button 
+                                            className="absolute top-2 right-2 p-1 bg-card rounded-full shadow-sm border border-sidebar-border/70 hover:bg-muted transition-colors"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                // Favori işlemi burada yapılabilir
+                                            }}
+                                        >
+                                            <Heart className="h-5 w-5 text-muted-foreground" />
+                                        </button>
+                                    </div>
+                                    <div className="p-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <span className="text-xs text-blue-600 font-medium bg-blue-50 px-2 py-1 rounded">
+                                                {getCategoryText(product.category)}
+                                            </span>
+                                        </div>
+                                        <h3 className="font-semibold text-card-foreground mb-1 line-clamp-2">
+                                            {product.title}
+                                        </h3>
+                                        <p className="text-2xl font-bold text-card-foreground mb-2">
+                                            {formatPrice(product.price)}
+                                        </p>
+                                        <div className="flex items-center justify-between text-sm text-muted-foreground">
+                                            <span>{product.location || 'Konum belirtilmemiş'}</span>
+                                            <span>{new Date(product.created_at).toLocaleDateString('tr-TR')}</span>
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-12">
+                            <div className="bg-card rounded-lg p-8 border border-sidebar-border/70">
+                                <h3 className="text-lg font-medium text-card-foreground mb-2">Henüz ürün yok</h3>
+                                <p className="text-muted-foreground mb-4">İlk ürünü siz ekleyin!</p>
+                                {auth.user ? (
+                                    <Link
+                                        href={route('ilanver')}
+                                        className="bg-[#075B5E] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#064A4D] transition-colors duration-200 inline-block"
+                                    >
+                                        İlan Ver
+                                    </Link>
+                                ) : (
+                                    <Link
+                                        href={route('register')}
+                                        className="bg-[#FF3F33] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#E6392E] transition-colors duration-200 inline-block"
+                                    >
+                                        Üye Ol ve İlan Ver
+                                    </Link>
+                                )}
                             </div>
                         </div>
-
-                        {/* Product Card 2 */}
-                        <div className="bg-card rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow border border-sidebar-border/70">
-                            <div className="relative">
-                                <div className="w-full h-48 bg-muted"></div>
-                                <button className="absolute top-2 right-2 p-1 bg-card rounded-full shadow-sm border border-sidebar-border/70">
-                                    <Heart className="h-5 w-5 text-muted-foreground" />
-                                </button>
-                            </div>
-                            <div className="p-4">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <Truck className="h-4 w-4 text-blue-600" />
-                                    <span className="text-xs text-blue-600 font-medium">Ücretsiz Kargo</span>
-                                </div>
-                                <h3 className="font-semibold text-card-foreground mb-1">iPhone 16 Pro 128GB</h3>
-                                <p className="text-2xl font-bold text-card-foreground mb-2">59.000 TL</p>
-                                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                                    <span>Kadıköy, İstanbul</span>
-                                    <span>DÜN</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Product Card 3 */}
-                        <div className="bg-card rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow border border-sidebar-border/70">
-                            <div className="relative">
-                                <div className="w-full h-48 bg-muted"></div>
-                                <button className="absolute top-2 right-2 p-1 bg-card rounded-full shadow-sm border border-sidebar-border/70">
-                                    <Heart className="h-5 w-5 text-muted-foreground" />
-                                </button>
-                            </div>
-                            <div className="p-4">
-                                <h3 className="font-semibold text-card-foreground mb-1">Matematik Ders Kitabı</h3>
-                                <p className="text-2xl font-bold text-card-foreground mb-2">50 TL</p>
-                                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                                    <span>Beşiktaş, İstanbul</span>
-                                    <span>3 GÜN ÖNCE</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Product Card 4 */}
-                        <div className="bg-card rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow border border-sidebar-border/70">
-                            <div className="relative">
-                                <div className="w-full h-48 bg-muted"></div>
-                                <button className="absolute top-2 right-2 p-1 bg-card rounded-full shadow-sm border border-sidebar-border/70">
-                                    <Heart className="h-5 w-5 text-muted-foreground" />
-                                </button>
-                            </div>
-                            <div className="p-4">
-                                <h3 className="font-semibold text-card-foreground mb-1">Bisiklet (Takaslık)</h3>
-                                <p className="text-2xl font-bold text-blue-600 mb-2">Takas</p>
-                                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                                    <span>Şişli, İstanbul</span>
-                                    <span>1 HAFTA ÖNCE</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Product Card 5 */}
-                        <div className="bg-card rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow border border-sidebar-border/70">
-                            <div className="relative">
-                                <div className="w-full h-48 bg-muted"></div>
-                                <button className="absolute top-2 right-2 p-1 bg-card rounded-full shadow-sm border border-sidebar-border/70">
-                                    <Heart className="h-5 w-5 text-muted-foreground" />
-                                </button>
-                            </div>
-                            <div className="p-4">
-                                <h3 className="font-semibold text-card-foreground mb-1">Kulaklık Sony WH-1000XM4</h3>
-                                <p className="text-2xl font-bold text-card-foreground mb-2">1.200 TL</p>
-                                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                                    <span>Üsküdar, İstanbul</span>
-                                    <span>BUGÜN</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Product Card 6 */}
-                        <div className="bg-card rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow border border-sidebar-border/70">
-                            <div className="relative">
-                                <div className="w-full h-48 bg-muted"></div>
-                                <button className="absolute top-2 right-2 p-1 bg-card rounded-full shadow-sm border border-sidebar-border/70">
-                                    <Heart className="h-5 w-5 text-muted-foreground" />
-                                </button>
-                            </div>
-                            <div className="p-4">
-                                <h3 className="font-semibold text-card-foreground mb-1">Kampüs Kartı (Yüklü)</h3>
-                                <p className="text-2xl font-bold text-card-foreground mb-2">200 TL</p>
-                                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                                    <span>Fatih, İstanbul</span>
-                                    <span>DÜN</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Product Card 7 */}
-                        <div className="bg-card rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow border border-sidebar-border/70">
-                            <div className="relative">
-                                <div className="w-full h-48 bg-muted"></div>
-                                <button className="absolute top-2 right-2 p-1 bg-card rounded-full shadow-sm border border-sidebar-border/70">
-                                    <Heart className="h-5 w-5 text-muted-foreground" />
-                                </button>
-                            </div>
-                            <div className="p-4">
-                                <h3 className="font-semibold text-card-foreground mb-1">Spor Ayakkabı Nike</h3>
-                                <p className="text-2xl font-bold text-card-foreground mb-2">350 TL</p>
-                                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                                    <span>Bakırköy, İstanbul</span>
-                                    <span>2 GÜN ÖNCE</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Product Card 8 */}
-                        <div className="bg-card rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow border border-sidebar-border/70">
-                            <div className="relative">
-                                <div className="w-full h-48 bg-muted"></div>
-                                <button className="absolute top-2 right-2 p-1 bg-card rounded-full shadow-sm border border-sidebar-border/70">
-                                    <Heart className="h-5 w-5 text-muted-foreground" />
-                                </button>
-                            </div>
-                            <div className="p-4">
-                                <h3 className="font-semibold text-card-foreground mb-1">Kitaplık (Montajlı)</h3>
-                                <p className="text-2xl font-bold text-card-foreground mb-2">150 TL</p>
-                                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                                    <span>Maltepe, İstanbul</span>
-                                    <span>1 HAFTA ÖNCE</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    )}
                 </div>
             </section>
 
