@@ -173,6 +173,50 @@ Route::middleware('auth')->group(function () {
 
         return back()->with('success', 'Sorunuz silindi!');
     })->name('questions.delete');
+
+    // Favori işlemleri
+    Route::post('/products/{product}/favorite', function ($productId) {
+        $user = auth()->user();
+        $product = \App\Models\Product::findOrFail($productId);
+        
+        // Kendi ürününü favorilere ekleyemez
+        if ($product->user_id === $user->id) {
+            return back()->with('error', 'Kendi ürününüzü favorilere ekleyemezsiniz!');
+        }
+        
+        // Zaten favorilerde mi kontrol et
+        $existingFavorite = $user->favorites()->where('product_id', $productId)->first();
+        
+        if ($existingFavorite) {
+            return back()->with('error', 'Bu ürün zaten favorilerinizde!');
+        }
+        
+        // Favorilere ekle
+        $user->favorites()->create([
+            'product_id' => $productId
+        ]);
+        
+        return back()->with('success', 'Ürün favorilerinize eklendi!');
+    })->name('favorites.add');
+
+    Route::delete('/products/{product}/favorite', function ($productId) {
+        $user = auth()->user();
+        
+        // Favoriyi kaldır
+        $user->favorites()->where('product_id', $productId)->delete();
+        
+        return back()->with('success', 'Ürün favorilerinizden kaldırıldı!');
+    })->name('favorites.remove');
+
+    // Favorilerim sayfası
+    Route::get('/favorilerim', function () {
+        $user = auth()->user();
+        $favorites = $user->favoriteProducts()->with('user')->latest()->get();
+        
+        return Inertia::render('favorilerim', [
+            'favorites' => $favorites
+        ]);
+    })->name('favorilerim');
 });
 
 require __DIR__.'/settings.php';
@@ -239,6 +283,12 @@ Route::get('/urun/{id}', function ($id) {
         'created_at' => $seller->created_at,
     ];
 
+    // Favori durumunu kontrol et
+    $isFavorited = false;
+    if ($viewer) {
+        $isFavorited = $viewer->favorites()->where('product_id', $product->id)->exists();
+    }
+
     // Soruları hazırla (pagination ile)
     $questionsQuery = $product->publicQuestions()->with('askedBy');
     $questions = $questionsQuery->paginate(5, ['*'], 'page', $page)->through(function ($question) {
@@ -262,6 +312,7 @@ Route::get('/urun/{id}', function ($id) {
         'seller' => $sellerData,
         'viewer' => $viewer,
         'questions' => $questions,
+        'isFavorited' => $isFavorited,
     ]);
 })->name('product.show');
 

@@ -52,6 +52,16 @@ class Product extends Model
         return $this->questions()->answered();
     }
 
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    public function favoritedBy()
+    {
+        return $this->belongsToMany(User::class, 'favorites');
+    }
+
     public function getFormattedPriceAttribute()
     {
         return number_format($this->price, 2) . ' ₺';

@@ -64,6 +64,16 @@ class User extends Authenticatable
         return $this->hasMany(Product::class);
     }
 
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    public function favoriteProducts()
+    {
+        return $this->belongsToMany(Product::class, 'favorites');
+    }
+
     /**
      * Belirli bir alanın görünürlüğünü kontrol eder
      */

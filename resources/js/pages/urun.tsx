@@ -1,11 +1,11 @@
 import { type SharedData } from '@/types';
-import { Head, Link, usePage, useForm } from '@inertiajs/react';
+import { Head, Link, usePage, useForm, router } from '@inertiajs/react';
 import { Heart, Truck, Shield, MapPin, Calendar, User, Mail, MoreVertical, Star, Users, GraduationCap, Eye, Plus, Edit, Trash2, Phone, Globe, Lock, Users as UsersIcon, ArrowLeft, Share2, MessageCircle, Tag, CheckCircle, Image as ImageIcon, HelpCircle, Send, X, ChevronLeft, ChevronRight, Flag } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Urun() {
     const { auth } = usePage<SharedData>().props;
-    const { product, seller, viewer, questions } = usePage<{ product: any; seller: any; viewer: any; questions: any }>().props;
+    const { product, seller, viewer, questions, isFavorited } = usePage<{ product: any; seller: any; viewer: any; questions: any; isFavorited: boolean }>().props;
     const [selectedImage, setSelectedImage] = useState(0);
     const [showQuestionForm, setShowQuestionForm] = useState(false);
     const [answeringQuestion, setAnsweringQuestion] = useState<number | null>(null);
@@ -169,10 +169,7 @@ export default function Urun() {
                                     
                                     {/* Floating Action Buttons */}
                                     <div className="absolute top-4 right-4 flex gap-2">
-                                        <button className="p-2 bg-card/90 backdrop-blur-sm text-muted-foreground rounded-lg hover:bg-card transition-all duration-200 shadow-sm border border-sidebar-border/70">
-                                            <Heart className="w-4 h-4" />
-                                        </button>
-                                        <button className="p-2 bg-card/90 backdrop-blur-sm text-muted-foreground rounded-lg hover:bg-card transition-all duration-200 shadow-sm border border-sidebar-border/70">
+                                        <button className="p-2 bg-card/90 backdrop-blur-sm text-muted-foreground rounded-lg hover:bg-card transition-all duration-200 shadow-sm border border-sidebar-border/70 cursor-pointer">
                                             <Share2 className="w-4 h-4" />
                                         </button>
                                     </div>
@@ -475,14 +472,34 @@ export default function Urun() {
 
                                     {/* Action Buttons */}
                                     <div className="space-y-2">
-                                        <button className="w-full bg-[#FF3F33] text-white font-medium py-3 px-4 rounded-lg hover:bg-[#E6392E] transition-colors duration-200 flex items-center justify-center gap-2">
+                                        <button className="w-full bg-[#075B5E] text-white font-medium py-3 px-4 rounded-lg hover:bg-[#064A4D] transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer">
                                             <MessageCircle className="w-4 h-4" />
                                             Satıcı ile İletişim
                                         </button>
-                                        <button className="w-full border border-sidebar-border text-card-foreground font-medium py-3 px-4 rounded-lg hover:bg-muted/50 transition-colors duration-200 flex items-center justify-center gap-2">
-                                            <Heart className="w-4 h-4" />
-                                            Favorilere Ekle
-                                        </button>
+                                        {auth.user && auth.user.id !== product.user_id ? (
+                                            isFavorited ? (
+                                                <button 
+                                                    onClick={() => router.delete(route('favorites.remove', { product: product.id }))}
+                                                    className="w-full bg-[#FF3F33] text-white font-medium py-3 px-4 rounded-lg hover:bg-[#E6392E] transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer"
+                                                >
+                                                    <Heart className="w-4 h-4 fill-white text-white" />
+                                                    Favorilerden Çıkar
+                                                </button>
+                                            ) : (
+                                                <button 
+                                                    onClick={() => router.post(route('favorites.add', { product: product.id }))}
+                                                    className="w-full bg-[#075B5E] text-white font-medium py-3 px-4 rounded-lg hover:bg-[#064A4D] transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer"
+                                                >
+                                                    <Heart className="w-4 h-4" />
+                                                    Favorilere Ekle
+                                                </button>
+                                            )
+                                        ) : (
+                                            <button className="w-full bg-gray-300 text-gray-500 font-medium py-3 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2" disabled>
+                                                <Heart className="w-4 h-4" />
+                                                {auth.user ? 'Kendi İlanınız' : 'Giriş Yapın'}
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -538,7 +555,7 @@ export default function Urun() {
                             {/* Şikayet Butonu */}
                             <div className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 p-4">
                                 <button 
-                                    className="w-full text-red-600 dark:text-red-400 font-medium py-2 px-4 rounded-lg border border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 flex items-center justify-center gap-2"
+                                    className="w-full bg-gray-100 text-gray-500 font-medium py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center justify-center gap-2"
                                     disabled
                                 >
                                     <Flag className="w-4 h-4" />
