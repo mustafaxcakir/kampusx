@@ -23,3 +23,30 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# Güvenlik Ayarları
+<IfModule mod_headers.c>
+    # XSS Koruması
+    Header always set X-XSS-Protection "1; mode=block"
+    # Content Type Sniffing Koruması
+    Header always set X-Content-Type-Options "nosniff"
+    # Clickjacking Koruması
+    Header always set X-Frame-Options "SAMEORIGIN"
+    # Referrer Policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Storage Dizini Güvenliği
+<IfModule mod_rewrite.c>
+    # Sadece resim dosyalarına izin ver
+    RewriteCond %{REQUEST_URI} ^/storage/products/
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteCond %{REQUEST_FILENAME} !\.(jpg|jpeg|png)$ [NC]
+    RewriteRule .* - [F,L]
+    
+    # PHP dosyalarını engelle
+    RewriteCond %{REQUEST_URI} ^/storage/
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteCond %{REQUEST_FILENAME} \.php$ [NC]
+    RewriteRule .* - [F,L]
+</IfModule>

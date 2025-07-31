@@ -71,4 +71,22 @@ class Product extends Model
     {
         return $this->images ? $this->images[0] : null;
     }
+
+    // Güvenli resim URL'leri için
+    public function getSafeImagesAttribute()
+    {
+        if (!$this->images) return [];
+        
+        return array_map(function($image) {
+            // Sadece güvenli dosya uzantılarına izin ver
+            $extension = pathinfo($image, PATHINFO_EXTENSION);
+            $allowedExtensions = ['jpg', 'jpeg', 'png'];
+            
+            if (!in_array(strtolower($extension), $allowedExtensions)) {
+                return null;
+            }
+            
+            return $image;
+        }, $this->images);
+    }
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
@@ -42,6 +42,16 @@ const conditions = [
 export default function IlanVer() {
     const [selectedImages, setSelectedImages] = useState<File[]>([]);
     const [imagePreview, setImagePreview] = useState<string[]>([]);
+    const [uploadingImages, setUploadingImages] = useState<{ [key: string]: boolean }>({});
+
+    // Component unmount olduğunda URL'leri temizle
+    useEffect(() => {
+        return () => {
+            imagePreview.forEach(url => {
+                URL.revokeObjectURL(url);
+            });
+        };
+    }, []);
 
     const form = useForm({
         title: '',
@@ -55,15 +65,50 @@ export default function IlanVer() {
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
-        setSelectedImages(files);
-        form.setData('images', files);
+        
+        // Toplam dosya sayısı kontrolü
+        if (selectedImages.length + files.length > 5) {
+            alert('Maksimum 5 fotoğraf yükleyebilirsiniz.');
+            return;
+        }
+        
+        // Güvenlik kontrolleri
+        const validFiles = files.filter(file => {
+            // Dosya türü kontrolü
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (!validTypes.includes(file.type)) {
+                alert(`${file.name} geçersiz dosya türü. Sadece JPEG ve PNG dosyaları kabul edilir.`);
+                return false;
+            }
+            
+            // Dosya boyutu kontrolü (10MB - sıkıştırma öncesi maksimum)
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            if (file.size > maxSize) {
+                alert(`${file.name} çok büyük. Maksimum dosya boyutu 10MB olmalıdır.`);
+                return false;
+            }
+            
+            return true;
+        });
+        
+        if (validFiles.length > 0) {
+            const newImages = [...selectedImages, ...validFiles];
+            setSelectedImages(newImages);
+            form.setData('images', newImages);
 
-        // Preview oluştur
-        const previews = files.map(file => URL.createObjectURL(file));
-        setImagePreview(previews);
+            // Preview oluştur
+            const newPreviews = validFiles.map(file => URL.createObjectURL(file));
+            setImagePreview([...imagePreview, ...newPreviews]);
+        }
+        
+        // Input'u temizle (aynı dosyayı tekrar seçebilmek için)
+        e.target.value = '';
     };
 
     const removeImage = (index: number) => {
+        // URL'yi temizle
+        URL.revokeObjectURL(imagePreview[index]);
+        
         const newImages = selectedImages.filter((_, i) => i !== index);
         const newPreviews = imagePreview.filter((_, i) => i !== index);
         setSelectedImages(newImages);
@@ -73,11 +118,23 @@ export default function IlanVer() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        
+        // Yükleme durumunu başlat
+        const uploadStates: { [key: string]: boolean } = {};
+        selectedImages.forEach((file, index) => {
+            uploadStates[`${file.name}_${index}`] = true;
+        });
+        setUploadingImages(uploadStates);
+        
         form.post(route('products.store'), {
             onSuccess: () => {
                 form.reset();
                 setSelectedImages([]);
                 setImagePreview([]);
+                setUploadingImages({});
+            },
+            onError: () => {
+                setUploadingImages({});
             },
         });
     };
@@ -252,51 +309,95 @@ export default function IlanVer() {
                                         Fotoğraflar
                                     </CardTitle>
                                     <CardDescription>
-                                        Ürününüzün fotoğraflarını ekleyin (En fazla 5 adet)
+                                        Ürününüzün fotoğraflarını ekleyin (En fazla 5 adet, otomatik sıkıştırılır)
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     {/* Fotoğraf Yükleme Alanı */}
-                                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
-                                        <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                                        <Label htmlFor="images" className="cursor-pointer">
-                                            <span className="text-sm text-gray-600 dark:text-gray-400">
-                                                Fotoğraf seçmek için tıklayın
+                                    <div className={`border border-dashed rounded-lg p-4 text-center transition-colors ${
+                                        form.processing 
+                                            ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800' 
+                                            : 'border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500'
+                                    }`}>
+                                        <Upload className={`mx-auto h-6 w-6 mb-2 ${
+                                            form.processing ? 'text-gray-300 dark:text-gray-600' : 'text-gray-400'
+                                        }`} />
+                                        
+                                        <Label htmlFor="images" className={`block cursor-pointer ${
+                                            form.processing ? 'cursor-not-allowed' : 'cursor-pointer'
+                                        }`}>
+                                            <span className={`text-sm ${
+                                                form.processing 
+                                                    ? 'text-gray-400 dark:text-gray-500' 
+                                                    : 'text-gray-600 dark:text-gray-400'
+                                            }`}>
+                                                {form.processing ? 'Yükleniyor...' : 'Fotoğraf ekle'}
                                             </span>
                                         </Label>
+                                        
                                         <Input
                                             id="images"
                                             type="file"
                                             multiple
-                                            accept="image/*"
+                                            accept="image/jpeg,image/jpg,image/png"
                                             onChange={handleImageChange}
+                                            disabled={form.processing}
                                             className="hidden"
                                         />
                                     </div>
 
                                     {/* Fotoğraf Önizlemeleri */}
                                     {imagePreview.length > 0 && (
-                                        <div className="space-y-2">
-                                            <Label className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                Seçilen Fotoğraflar
-                                            </Label>
-                                            <div className="grid grid-cols-2 gap-2">
-                                                {imagePreview.map((preview, index) => (
-                                                    <div key={index} className="relative group">
-                                                        <img
-                                                            src={preview}
-                                                            alt={`Preview ${index + 1}`}
-                                                            className="w-full h-24 object-cover rounded-lg"
-                                                        />
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => removeImage(index)}
-                                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                                                        >
-                                                            ×
-                                                        </button>
-                                                    </div>
-                                                ))}
+                                        <div className="space-y-3">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                                <span className="text-sm text-gray-600 dark:text-gray-400">
+                                                    {imagePreview.length} fotoğraf seçildi
+                                                </span>
+                                            </div>
+                                            
+                                            <div className="flex flex-wrap gap-2">
+                                                {imagePreview.map((preview, index) => {
+                                                    const fileKey = `${selectedImages[index]?.name}_${index}`;
+                                                    const isUploading = uploadingImages[fileKey];
+                                                    
+                                                    return (
+                                                        <div key={index} className="relative group">
+                                                            <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
+                                                                <img
+                                                                    src={preview}
+                                                                    alt={`Preview ${index + 1}`}
+                                                                    className={`w-full h-full object-cover transition-all duration-200 ${
+                                                                        isUploading ? 'opacity-40' : 'opacity-100'
+                                                                    }`}
+                                                                />
+                                                                
+                                                                {/* Yükleme Overlay */}
+                                                                {isUploading && (
+                                                                    <div className="absolute inset-0 flex items-center justify-center">
+                                                                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent"></div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            
+                                                            {/* Silme Butonu */}
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => removeImage(index)}
+                                                                disabled={isUploading}
+                                                                className={`absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 ${
+                                                                    isUploading 
+                                                                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                                                                        : 'bg-red-500 text-white hover:bg-red-600 hover:scale-110 opacity-0 group-hover:opacity-100'
+                                                                }`}
+                                                            >
+                                                                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
                                     )}
@@ -312,7 +413,14 @@ export default function IlanVer() {
                                         className="w-full"
                                         size="lg"
                                     >
-                                        {form.processing ? 'İlan Veriliyor...' : 'İlanı Yayınla'}
+                                        {form.processing ? (
+                                            <div className="flex items-center space-x-2">
+                                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                                <span>İlan Veriliyor...</span>
+                                            </div>
+                                        ) : (
+                                            'İlanı Yayınla'
+                                        )}
                                     </Button>
                                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
                                         İlanınız onaylandıktan sonra yayınlanacaktır

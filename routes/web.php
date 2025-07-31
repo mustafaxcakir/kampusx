@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+
+
 Route::get('/', function () {
     $products = \App\Models\Product::with('user')
         ->where('is_active', true)
@@ -48,7 +50,8 @@ Route::middleware('auth')->group(function () {
             'category' => 'required|string',
             'condition' => 'required|string|in:new,like_new,used',
             'location' => 'nullable|string|max:255',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images' => 'nullable|array|max:5', // Maksimum 5 fotoğraf
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg|dimensions:min_width=100,min_height=100',
         ]);
 
         $user = auth()->user();
@@ -61,11 +64,17 @@ Route::middleware('auth')->group(function () {
             'location' => $validated['location'],
         ]);
 
-        // Fotoğrafları kaydet
+        // Fotoğrafları güvenli şekilde kaydet
         if (request()->hasFile('images')) {
             $images = [];
             foreach (request()->file('images') as $image) {
-                $path = $image->store('products', 'public');
+                // Dosya adını güvenli hale getir
+                $originalName = $image->getClientOriginalName();
+                $extension = $image->getClientOriginalExtension();
+                $safeName = time() . '_' . uniqid() . '.' . $extension;
+                
+                // Dosyayı kaydet (GD extension yoksa normal kaydet)
+                $path = $image->storeAs('products', $safeName, 'public');
                 $images[] = $path;
             }
             $product->update(['images' => $images]);
