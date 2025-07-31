@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, Link } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2, Package } from 'lucide-react';
 import InputError from '@/components/input-error';
 import OptimizedImage from '@/components/optimized-image';
 
@@ -175,8 +175,20 @@ const getConditionText = (condition: string) => {
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold text-card-foreground">İlanlarım</h1>
                 </div>
-                                            {products.length === 0 ? (
-                                <div className="text-gray-500 dark:text-gray-400">Henüz hiç ilanınız yok.</div>
+                            {products.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-12 text-center">
+                                    <Package className="w-16 h-16 text-muted-foreground/50 mb-4" />
+                                    <h3 className="text-lg font-medium text-card-foreground mb-2">Henüz ilanınız yok</h3>
+                                    <p className="text-muted-foreground mb-6 max-w-md">
+                                        İlk ilanınızı oluşturarak ürünlerinizi satışa çıkarabilirsiniz.
+                                    </p>
+                                    <Link
+                                        href="/ilanver"
+                                        className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+                                    >
+                                        İlan Ver
+                                    </Link>
+                                </div>
                             ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
                         {products.map(product => (
