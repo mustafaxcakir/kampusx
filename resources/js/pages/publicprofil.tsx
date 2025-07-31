@@ -1,12 +1,14 @@
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { Heart, Truck, Shield, MapPin, Calendar, User, Mail, MoreVertical, Star, Users, GraduationCap, Eye, Plus, Edit, Trash2, Phone, Globe, Lock, Users as UsersIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function PublicProfile() {
     const { auth } = usePage<SharedData>().props;
     const { user, ads } = usePage<{ user: any; ads: any[] }>().props;
     const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'sold' | 'rental'>('all');
+    const [visibleImages, setVisibleImages] = useState<Set<number>>(new Set());
+    const [loading, setLoading] = useState(true);
     
     // Gerçek ürünleri kullan
     const listings = ads.map(ad => ({
@@ -45,6 +47,47 @@ export default function PublicProfile() {
     };
 
     // Gizlilik ikonunu render eder
+    // Loading state'ini yönet
+    useEffect(() => {
+        if (ads !== undefined) {
+            setLoading(false);
+        }
+    }, [ads]);
+
+    // Intersection Observer ile görünür resimleri takip et
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const newVisibleImages = new Set(visibleImages);
+                let hasChanges = false;
+
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        const productId = parseInt(entry.target.getAttribute('data-product-id') || '0');
+                        if (!newVisibleImages.has(productId)) {
+                            newVisibleImages.add(productId);
+                            hasChanges = true;
+                        }
+                    }
+                });
+
+                if (hasChanges) {
+                    setVisibleImages(newVisibleImages);
+                }
+            },
+            { 
+                threshold: 0.1,
+                rootMargin: '200px' // Daha fazla önceden yükle
+            }
+        );
+
+        // Tüm ürün kartlarını gözlemle
+        const cards = document.querySelectorAll('[data-product-id]');
+        cards.forEach(card => observer.observe(card));
+
+        return () => observer.disconnect();
+    }, [filteredListings, visibleImages]);
+
     const getPrivacyIcon = (privacy: string) => {
         switch (privacy) {
             case 'public':
@@ -259,51 +302,76 @@ export default function PublicProfile() {
                             </div>
 
                             {/* Listings Grid */}
-                            {filteredListings.length > 0 ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {loading ? (
+                                <div className="flex flex-col items-center justify-center py-12 text-center">
+                                    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                                    <p className="text-muted-foreground">İlanlar yükleniyor...</p>
+                                </div>
+                            ) : filteredListings.length > 0 ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
                                     {filteredListings.map((listing) => (
                                         <Link 
                                             key={listing.id} 
                                             href={route('product.show', { id: listing.id })}
-                                            className="bg-card border border-sidebar-border/70 rounded-lg overflow-hidden hover:shadow-lg transition-shadow block"
+                                            className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 overflow-hidden hover:shadow-md transition-shadow duration-200 flex flex-col block" 
+                                            data-product-id={listing.id}
+                                            style={{ willChange: 'transform' }}
                                         >
-                                            <div className="relative">
-                                                {listing.image ? (
-                                                    <img 
-                                                        src={listing.image} 
-                                                        alt={listing.title}
-                                                        className="w-full h-48 object-cover"
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-48 bg-muted flex items-center justify-center">
-                                                        <span className="text-muted-foreground">Fotoğraf Yok</span>
-                                                    </div>
-                                                )}
-                                                <span className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(listing.status)}`}>
-                                                    {listing.status}
-                                                </span>
-                                            </div>
-
-                                            <div className="p-4">
-                                                <h3 className="font-semibold text-lg mb-2 line-clamp-2 text-card-foreground">{listing.title}</h3>
-                                                <p className="text-2xl font-bold text-green-600 dark:text-green-400 mb-2">{listing.price}</p>
-                                                <div className="flex justify-between items-center text-sm text-muted-foreground mb-2">
-                                                    <span className="capitalize">{listing.category}</span>
-                                                    <span>{listing.date}</span>
+                                            <div className="p-4 flex-1 flex flex-col gap-2">
+                                                <div className="h-32 w-full bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
+                                                    {listing.image ? (
+                                                        visibleImages.has(listing.id) ? (
+                                                            <img
+                                                                src={listing.image}
+                                                                alt={listing.title}
+                                                                className="object-cover w-full h-full"
+                                                                loading="lazy"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                                                <div className="w-4 h-4 border border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+                                                            </div>
+                                                        )
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center">
+                                                            <span className="text-gray-400 text-xs">Fotoğraf yok</span>
+                                                        </div>
+                                                    )}
                                                 </div>
-                                                <div className="flex justify-between items-center text-sm text-muted-foreground mb-3">
-                                                    <span className="capitalize">{listing.condition}</span>
+                                                
+                                                <div className="flex items-start justify-between">
+                                                    <h3 className="font-semibold text-card-foreground line-clamp-2 truncate text-base flex-1">
+                                                        {listing.title}
+                                                    </h3>
+                                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(listing.status)}`}>
+                                                        {listing.status}
+                                                    </span>
+                                                </div>
+                                                
+                                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                                    {listing.category} • {listing.condition}
+                                                </div>
+                                                
+                                                <div className="font-bold text-primary mt-auto">
+                                                    {listing.price}
+                                                </div>
+                                                
+                                                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                                    <div className="flex items-center gap-1">
+                                                        <Calendar className="w-3 h-3" />
+                                                        <span>{listing.date}</span>
+                                                    </div>
                                                     {listing.location && (
-                                                        <span className="flex items-center gap-1">
+                                                        <div className="flex items-center gap-1">
                                                             <MapPin className="w-3 h-3" />
-                                                            {listing.location}
-                                                        </span>
+                                                            <span>{listing.location}</span>
+                                                        </div>
                                                     )}
                                                 </div>
 
                                                 {/* Sadece kendi profilinde düzenleme butonları göster */}
                                                 {auth.user && auth.user.id === user.id && (
-                                                    <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                                                    <div className="flex gap-2 mt-2" onClick={(e) => e.stopPropagation()}>
                                                         <Link 
                                                             href={route('ilanlarim')}
                                                             className="flex-1 px-3 py-2 border border-sidebar-border rounded-md text-sm hover:bg-accent transition-colors text-foreground text-center"
