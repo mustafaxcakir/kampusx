@@ -1,16 +1,30 @@
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { Heart, Truck, Shield } from 'lucide-react';
+import { Heart, Truck, Shield, MapPin, Calendar, User } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 export default function Welcome() {
     const { auth } = usePage<SharedData>().props;
     const { products } = usePage<{ products: any[] }>().props;
+    const [loading, setLoading] = useState(true);
+    const [showAllProducts, setShowAllProducts] = useState(false);
 
     const formatPrice = (price: number) => {
         return Number(price) % 1 === 0 
             ? Number(price).toFixed(0) + ' ₺'
             : Number(price).toFixed(2) + ' ₺';
     };
+
+    // Loading state'ini yönet
+    useEffect(() => {
+        if (products !== undefined) {
+            setLoading(false);
+        }
+    }, [products]);
+
+
+
+
 
     const getCategoryText = (category: string) => {
         const categories: { [key: string]: string } = {
@@ -132,56 +146,95 @@ export default function Welcome() {
             {/* PRODUCTS GRID */}
             <section className="py-8 bg-muted/50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    {products && products.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {products.map((product) => (
-                                <Link 
-                                    key={product.id} 
-                                    href={route('product.show', { id: product.id })}
-                                    className="bg-card rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow border border-sidebar-border/70 cursor-pointer"
-                                >
-                                    <div className="relative">
-                                        {product.images && product.images.length > 0 ? (
-                                            <img 
-                                                src={`/storage/${product.images[0]}`}
-                                                alt={product.title}
-                                                className="w-full h-48 object-cover"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-48 bg-muted flex items-center justify-center">
-                                                <span className="text-muted-foreground text-sm">Fotoğraf Yok</span>
-                                            </div>
-                                        )}
-                                        <button 
-                                            className="absolute top-2 right-2 p-1 bg-card rounded-full shadow-sm border border-sidebar-border/70 hover:bg-muted transition-colors"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                // Favori işlemi burada yapılabilir
-                                            }}
-                                        >
-                                            <Heart className="h-5 w-5 text-muted-foreground" />
-                                        </button>
-                                    </div>
-                                    <div className="p-4">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <span className="text-xs text-blue-600 font-medium bg-blue-50 px-2 py-1 rounded">
-                                                {getCategoryText(product.category)}
-                                            </span>
-                                        </div>
-                                        <h3 className="font-semibold text-card-foreground mb-1 line-clamp-2">
-                                            {product.title}
-                                        </h3>
-                                        <p className="text-2xl font-bold text-card-foreground mb-2">
-                                            {formatPrice(product.price)}
-                                        </p>
-                                        <div className="flex items-center justify-between text-sm text-muted-foreground">
-                                            <span>{product.location || 'Konum belirtilmemiş'}</span>
-                                            <span>{new Date(product.created_at).toLocaleDateString('tr-TR')}</span>
-                                        </div>
-                                    </div>
-                                </Link>
-                            ))}
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-12 text-center">
+                            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                            <p className="text-muted-foreground">Ürünler yükleniyor...</p>
                         </div>
+                    ) : products && products.length > 0 ? (
+                        <>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+                                {[...products].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, showAllProducts ? products.length : 10).map((product) => (
+                                <div 
+                                    key={product.id} 
+                                    className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 overflow-hidden hover:shadow-md transition-shadow duration-200 flex flex-col" 
+                                    style={{ willChange: 'transform' }}
+                                >
+                                    <div className="p-4 flex-1 flex flex-col gap-2">
+                                        <div className="h-32 w-full bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
+                                            {product.images && product.images.length > 0 ? (
+                                                <img
+                                                    src={`/storage/${product.images[0]}`}
+                                                    alt={product.title}
+                                                    className="object-cover w-full h-full"
+                                                    loading="lazy"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center">
+                                                    <span className="text-gray-400 text-xs">Fotoğraf yok</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        
+                                        <div className="flex items-start justify-between">
+                                            <Link href={route('product.show', { id: product.id })} className="flex-1">
+                                                <h3 className="font-semibold text-card-foreground line-clamp-2 hover:text-primary transition-colors truncate text-base">
+                                                    {product.title}
+                                                </h3>
+                                            </Link>
+                                            <button 
+                                                className="flex-shrink-0 ml-2 p-1 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    // Favori işlemi burada yapılabilir
+                                                }}
+                                            >
+                                                <Heart className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                        
+                                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                                            {getCategoryText(product.category)} • {product.condition}
+                                        </div>
+                                        
+                                        <div className="font-bold text-primary mt-auto">
+                                            {formatPrice(product.price)}
+                                        </div>
+                                        
+                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                            <User className="w-3 h-3" />
+                                            <span>{product.user?.name} {product.user?.surname}</span>
+                                        </div>
+                                        
+                                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                            <div className="flex items-center gap-1">
+                                                <Calendar className="w-3 h-3" />
+                                                <span>{new Date(product.created_at).toLocaleDateString('tr-TR')}</span>
+                                            </div>
+                                            {product.location && (
+                                                <div className="flex items-center gap-1">
+                                                    <MapPin className="w-3 h-3" />
+                                                    <span>{product.location}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                            </div>
+                            
+                            {/* Daha Fazla Ürün Butonu */}
+                            {!showAllProducts && products.length > 10 && (
+                                <div className="flex justify-center mt-8">
+                                    <button
+                                        onClick={() => setShowAllProducts(true)}
+                                        className="bg-primary text-primary-foreground px-8 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-200 shadow-sm"
+                                    >
+                                        Daha Fazla Ürün Göster ({products.length - 10} ürün daha)
+                                    </button>
+                                </div>
+                            )}
+                        </>
                     ) : (
                         <div className="text-center py-12">
                             <div className="bg-card rounded-lg p-8 border border-sidebar-border/70">

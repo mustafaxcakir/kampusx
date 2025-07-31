@@ -9,7 +9,6 @@ Route::get('/', function () {
     $products = \App\Models\Product::with('user')
         ->where('is_active', true)
         ->latest()
-        ->take(8)
         ->get();
     
     return Inertia::render('welcome', [
