@@ -164,17 +164,9 @@ export default function IlanVer() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="İlan Ver" />
-            <div className="flex h-full flex-1 flex-col gap-6 p-6">
-                <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                        <Package className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Yeni İlan Ver</h1>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Ürününüzü satışa çıkarın ve kampüs içinde alıcılarla buluşturun
-                        </p>
-                    </div>
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+                <div className="flex items-center justify-between">
+                    <h1 className="text-2xl font-bold text-card-foreground">Yeni İlan Ver</h1>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
