@@ -253,7 +253,7 @@ export default function Ilanlarim() {
                             <InputError message={form.errors.price} />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="location">Konum</Label>
+                            <Label htmlFor="location">Konum </Label>
                             <Input 
                                 id="location" 
                                 value={form.data.location} 
