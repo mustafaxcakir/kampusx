@@ -40,15 +40,35 @@ const conditions = [
     { value: 'used', label: 'Kullanılmış' },
 ];
 
-export default function Ilanlarim() {
-    const [products, setProducts] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [editModal, setEditModal] = useState(false);
+const getCategoryText = (category: string) => {
+    const categories: { [key: string]: string } = {
+        'electronics': 'Elektronik',
+        'books': 'Kitap',
+        'clothing': 'Giyim',
+        'sports': 'Spor',
+        'home': 'Ev & Yaşam',
+        'automotive': 'Otomotiv',
+        'other': 'Diğer'
+    };
+    return categories[category] || category;
+};
+
+const getConditionText = (condition: string) => {
+    const conditions: { [key: string]: string } = {
+        'new': 'Yeni',
+        'like_new': 'Az Kullanılmış',
+        'used': 'Kullanılmış'
+    };
+    return conditions[condition] || condition;
+};
+
+            export default function Ilanlarim() {
+                const [products, setProducts] = useState<any[]>([]);
+                const [editModal, setEditModal] = useState(false);
     const [editProduct, setEditProduct] = useState<any>(null);
     const [deleteModal, setDeleteModal] = useState(false);
     const [deleteProduct, setDeleteProduct] = useState<any>(null);
     const [visibleImages, setVisibleImages] = useState<Set<number>>(new Set());
-    
     const form = useForm({
         title: '',
         description: '',
@@ -60,14 +80,13 @@ export default function Ilanlarim() {
     
     const deleteForm = useForm({});
 
-    useEffect(() => {
-        fetch('/my-products')
-            .then(res => res.json())
-            .then(data => {
-                setProducts(data);
-                setLoading(false);
-            });
-    }, []);
+                    useEffect(() => {
+                    fetch('/my-products')
+                        .then(res => res.json())
+                        .then(data => {
+                            setProducts(data);
+                        });
+                }, []);
 
     // Intersection Observer ile görünür resimleri takip et
     useEffect(() => {
@@ -152,20 +171,17 @@ export default function Ilanlarim() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="İlanlarım" />
-            <div className="flex flex-col gap-6 p-6">
-                <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">İlanlarım</h1>
-                {loading ? (
-                    <div>Yükleniyor...</div>
-                ) : products.length === 0 ? (
-                    <div className="text-gray-500 dark:text-gray-400">Henüz hiç ilanınız yok.</div>
-                ) : (
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+                <div className="flex items-center justify-between">
+                    <h1 className="text-2xl font-bold text-card-foreground">İlanlarım</h1>
+                </div>
+                                            {products.length === 0 ? (
+                                <div className="text-gray-500 dark:text-gray-400">Henüz hiç ilanınız yok.</div>
+                            ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
                         {products.map(product => (
-                            <Card key={product.id} className="flex flex-col" data-product-id={product.id}>
-                                <CardHeader>
-                                    <CardTitle className="truncate text-base">{product.title}</CardTitle>
-                                </CardHeader>
-                                <CardContent className="flex-1 flex flex-col gap-2">
+                            <div key={product.id} className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 overflow-hidden hover:shadow-md transition-shadow flex flex-col" data-product-id={product.id}>
+                                <div className="p-4 flex-1 flex flex-col gap-2">
                                     <div className="h-32 w-full bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
                                         {product.images && product.images.length > 0 ? (
                                             visibleImages.has(product.id) ? (
@@ -186,7 +202,7 @@ export default function Ilanlarim() {
                                         )}
                                     </div>
                                     <div className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">{product.description}</div>
-                                    <div className="text-xs text-gray-500 dark:text-gray-400">{product.category} • {product.condition}</div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">{getCategoryText(product.category)} • {getConditionText(product.condition)}</div>
                                     <div className="font-bold text-primary mt-auto">
                                         {Number(product.price) % 1 === 0 
                                             ? Number(product.price).toFixed(0) 
@@ -201,8 +217,8 @@ export default function Ilanlarim() {
                                             <Trash2 className="w-4 h-4 mr-1" /> Sil
                                         </Button>
                                     </div>
-                                </CardContent>
-                            </Card>
+                                </div>
+                            </div>
                         ))}
                     </div>
                 )}

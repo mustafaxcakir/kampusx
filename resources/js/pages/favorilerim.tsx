@@ -93,7 +93,7 @@ export default function Favorilerim() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
                         {favorites.map((product) => (
                             <div key={product.id} className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 overflow-hidden hover:shadow-md transition-shadow flex flex-col" data-product-id={product.id}>
-                                <Link href={route('product.show', { id: product.id })}>
+                                <div className="p-4 flex-1 flex flex-col gap-2">
                                     <div className="h-32 w-full bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
                                         {product.images && product.images.length > 0 ? (
                                             visibleImages.has(product.id) ? (
@@ -113,9 +113,6 @@ export default function Favorilerim() {
                                             </div>
                                         )}
                                     </div>
-                                </Link>
-                                
-                                <div className="p-4 flex-1 flex flex-col gap-2">
                                     <div className="flex items-start justify-between">
                                         <Link href={route('product.show', { id: product.id })} className="flex-1">
                                             <h3 className="font-semibold text-card-foreground line-clamp-2 hover:text-primary transition-colors truncate text-base">
