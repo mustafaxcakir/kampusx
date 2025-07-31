@@ -1,7 +1,7 @@
 import { type SharedData } from '@/types';
 import { Head, Link, usePage, useForm, router } from '@inertiajs/react';
-import { Heart, Truck, Shield, MapPin, Calendar, User, Mail, MoreVertical, Star, Users, GraduationCap, Eye, Plus, Edit, Trash2, Phone, Globe, Lock, Users as UsersIcon, ArrowLeft, Share2, MessageCircle, Tag, CheckCircle, Image as ImageIcon, HelpCircle, Send, X, ChevronLeft, ChevronRight, Flag } from 'lucide-react';
-import { useState } from 'react';
+import { Heart, Truck, Shield, MapPin, Calendar, User, Mail, MoreVertical, Star, Users, GraduationCap, Eye, Plus, Edit, Trash2, Phone, Globe, Lock, Users as UsersIcon, ArrowLeft, Share2, MessageCircle, Tag, CheckCircle, Image as ImageIcon, HelpCircle, Send, X, ChevronLeft, ChevronRight, Flag, ZoomIn } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
 export default function Urun() {
     const { auth } = usePage<SharedData>().props;
@@ -9,6 +9,50 @@ export default function Urun() {
     const [selectedImage, setSelectedImage] = useState(0);
     const [showQuestionForm, setShowQuestionForm] = useState(false);
     const [answeringQuestion, setAnsweringQuestion] = useState<number | null>(null);
+    const [imageLoading, setImageLoading] = useState(true);
+    const [showZoomModal, setShowZoomModal] = useState(false);
+
+    // Klavye tuşlarıyla fotoğraf geçişi
+    const handleKeyDown = (e: KeyboardEvent) => {
+        if (!product.images || product.images.length <= 1) return;
+        
+        if (e.key === 'ArrowLeft') {
+            const newIndex = selectedImage === 0 ? product.images.length - 1 : selectedImage - 1;
+            setSelectedImage(newIndex);
+            setImageLoading(true);
+        } else if (e.key === 'ArrowRight') {
+            const newIndex = selectedImage === product.images.length - 1 ? 0 : selectedImage + 1;
+            setSelectedImage(newIndex);
+            setImageLoading(true);
+        }
+    };
+
+    // Component mount olduğunda event listener ekle
+    useEffect(() => {
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [selectedImage, product.images]);
+
+    // Modal için ESC tuşu desteği
+    useEffect(() => {
+        const handleEscKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && showZoomModal) {
+                setShowZoomModal(false);
+            }
+        };
+
+        if (showZoomModal) {
+            document.addEventListener('keydown', handleEscKey);
+            document.body.style.overflow = 'hidden'; // Scroll'u engelle
+        }
+
+        return () => {
+            document.removeEventListener('keydown', handleEscKey);
+            document.body.style.overflow = 'unset'; // Scroll'u geri aç
+        };
+    }, [showZoomModal]);
 
     const questionForm = useForm({
         question: '',
@@ -153,13 +197,33 @@ export default function Urun() {
                             <div className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 overflow-hidden">
                                 <div className="relative">
                                     {product.images && product.images.length > 0 ? (
-                                        <img 
-                                            src={`/storage/${product.images[selectedImage]}`}
-                                            alt={product.title}
-                                            className="w-full h-[500px] object-cover"
-                                        />
+                                        <div className="relative w-full h-[300px] sm:h-[400px] md:h-[500px] bg-gray-100 dark:bg-gray-800">
+                                            {imageLoading && (
+                                                <div className="absolute inset-0 flex items-center justify-center z-10">
+                                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-600"></div>
+                                                </div>
+                                            )}
+                                            <img 
+                                                src={`/storage/${product.images[selectedImage]}`}
+                                                alt={product.title}
+                                                className="w-full h-full object-contain"
+                                                onLoad={() => setImageLoading(false)}
+                                                onError={(e) => {
+                                                    const target = e.target as HTMLImageElement;
+                                                    target.style.display = 'none';
+                                                    target.nextElementSibling?.classList.remove('hidden');
+                                                    setImageLoading(false);
+                                                }}
+                                            />
+                                            <div className="hidden absolute inset-0 flex items-center justify-center">
+                                                <div className="text-center">
+                                                    <ImageIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                                                    <span className="text-gray-500 dark:text-gray-400">Fotoğraf Yüklenemedi</span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     ) : (
-                                        <div className="w-full h-[500px] bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center">
+                                        <div className="w-full h-[300px] sm:h-[400px] md:h-[500px] bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center">
                                             <div className="text-center">
                                                 <ImageIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                                                 <span className="text-gray-500 dark:text-gray-400">Fotoğraf Yok</span>
@@ -169,10 +233,45 @@ export default function Urun() {
                                     
                                     {/* Floating Action Buttons */}
                                     <div className="absolute top-4 right-4 flex gap-2">
-                                        <button className="p-2 bg-card/90 backdrop-blur-sm text-muted-foreground rounded-lg hover:bg-card transition-all duration-200 shadow-sm border border-sidebar-border/70 cursor-pointer">
+                                        <button 
+                                            onClick={() => setShowZoomModal(true)}
+                                            className="p-2 bg-card/90 backdrop-blur-sm text-muted-foreground rounded-lg hover:bg-card transition-all duration-200 shadow-sm border border-sidebar-border/70 cursor-pointer hover:text-foreground"
+                                        >
+                                            <ZoomIn className="w-4 h-4" />
+                                        </button>
+                                        <button className="p-2 bg-card/90 backdrop-blur-sm text-muted-foreground rounded-lg hover:bg-card transition-all duration-200 shadow-sm border border-sidebar-border/70 cursor-pointer hover:text-foreground">
                                             <Share2 className="w-4 h-4" />
                                         </button>
                                     </div>
+
+                                    {/* Navigation Arrows */}
+                                    {product.images && product.images.length > 1 && (
+                                        <>
+                                            {/* Sol Ok */}
+                                            <button 
+                                                onClick={() => {
+                                                    const newIndex = selectedImage === 0 ? product.images.length - 1 : selectedImage - 1;
+                                                    setSelectedImage(newIndex);
+                                                    setImageLoading(true);
+                                                }}
+                                                className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-card/90 backdrop-blur-sm text-muted-foreground rounded-full hover:bg-card transition-all duration-200 shadow-sm border border-sidebar-border/70 cursor-pointer hover:text-foreground hidden md:block"
+                                            >
+                                                <ChevronLeft className="w-5 h-5" />
+                                            </button>
+
+                                            {/* Sağ Ok */}
+                                            <button 
+                                                onClick={() => {
+                                                    const newIndex = selectedImage === product.images.length - 1 ? 0 : selectedImage + 1;
+                                                    setSelectedImage(newIndex);
+                                                    setImageLoading(true);
+                                                }}
+                                                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-card/90 backdrop-blur-sm text-muted-foreground rounded-full hover:bg-card transition-all duration-200 shadow-sm border border-sidebar-border/70 cursor-pointer hover:text-foreground hidden md:block"
+                                            >
+                                                <ChevronRight className="w-5 h-5" />
+                                            </button>
+                                        </>
+                                    )}
 
                                     {/* Image Counter */}
                                     {product.images && product.images.length > 1 && (
@@ -185,12 +284,15 @@ export default function Urun() {
                                 {/* Thumbnail Gallery */}
                                 {product.images && product.images.length > 1 && (
                                     <div className="p-4 bg-muted/30">
-                                        <div className="flex gap-2 overflow-x-auto">
+                                        <div className="flex gap-2 overflow-x-auto pb-2">
                                             {product.images.map((image: string, index: number) => (
                                                 <button
                                                     key={index}
-                                                    onClick={() => setSelectedImage(index)}
-                                                    className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                                                    onClick={() => {
+                                                        setSelectedImage(index);
+                                                        setImageLoading(true);
+                                                    }}
+                                                    className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 bg-gray-100 dark:bg-gray-800 ${
                                                         selectedImage === index 
                                                             ? 'border-foreground ring-2 ring-foreground/20' 
                                                             : 'border-sidebar-border/70 hover:border-sidebar-border'
@@ -200,6 +302,10 @@ export default function Urun() {
                                                         src={`/storage/${image}`}
                                                         alt={`${product.title} ${index + 1}`}
                                                         className="w-full h-full object-cover"
+                                                        onError={(e) => {
+                                                            const target = e.target as HTMLImageElement;
+                                                            target.style.display = 'none';
+                                                        }}
                                                     />
                                                 </button>
                                             ))}
@@ -568,6 +674,110 @@ export default function Urun() {
 
                 </div>
             </div>
+
+            {/* Zoom Modal */}
+            {showZoomModal && (
+                <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+                    <div className="relative w-full h-full flex items-center justify-center">
+                        {/* Close Button */}
+                        <button 
+                            onClick={() => setShowZoomModal(false)}
+                            className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
+
+                        {/* Navigation Arrows */}
+                        {product.images && product.images.length > 1 && (
+                            <>
+                                <button 
+                                    onClick={() => {
+                                        const newIndex = selectedImage === 0 ? product.images.length - 1 : selectedImage - 1;
+                                        setSelectedImage(newIndex);
+                                        setImageLoading(true);
+                                    }}
+                                    className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
+                                >
+                                    <ChevronLeft className="w-6 h-6" />
+                                </button>
+
+                                <button 
+                                    onClick={() => {
+                                        const newIndex = selectedImage === product.images.length - 1 ? 0 : selectedImage + 1;
+                                        setSelectedImage(newIndex);
+                                        setImageLoading(true);
+                                    }}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
+                                >
+                                    <ChevronRight className="w-6 h-6" />
+                                </button>
+                            </>
+                        )}
+
+                        {/* Image */}
+                        {product.images && product.images.length > 0 ? (
+                            <div className="relative w-full h-full flex items-center justify-center">
+                                {imageLoading && (
+                                    <div className="absolute inset-0 flex items-center justify-center z-10">
+                                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+                                    </div>
+                                )}
+                                <img 
+                                    src={`/storage/${product.images[selectedImage]}`}
+                                    alt={product.title}
+                                    className="max-w-full max-h-full object-contain"
+                                    onLoad={() => setImageLoading(false)}
+                                    onError={(e) => {
+                                        const target = e.target as HTMLImageElement;
+                                        target.style.display = 'none';
+                                        setImageLoading(false);
+                                    }}
+                                />
+                            </div>
+                        ) : (
+                            <div className="text-center text-white">
+                                <ImageIcon className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                                <span className="opacity-50">Fotoğraf Yok</span>
+                            </div>
+                        )}
+
+                        {/* Image Counter */}
+                        {product.images && product.images.length > 1 && (
+                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-lg text-sm">
+                                {selectedImage + 1} / {product.images.length}
+                            </div>
+                        )}
+
+                        {/* Thumbnail Gallery */}
+                        {product.images && product.images.length > 1 && (
+                            <div className="absolute bottom-20 left-1/2 -translate-x-1/2">
+                                <div className="flex gap-2 bg-black/30 backdrop-blur-sm rounded-lg p-2">
+                                    {product.images.map((image: string, index: number) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => {
+                                                setSelectedImage(index);
+                                                setImageLoading(true);
+                                            }}
+                                            className={`flex-shrink-0 w-12 h-12 rounded overflow-hidden border-2 transition-all duration-200 ${
+                                                selectedImage === index 
+                                                    ? 'border-white' 
+                                                    : 'border-white/30 hover:border-white/60'
+                                            }`}
+                                        >
+                                            <img 
+                                                src={`/storage/${image}`}
+                                                alt={`${product.title} ${index + 1}`}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
         </>
     );
 }
