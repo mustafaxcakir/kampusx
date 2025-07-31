@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,8 +9,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Upload, Image as ImageIcon, Package, MapPin, DollarSign, FileText } from 'lucide-react';
+import { Upload, Image as ImageIcon, Package, MapPin, DollarSign, FileText, AlertCircle } from 'lucide-react';
 import InputError from '@/components/input-error';
+// import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -43,6 +44,7 @@ export default function IlanVer() {
     const [selectedImages, setSelectedImages] = useState<File[]>([]);
     const [imagePreview, setImagePreview] = useState<string[]>([]);
     const [uploadingImages, setUploadingImages] = useState<{ [key: string]: boolean }>({});
+    const [showSuccessToast, setShowSuccessToast] = useState(false);
 
     // Component unmount olduğunda URL'leri temizle
     useEffect(() => {
@@ -53,6 +55,8 @@ export default function IlanVer() {
         };
     }, []);
 
+    // Popup'ları geçici olarak kaldırdık
+
     const form = useForm({
         title: '',
         description: '',
@@ -62,6 +66,17 @@ export default function IlanVer() {
         location: '',
         images: [] as File[],
     });
+
+    // Laravel'den gelen başarı mesajını yakala
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('success')) {
+            setShowSuccessToast(true);
+            setTimeout(() => {
+                setShowSuccessToast(false);
+            }, 3000);
+        }
+    }, []);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
@@ -127,11 +142,18 @@ export default function IlanVer() {
         setUploadingImages(uploadStates);
         
         form.post(route('products.store'), {
+            preserveScroll: true,
             onSuccess: () => {
+                setShowSuccessToast(true);
                 form.reset();
                 setSelectedImages([]);
                 setImagePreview([]);
                 setUploadingImages({});
+                
+                // 3 saniye sonra toast'ı kapat
+                setTimeout(() => {
+                    setShowSuccessToast(false);
+                }, 3000);
             },
             onError: () => {
                 setUploadingImages({});
@@ -431,6 +453,31 @@ export default function IlanVer() {
                     </div>
                 </form>
             </div>
+
+            {/* Başarı Toast Notification */}
+            {showSuccessToast && (
+                <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 duration-300">
+                    <div className="bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 min-w-[300px]">
+                        <div className="flex-shrink-0">
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                        </div>
+                        <div className="flex-1">
+                            <h4 className="font-semibold">Başarılı!</h4>
+                            <p className="text-sm opacity-90">İlanınız başarıyla oluşturuldu.</p>
+                        </div>
+                        <button 
+                            onClick={() => setShowSuccessToast(false)}
+                            className="flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity"
+                        >
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            )}
         </AppLayout>
     );
 }

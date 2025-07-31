@@ -15,28 +15,48 @@ class SecureImageUpload
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Sadece POST isteklerini kontrol et
-        if ($request->isMethod('post') && $request->hasFile('images')) {
+        // Debug: Middleware'in çalışıp çalışmadığını kontrol et
+        \Log::info('SecureImageUpload middleware çalışıyor', [
+            'route' => $request->route()?->getName(),
+            'method' => $request->method(),
+            'hasFiles' => $request->hasFile('images')
+        ]);
+
+        // Sadece products.store route'unu kontrol et
+        if ($request->routeIs('products.store') && $request->isMethod('post') && $request->hasFile('images')) {
             $files = $request->file('images');
+            
+            \Log::info('Dosya kontrolü başlıyor', ['fileCount' => count($files)]);
+            
+            // Dosya sayısı kontrolü
+            if (count($files) > 5) {
+                \Log::info('Dosya sayısı limiti aşıldı');
+                return back()->withErrors(['general' => 'Maksimum 5 fotoğraf yükleyebilirsiniz.']);
+            }
             
             foreach ($files as $file) {
                 // Dosya türü kontrolü
                 $allowedMimes = ['image/jpeg', 'image/jpg', 'image/png'];
                 if (!in_array($file->getMimeType(), $allowedMimes)) {
-                    return back()->withErrors(['images' => 'Geçersiz dosya türü. Sadece JPEG ve PNG dosyaları kabul edilir.']);
+                    \Log::info('Geçersiz dosya türü', ['mime' => $file->getMimeType()]);
+                    return back()->withErrors(['general' => 'Geçersiz dosya türü. Sadece JPEG ve PNG dosyaları kabul edilir.']);
                 }
                 
                 // Dosya boyutu kontrolü (10MB - sıkıştırma öncesi maksimum)
                 if ($file->getSize() > 10 * 1024 * 1024) {
-                    return back()->withErrors(['images' => 'Dosya boyutu çok büyük. Maksimum 10MB olmalıdır.']);
+                    \Log::info('Dosya boyutu çok büyük', ['size' => $file->getSize()]);
+                    return back()->withErrors(['general' => 'Dosya boyutu çok büyük. Maksimum 10MB olmalıdır.']);
                 }
                 
-                // Dosya adı güvenliği
+                // Dosya adı güvenliği - daha esnek
                 $filename = $file->getClientOriginalName();
-                if (preg_match('/[^a-zA-Z0-9._-]/', $filename)) {
-                    return back()->withErrors(['images' => 'Geçersiz dosya adı.']);
+                if (empty($filename) || strlen($filename) > 255) {
+                    \Log::info('Geçersiz dosya adı', ['filename' => $filename]);
+                    return back()->withErrors(['general' => 'Geçersiz dosya adı.']);
                 }
             }
+            
+            \Log::info('Dosya kontrolü başarılı');
         }
         
         return $next($request);

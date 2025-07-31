@@ -80,7 +80,7 @@ Route::middleware('auth')->group(function () {
             $product->update(['images' => $images]);
         }
 
-        return redirect()->route('dashboard')->with('success', 'İlanınız başarıyla oluşturuldu!');
+        return back()->with('success', 'İlanınız başarıyla oluşturuldu!');
     })->name('products.store');
 
     // Kullanıcının kendi ilanlarını getir
@@ -283,6 +283,11 @@ Route::get('profil/{unique_id}', function ($unique_id) {
 
 // Ürün detay sayfası
 Route::get('/urun/{id}', function ($id) {
+    // ID'nin sayısal olduğunu kontrol et
+    if (!is_numeric($id) || $id <= 0) {
+        abort(404);
+    }
+    
     $page = request()->get('page', 1);
     $product = \App\Models\Product::with(['user.university', 'questions.askedBy'])->findOrFail($id);
     $viewer = auth()->user();
