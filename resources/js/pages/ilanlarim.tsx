@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm, Link } from '@inertiajs/react';
@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Pencil, Trash2, Package } from 'lucide-react';
 import InputError from '@/components/input-error';
-import OptimizedImage from '@/components/optimized-image';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -69,6 +68,8 @@ const getConditionText = (condition: string) => {
     const [deleteModal, setDeleteModal] = useState(false);
     const [deleteProduct, setDeleteProduct] = useState<any>(null);
     const [visibleImages, setVisibleImages] = useState<Set<number>>(new Set());
+    const [loading, setLoading] = useState(true);
+
     const form = useForm({
         title: '',
         description: '',
@@ -85,21 +86,38 @@ const getConditionText = (condition: string) => {
                         .then(res => res.json())
                         .then(data => {
                             setProducts(data);
+                            setLoading(false);
+                        })
+                        .catch(() => {
+                            setLoading(false);
                         });
                 }, []);
 
-    // Intersection Observer ile görünür resimleri takip et
+    // Optimize edilmiş Intersection Observer
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
+                const newVisibleImages = new Set(visibleImages);
+                let hasChanges = false;
+
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
                         const productId = parseInt(entry.target.getAttribute('data-product-id') || '0');
-                        setVisibleImages(prev => new Set([...prev, productId]));
+                        if (!newVisibleImages.has(productId)) {
+                            newVisibleImages.add(productId);
+                            hasChanges = true;
+                        }
                     }
                 });
+
+                if (hasChanges) {
+                    setVisibleImages(newVisibleImages);
+                }
             },
-            { threshold: 0.1 }
+            { 
+                threshold: 0.1,
+                rootMargin: '200px' // Daha fazla önceden yükle
+            }
         );
 
         // Tüm ürün kartlarını gözlemle
@@ -107,9 +125,9 @@ const getConditionText = (condition: string) => {
         cards.forEach(card => observer.observe(card));
 
         return () => observer.disconnect();
-    }, [products]);
+    }, [products, visibleImages]);
 
-    const openEditModal = (product: any) => {
+    const openEditModal = useCallback((product: any) => {
         setEditProduct(product);
         form.setData({
             title: product.title,
@@ -120,7 +138,7 @@ const getConditionText = (condition: string) => {
             location: product.location,
         });
         setEditModal(true);
-    };
+    }, [form]);
 
     const closeEditModal = () => {
         setEditModal(false);
@@ -140,10 +158,10 @@ const getConditionText = (condition: string) => {
         });
     };
 
-    const openDeleteModal = (product: any) => {
+    const openDeleteModal = useCallback((product: any) => {
         setDeleteProduct(product);
         setDeleteModal(true);
-    };
+    }, []);
 
     const closeDeleteModal = () => {
         setDeleteModal(false);
@@ -175,7 +193,12 @@ const getConditionText = (condition: string) => {
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold text-card-foreground">İlanlarım</h1>
                 </div>
-                            {products.length === 0 ? (
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                        <p className="text-muted-foreground">İlanlarınız yükleniyor...</p>
+                    </div>
+                ) : products.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-12 text-center">
                                     <Package className="w-16 h-16 text-muted-foreground/50 mb-4" />
                                     <h3 className="text-lg font-medium text-card-foreground mb-2">Henüz ilanınız yok</h3>
@@ -192,19 +215,20 @@ const getConditionText = (condition: string) => {
                             ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
                         {products.map(product => (
-                            <div key={product.id} className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 overflow-hidden hover:shadow-md transition-shadow flex flex-col" data-product-id={product.id}>
+                            <div key={product.id} className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 overflow-hidden hover:shadow-md transition-shadow duration-200 flex flex-col" data-product-id={product.id} style={{ willChange: 'transform' }}>
                                 <div className="p-4 flex-1 flex flex-col gap-2">
                                     <div className="h-32 w-full bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
                                         {product.images && product.images.length > 0 ? (
                                             visibleImages.has(product.id) ? (
-                                                <OptimizedImage
+                                                <img
                                                     src={"/storage/" + product.images[0]}
                                                     alt={product.title}
                                                     className="object-cover w-full h-full"
+                                                    loading="lazy"
                                                 />
                                             ) : (
-                                                <div className="w-full h-full bg-gray-200 dark:bg-gray-700 animate-pulse flex items-center justify-center">
-                                                    <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+                                                <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                                    <div className="w-4 h-4 border border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
                                                 </div>
                                             )
                                         ) : (

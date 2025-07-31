@@ -4,7 +4,6 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage, useForm } from '@inertiajs/react';
 import { Heart, MapPin, Calendar, User } from 'lucide-react';
-import OptimizedImage from '@/components/optimized-image';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -20,21 +19,42 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Favorilerim() {
     const { favorites } = usePage<{ favorites: any[] }>().props;
     const [visibleImages, setVisibleImages] = useState<Set<number>>(new Set());
+    const [loading, setLoading] = useState(true);
     
     const removeForm = useForm({});
+
+    // Loading state'ini yönet
+    useEffect(() => {
+        if (favorites !== undefined) {
+            setLoading(false);
+        }
+    }, [favorites]);
 
     // Intersection Observer ile görünür resimleri takip et
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
+                const newVisibleImages = new Set(visibleImages);
+                let hasChanges = false;
+
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
                         const productId = parseInt(entry.target.getAttribute('data-product-id') || '0');
-                        setVisibleImages(prev => new Set([...prev, productId]));
+                        if (!newVisibleImages.has(productId)) {
+                            newVisibleImages.add(productId);
+                            hasChanges = true;
+                        }
                     }
                 });
+
+                if (hasChanges) {
+                    setVisibleImages(newVisibleImages);
+                }
             },
-            { threshold: 0.1 }
+            { 
+                threshold: 0.1,
+                rootMargin: '200px' // Daha fazla önceden yükle
+            }
         );
 
         // Tüm ürün kartlarını gözlemle
@@ -42,7 +62,7 @@ export default function Favorilerim() {
         cards.forEach(card => observer.observe(card));
 
         return () => observer.disconnect();
-    }, [favorites]);
+    }, [favorites, visibleImages]);
 
     const formatPrice = (price: number) => {
         return Number(price) % 1 === 0 
@@ -89,7 +109,12 @@ export default function Favorilerim() {
                     <h1 className="text-2xl font-bold text-card-foreground">Favorilerim</h1>
                 </div>
 
-                {favorites && favorites.length > 0 ? (
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                        <p className="text-muted-foreground">Favorileriniz yükleniyor...</p>
+                    </div>
+                ) : favorites && favorites.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
                         {favorites.map((product) => (
                             <div key={product.id} className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 overflow-hidden hover:shadow-md transition-shadow flex flex-col" data-product-id={product.id}>
@@ -97,14 +122,15 @@ export default function Favorilerim() {
                                     <div className="h-32 w-full bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
                                         {product.images && product.images.length > 0 ? (
                                             visibleImages.has(product.id) ? (
-                                                <OptimizedImage
+                                                <img
                                                     src={"/storage/" + product.images[0]}
                                                     alt={product.title}
                                                     className="object-cover w-full h-full hover:scale-105 transition-transform duration-200"
+                                                    loading="lazy"
                                                 />
                                             ) : (
-                                                <div className="w-full h-full bg-gray-200 dark:bg-gray-700 animate-pulse flex items-center justify-center">
-                                                    <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+                                                <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                                    <div className="w-4 h-4 border border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
                                                 </div>
                                             )
                                         ) : (
