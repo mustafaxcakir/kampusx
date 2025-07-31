@@ -11,8 +11,17 @@ Route::get('/', function () {
         ->latest()
         ->get();
     
+    // Kullanıcının favori durumlarını kontrol et
+    $viewer = auth()->user();
+    $favoritedProductIds = [];
+    
+    if ($viewer) {
+        $favoritedProductIds = $viewer->favorites()->pluck('product_id')->toArray();
+    }
+    
     return Inertia::render('welcome', [
-        'products' => $products
+        'products' => $products,
+        'favoritedProductIds' => $favoritedProductIds
     ]);
 })->name('home');
 
@@ -197,14 +206,14 @@ Route::middleware('auth')->group(function () {
         
         // Kendi ürününü favorilere ekleyemez
         if ($product->user_id === $user->id) {
-            return back()->with('error', 'Kendi ürününüzü favorilere ekleyemezsiniz!');
+            return back()->withErrors(['error' => 'Kendi ürününüzü favorilere ekleyemezsiniz!']);
         }
         
         // Zaten favorilerde mi kontrol et
         $existingFavorite = $user->favorites()->where('product_id', $productId)->first();
         
         if ($existingFavorite) {
-            return back()->with('error', 'Bu ürün zaten favorilerinizde!');
+            return back()->withErrors(['error' => 'Bu ürün zaten favorilerinizde!']);
         }
         
         // Favorilere ekle
@@ -233,6 +242,14 @@ Route::middleware('auth')->group(function () {
             'favorites' => $favorites
         ]);
     })->name('favorilerim');
+
+    // Favori ürün ID'lerini JSON olarak döndür
+    Route::get('/api/favorites', function () {
+        $user = auth()->user();
+        $favorites = $user->favoriteProducts()->pluck('id');
+        
+        return response()->json($favorites);
+    })->name('api.favorites');
 });
 
 require __DIR__.'/settings.php';

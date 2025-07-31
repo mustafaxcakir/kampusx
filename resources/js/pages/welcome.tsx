@@ -1,13 +1,14 @@
 import { type SharedData } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage, useForm, router } from '@inertiajs/react';
 import { Heart, Truck, Shield, MapPin, Calendar, User } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 export default function Welcome() {
     const { auth } = usePage<SharedData>().props;
-    const { products } = usePage<{ products: any[] }>().props;
+    const { products, errors, favoritedProductIds } = usePage<{ products: any[]; errors: any; favoritedProductIds: number[] }>().props;
     const [loading, setLoading] = useState(true);
     const [showAllProducts, setShowAllProducts] = useState(false);
+    const [favoritedProducts, setFavoritedProducts] = useState<Set<number>>(new Set(favoritedProductIds || []));
 
     const formatPrice = (price: number) => {
         return Number(price) % 1 === 0 
@@ -26,6 +27,8 @@ export default function Welcome() {
 
 
 
+
+
     const getCategoryText = (category: string) => {
         const categories: { [key: string]: string } = {
             'electronics': 'Elektronik',
@@ -37,6 +40,33 @@ export default function Welcome() {
             'other': 'Diğer'
         };
         return categories[category] || category;
+    };
+
+    const getConditionText = (condition: string) => {
+        const conditions: { [key: string]: string } = {
+            'new': 'Yeni',
+            'like_new': 'Az Kullanılmış',
+            'used': 'Kullanılmış'
+        };
+        return conditions[condition] || condition;
+    };
+
+    const toggleFavorite = (productId: number) => {
+        const isFavorited = favoritedProducts.has(productId);
+        
+        if (isFavorited) {
+            // Favorilerden çıkar
+            router.delete(route('favorites.remove', { product: productId }));
+            setFavoritedProducts(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(productId);
+                return newSet;
+            });
+        } else {
+            // Favorilere ekle
+            router.post(route('favorites.add', { product: productId }));
+            setFavoritedProducts(prev => new Set([...prev, productId]));
+        }
     };
 
     return (
@@ -155,9 +185,10 @@ export default function Welcome() {
                         <>
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
                                 {[...products].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, showAllProducts ? products.length : 10).map((product) => (
-                                <div 
+                                <Link 
                                     key={product.id} 
-                                    className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 overflow-hidden hover:shadow-md transition-shadow duration-200 flex flex-col" 
+                                    href={route('product.show', { id: product.id })}
+                                    className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 overflow-hidden hover:shadow-md transition-shadow duration-200 flex flex-col block" 
                                     style={{ willChange: 'transform' }}
                                 >
                                     <div className="p-4 flex-1 flex flex-col gap-2">
@@ -177,24 +208,29 @@ export default function Welcome() {
                                         </div>
                                         
                                         <div className="flex items-start justify-between">
-                                            <Link href={route('product.show', { id: product.id })} className="flex-1">
-                                                <h3 className="font-semibold text-card-foreground line-clamp-2 hover:text-primary transition-colors truncate text-base">
-                                                    {product.title}
-                                                </h3>
-                                            </Link>
-                                            <button 
-                                                className="flex-shrink-0 ml-2 p-1 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    // Favori işlemi burada yapılabilir
-                                                }}
-                                            >
-                                                <Heart className="w-4 h-4" />
-                                            </button>
+                                            <h3 className="font-semibold text-card-foreground line-clamp-2 truncate text-base flex-1">
+                                                {product.title}
+                                            </h3>
+                                            {auth.user && auth.user.id !== product.user?.id && (
+                                                <button 
+                                                    className={`flex-shrink-0 ml-2 p-1 rounded transition-colors ${
+                                                        favoritedProducts.has(product.id)
+                                                            ? 'text-red-500 bg-red-50 dark:bg-red-900/20'
+                                                            : 'text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'
+                                                    }`}
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        toggleFavorite(product.id);
+                                                    }}
+                                                >
+                                                    <Heart className={`w-4 h-4 ${favoritedProducts.has(product.id) ? 'fill-current' : ''}`} />
+                                                </button>
+                                            )}
                                         </div>
                                         
                                         <div className="text-xs text-gray-500 dark:text-gray-400">
-                                            {getCategoryText(product.category)} • {product.condition}
+                                            {getCategoryText(product.category)} • {getConditionText(product.condition)}
                                         </div>
                                         
                                         <div className="font-bold text-primary mt-auto">
@@ -219,7 +255,7 @@ export default function Welcome() {
                                             )}
                                         </div>
                                     </div>
-                                </div>
+                                </Link>
                             ))}
                             </div>
                             
