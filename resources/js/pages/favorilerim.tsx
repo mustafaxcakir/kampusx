@@ -1,8 +1,10 @@
+import { useState, useEffect } from 'react';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage, useForm } from '@inertiajs/react';
 import { Heart, MapPin, Calendar, User } from 'lucide-react';
+import OptimizedImage from '@/components/optimized-image';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -17,6 +19,30 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Favorilerim() {
     const { favorites } = usePage<{ favorites: any[] }>().props;
+    const [visibleImages, setVisibleImages] = useState<Set<number>>(new Set());
+    
+    const removeForm = useForm({});
+
+    // Intersection Observer ile görünür resimleri takip et
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        const productId = parseInt(entry.target.getAttribute('data-product-id') || '0');
+                        setVisibleImages(prev => new Set([...prev, productId]));
+                    }
+                });
+            },
+            { threshold: 0.1 }
+        );
+
+        // Tüm ürün kartlarını gözlemle
+        const cards = document.querySelectorAll('[data-product-id]');
+        cards.forEach(card => observer.observe(card));
+
+        return () => observer.disconnect();
+    }, [favorites]);
 
     const formatPrice = (price: number) => {
         return Number(price) % 1 === 0 
@@ -37,55 +63,86 @@ export default function Favorilerim() {
         return categories[category] || category;
     };
 
+    const getConditionText = (condition: string) => {
+        const conditions: { [key: string]: string } = {
+            'new': 'Yeni',
+            'like_new': 'Az Kullanılmış',
+            'used': 'Kullanılmış'
+        };
+        return conditions[condition] || condition;
+    };
+
+    const removeFromFavorites = (productId: number) => {
+        removeForm.delete(`/products/${productId}/favorite`, {
+            onSuccess: () => {
+                // Sayfayı yenile
+                window.location.reload();
+            },
+        });
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Favorilerim" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold text-card-foreground">Favorilerim</h1>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Heart className="w-4 h-4" />
-                        <span>{favorites?.length || 0} ürün</span>
-                    </div>
                 </div>
 
                 {favorites && favorites.length > 0 ? (
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
                         {favorites.map((product) => (
-                            <div key={product.id} className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 overflow-hidden hover:shadow-md transition-shadow">
+                            <div key={product.id} className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 overflow-hidden hover:shadow-md transition-shadow flex flex-col" data-product-id={product.id}>
                                 <Link href={route('product.show', { id: product.id })}>
-                                    <div className="aspect-square overflow-hidden">
+                                    <div className="h-32 w-full bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
                                         {product.images && product.images.length > 0 ? (
-                                            <img 
-                                                src={`/storage/${product.images[0]}`}
-                                                alt={product.title}
-                                                className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
-                                            />
+                                            visibleImages.has(product.id) ? (
+                                                <OptimizedImage
+                                                    src={"/storage/" + product.images[0]}
+                                                    alt={product.title}
+                                                    className="object-cover w-full h-full hover:scale-105 transition-transform duration-200"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full bg-gray-200 dark:bg-gray-700 animate-pulse flex items-center justify-center">
+                                                    <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+                                                </div>
+                                            )
                                         ) : (
-                                            <div className="w-full h-full bg-muted flex items-center justify-center">
-                                                <span className="text-muted-foreground text-sm">Fotoğraf Yok</span>
+                                            <div className="w-full h-full flex items-center justify-center">
+                                                <span className="text-gray-400 text-xs">Fotoğraf yok</span>
                                             </div>
                                         )}
                                     </div>
                                 </Link>
                                 
-                                <div className="p-4">
-                                    <Link href={route('product.show', { id: product.id })}>
-                                        <h3 className="font-semibold text-card-foreground mb-2 line-clamp-2 hover:text-primary transition-colors">
-                                            {product.title}
-                                        </h3>
-                                    </Link>
-                                    
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-lg font-bold text-green-600 dark:text-green-400">
-                                            {formatPrice(product.price)}
-                                        </span>
-                                        <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
-                                            {getCategoryText(product.category)}
-                                        </span>
+                                <div className="p-4 flex-1 flex flex-col gap-2">
+                                    <div className="flex items-start justify-between">
+                                        <Link href={route('product.show', { id: product.id })} className="flex-1">
+                                            <h3 className="font-semibold text-card-foreground line-clamp-2 hover:text-primary transition-colors truncate text-base">
+                                                {product.title}
+                                            </h3>
+                                        </Link>
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                removeFromFavorites(product.id);
+                                            }}
+                                            disabled={removeForm.processing}
+                                            className="flex-shrink-0 ml-2 p-1 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                                        >
+                                            <Heart className="w-4 h-4 fill-current" />
+                                        </button>
                                     </div>
                                     
-                                    <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                                        {getCategoryText(product.category)} • {getConditionText(product.condition)}
+                                    </div>
+                                    
+                                    <div className="font-bold text-primary mt-auto">
+                                        {formatPrice(product.price)}
+                                    </div>
+                                    
+                                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                         <User className="w-3 h-3" />
                                         <span>{product.user.name} {product.user.surname}</span>
                                     </div>

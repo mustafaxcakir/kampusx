@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Pencil, Trash2 } from 'lucide-react';
 import InputError from '@/components/input-error';
+import OptimizedImage from '@/components/optimized-image';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -46,6 +47,7 @@ export default function Ilanlarim() {
     const [editProduct, setEditProduct] = useState<any>(null);
     const [deleteModal, setDeleteModal] = useState(false);
     const [deleteProduct, setDeleteProduct] = useState<any>(null);
+    const [visibleImages, setVisibleImages] = useState<Set<number>>(new Set());
     
     const form = useForm({
         title: '',
@@ -66,6 +68,27 @@ export default function Ilanlarim() {
                 setLoading(false);
             });
     }, []);
+
+    // Intersection Observer ile görünür resimleri takip et
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        const productId = parseInt(entry.target.getAttribute('data-product-id') || '0');
+                        setVisibleImages(prev => new Set([...prev, productId]));
+                    }
+                });
+            },
+            { threshold: 0.1 }
+        );
+
+        // Tüm ürün kartlarını gözlemle
+        const cards = document.querySelectorAll('[data-product-id]');
+        cards.forEach(card => observer.observe(card));
+
+        return () => observer.disconnect();
+    }, [products]);
 
     const openEditModal = (product: any) => {
         setEditProduct(product);
@@ -138,16 +161,28 @@ export default function Ilanlarim() {
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
                         {products.map(product => (
-                            <Card key={product.id} className="flex flex-col">
+                            <Card key={product.id} className="flex flex-col" data-product-id={product.id}>
                                 <CardHeader>
                                     <CardTitle className="truncate text-base">{product.title}</CardTitle>
                                 </CardHeader>
                                 <CardContent className="flex-1 flex flex-col gap-2">
-                                    <div className="h-32 w-full bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center overflow-hidden">
+                                    <div className="h-32 w-full bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
                                         {product.images && product.images.length > 0 ? (
-                                            <img src={"/storage/" + product.images[0]} alt={product.title} className="object-cover w-full h-full" />
+                                            visibleImages.has(product.id) ? (
+                                                <OptimizedImage
+                                                    src={"/storage/" + product.images[0]}
+                                                    alt={product.title}
+                                                    className="object-cover w-full h-full"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full bg-gray-200 dark:bg-gray-700 animate-pulse flex items-center justify-center">
+                                                    <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+                                                </div>
+                                            )
                                         ) : (
-                                            <span className="text-gray-400 text-xs">Fotoğraf yok</span>
+                                            <div className="w-full h-full flex items-center justify-center">
+                                                <span className="text-gray-400 text-xs">Fotoğraf yok</span>
+                                            </div>
                                         )}
                                     </div>
                                     <div className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">{product.description}</div>
@@ -253,7 +288,7 @@ export default function Ilanlarim() {
                             <InputError message={form.errors.price} />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="location">Konum </Label>
+                            <Label htmlFor="location">Konum</Label>
                             <Input 
                                 id="location" 
                                 value={form.data.location} 
