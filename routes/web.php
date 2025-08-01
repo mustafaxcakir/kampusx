@@ -110,15 +110,17 @@ Route::middleware('auth')->group(function () {
 
     // İlan güncelle
     Route::patch('/products/{product}', function ($productId) {
-        // Rate limiting: 1 dakikada maksimum 5 güncelleme
-        $key = 'product_update_' . auth()->id();
-        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 5)) {
-            return back()->withErrors(['error' => 'Çok fazla güncelleme yapıyorsunuz. Lütfen biraz bekleyin.']);
-        }
-        \Illuminate\Support\Facades\RateLimiter::hit($key, 60);
+        try {
+            // Rate limiting: 1 dakikada maksimum 5 güncelleme
+            $key = 'product_update_' . auth()->id();
+            if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 5)) {
+                return back()->withErrors(['error' => 'Çok fazla güncelleme yapıyorsunuz. Lütfen biraz bekleyin.']);
+            }
+            \Illuminate\Support\Facades\RateLimiter::hit($key, 60);
+            
+            $user = auth()->user();
+            $product = $user->products()->findOrFail($productId);
         
-        $user = auth()->user();
-        $product = $user->products()->findOrFail($productId);
         $validated = request()->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -127,13 +129,43 @@ Route::middleware('auth')->group(function () {
             'condition' => 'required|string|in:new,like_new,used',
             'university_id' => 'required|exists:universities,id',
         ]);
-        $product->update($validated);
+        
+        // Ürünü güncelle (fotoğraflar hariç)
+        $product->update([
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'price' => $validated['price'],
+            'category' => $validated['category'],
+            'condition' => $validated['condition'],
+            'university_id' => $validated['university_id'],
+        ]);
+        
+        // Güncel ürün verisini al
+        $updatedProduct = $product->fresh();
         
         if (request()->wantsJson()) {
-            return response()->json($product);
+            return response()->json(['success' => true, 'product' => $updatedProduct]);
         }
         
-        return back()->with('success', 'İlan başarıyla güncellendi!');
+        // Inertia.js için güncel ürün verisini döndür
+        return back()->with([
+            'success' => 'İlan başarıyla güncellendi!',
+            'updatedProduct' => $updatedProduct
+        ]);
+        
+        } catch (\Exception $e) {
+            \Log::error('Product update error: ' . $e->getMessage(), [
+                'user_id' => auth()->id(),
+                'product_id' => $productId,
+                'request_data' => request()->all()
+            ]);
+            
+            if (request()->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Güncelleme sırasında hata oluştu: ' . $e->getMessage()], 500);
+            }
+            
+            return back()->with('error', 'Güncelleme sırasında hata oluştu!');
+        }
     })->name('products.update');
 
     // İlan sil

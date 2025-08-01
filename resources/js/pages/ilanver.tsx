@@ -46,6 +46,8 @@ export default function IlanVer() {
     const [imagePreview, setImagePreview] = useState<string[]>([]);
     const [uploadingImages, setUploadingImages] = useState<{ [key: string]: boolean }>({});
     const [showSuccessToast, setShowSuccessToast] = useState(false);
+    const [showErrorToast, setShowErrorToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
 
     // Component unmount olduğunda URL'leri temizle
     useEffect(() => {
@@ -57,6 +59,17 @@ export default function IlanVer() {
     }, []);
 
     // Popup'ları geçici olarak kaldırdık
+
+    const showToast = (message: string, type: 'success' | 'error') => {
+        setToastMessage(message);
+        if (type === 'success') {
+            setShowSuccessToast(true);
+            setTimeout(() => setShowSuccessToast(false), 3000);
+        } else {
+            setShowErrorToast(true);
+            setTimeout(() => setShowErrorToast(false), 3000);
+        }
+    };
 
     const form = useForm({
         title: '',
@@ -84,7 +97,7 @@ export default function IlanVer() {
         
         // Toplam dosya sayısı kontrolü
         if (selectedImages.length + files.length > 5) {
-            alert('Maksimum 5 fotoğraf yükleyebilirsiniz.');
+            showToast('Maksimum 5 fotoğraf yükleyebilirsiniz.', 'error');
             return;
         }
         
@@ -93,14 +106,14 @@ export default function IlanVer() {
             // Dosya türü kontrolü
             const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
             if (!validTypes.includes(file.type)) {
-                alert(`${file.name} geçersiz dosya türü. Sadece JPEG ve PNG dosyaları kabul edilir.`);
+                showToast(`${file.name} geçersiz dosya türü. Sadece JPEG ve PNG dosyaları kabul edilir.`, 'error');
                 return false;
             }
             
             // Dosya boyutu kontrolü (10MB - sıkıştırma öncesi maksimum)
             const maxSize = 10 * 1024 * 1024; // 10MB
             if (file.size > maxSize) {
-                alert(`${file.name} çok büyük. Maksimum dosya boyutu 10MB olmalıdır.`);
+                showToast(`${file.name} çok büyük. Maksimum dosya boyutu 10MB olmalıdır.`, 'error');
                 return false;
             }
             
@@ -135,6 +148,9 @@ export default function IlanVer() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         
+        console.log('Gönderilen fotoğraflar:', selectedImages.length);
+        console.log('Form data:', form.data);
+        
         // Yükleme durumunu başlat
         const uploadStates: { [key: string]: boolean } = {};
         selectedImages.forEach((file, index) => {
@@ -145,6 +161,7 @@ export default function IlanVer() {
         form.post(route('products.store'), {
             preserveScroll: true,
             onSuccess: () => {
+                console.log('Başarılı!');
                 setShowSuccessToast(true);
                 form.reset();
                 setSelectedImages([]);
@@ -156,7 +173,8 @@ export default function IlanVer() {
                     setShowSuccessToast(false);
                 }, 3000);
             },
-            onError: () => {
+            onError: (errors) => {
+                console.log('Hata:', errors);
                 setUploadingImages({});
             },
         });
@@ -475,6 +493,31 @@ export default function IlanVer() {
                         </div>
                         <button 
                             onClick={() => setShowSuccessToast(false)}
+                            className="flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity"
+                        >
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Hata Toast Notification */}
+            {showErrorToast && (
+                <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 duration-300">
+                    <div className="bg-red-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 min-w-[300px]">
+                        <div className="flex-shrink-0">
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                        </div>
+                        <div className="flex-1">
+                            <h4 className="font-semibold">Hata!</h4>
+                            <p className="text-sm opacity-90">{toastMessage}</p>
+                        </div>
+                        <button 
+                            onClick={() => setShowErrorToast(false)}
                             className="flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity"
                         >
                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">

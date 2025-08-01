@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, useForm, Link } from '@inertiajs/react';
+import { Head, useForm, Link, usePage } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Pencil, Trash2, Package, Calendar, MapPin } from 'lucide-react';
+import { Pencil, Trash2, Package, Calendar, MapPin, X } from 'lucide-react';
 import InputError from '@/components/input-error';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -70,6 +70,7 @@ const getCategoryText = (category: string) => {
     };
 
             export default function Ilanlarim() {
+                const { csrf } = usePage<{ csrf: string }>().props;
                 const [products, setProducts] = useState<any[]>([]);
                 const [editModal, setEditModal] = useState(false);
     const [editProduct, setEditProduct] = useState<any>(null);
@@ -77,6 +78,10 @@ const getCategoryText = (category: string) => {
     const [deleteProduct, setDeleteProduct] = useState<any>(null);
     const [visibleImages, setVisibleImages] = useState<Set<number>>(new Set());
     const [loading, setLoading] = useState(true);
+    const [showSuccessToast, setShowSuccessToast] = useState(false);
+    const [showErrorToast, setShowErrorToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
+
 
     const form = useForm({
         title: '',
@@ -84,7 +89,7 @@ const getCategoryText = (category: string) => {
         price: '',
         category: '',
         condition: '',
-        location: '',
+        university_id: '',
     });
     
     const deleteForm = useForm({});
@@ -143,7 +148,7 @@ const getCategoryText = (category: string) => {
             price: product.price,
             category: product.category,
             condition: product.condition,
-            location: product.location,
+            university_id: product.university_id?.toString() || '',
         });
         setEditModal(true);
     }, [form]);
@@ -154,15 +159,43 @@ const getCategoryText = (category: string) => {
         form.reset();
     };
 
+    const showToast = (message: string, type: 'success' | 'error') => {
+        setToastMessage(message);
+        if (type === 'success') {
+            setShowSuccessToast(true);
+            setTimeout(() => setShowSuccessToast(false), 3000);
+        } else {
+            setShowErrorToast(true);
+            setTimeout(() => setShowErrorToast(false), 3000);
+        }
+    };
+
+
+
     const handleEditSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        
+        // Inertia.js ile gönder
         form.patch(`/products/${editProduct.id}`, {
-            onSuccess: () => {
-                // Ürünü güncelle
-                const updated = form.data;
-                setProducts(products.map(p => p.id === editProduct.id ? { ...p, ...updated } : p));
+            onSuccess: (page) => {
+                // Backend'den dönen güncel ürün verisini kullan
+                if (page.props.updatedProduct) {
+                    setProducts(products.map(p => p.id === editProduct.id ? page.props.updatedProduct : p));
+                } else {
+                    // Eğer backend'den veri dönmüyorsa, local state'i güncelle
+                    const updated = form.data;
+                    setProducts(products.map(p => p.id === editProduct.id ? { 
+                        ...p, 
+                        ...updated
+                    } : p));
+                }
+                
                 closeEditModal();
+                showToast('İlan başarıyla güncellendi!', 'success');
             },
+            onError: (errors) => {
+                showToast('Güncelleme hatası: ' + Object.values(errors).join(', '), 'error');
+            }
         });
     };
 
@@ -179,17 +212,15 @@ const getCategoryText = (category: string) => {
     const handleDelete = () => {
         if (!deleteProduct) return;
         
-        console.log('Silme işlemi başlatılıyor:', deleteProduct.id);
-        
         // Inertia.js ile silme
         deleteForm.post(`/products/${deleteProduct.id}/delete`, {
             onSuccess: () => {
-                console.log('İlan başarıyla silindi');
                 setProducts(products.filter(p => p.id !== deleteProduct.id));
                 closeDeleteModal();
+                showToast('İlan başarıyla silindi!', 'success');
             },
             onError: (errors) => {
-                console.log('Silme hatası:', errors);
+                showToast('Silme hatası: ' + Object.values(errors).join(', '), 'error');
             },
         });
     };
@@ -370,15 +401,9 @@ const getCategoryText = (category: string) => {
                             />
                             <InputError message={form.errors.price} />
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="location">Konum</Label>
-                            <Input 
-                                id="location" 
-                                value={form.data.location} 
-                                onChange={e => form.setData('location', e.target.value)} 
-                            />
-                            <InputError message={form.errors.location} />
-                        </div>
+
+
+
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={closeEditModal}>Vazgeç</Button>
                             <Button type="submit" disabled={form.processing}>
@@ -431,6 +456,56 @@ const getCategoryText = (category: string) => {
                     </div>
                 </DialogContent>
             </Dialog>
+
+            {/* Başarı Toast Notification */}
+            {showSuccessToast && (
+                <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 duration-300">
+                    <div className="bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 min-w-[300px]">
+                        <div className="flex-shrink-0">
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                        </div>
+                        <div className="flex-1">
+                            <h4 className="font-semibold">Başarılı!</h4>
+                            <p className="text-sm opacity-90">{toastMessage}</p>
+                        </div>
+                        <button 
+                            onClick={() => setShowSuccessToast(false)}
+                            className="flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity"
+                        >
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Hata Toast Notification */}
+            {showErrorToast && (
+                <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 duration-300">
+                    <div className="bg-red-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 min-w-[300px]">
+                        <div className="flex-shrink-0">
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                        </div>
+                        <div className="flex-1">
+                            <h4 className="font-semibold">Hata!</h4>
+                            <p className="text-sm opacity-90">{toastMessage}</p>
+                        </div>
+                        <button 
+                            onClick={() => setShowErrorToast(false)}
+                            className="flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity"
+                        >
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            )}
         </AppLayout>
     );
 }
