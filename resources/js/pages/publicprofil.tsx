@@ -266,22 +266,22 @@ export default function PublicProfile() {
                                                 <button
                                                     onClick={handleToggleFollow}
                                                     disabled={followLoading}
-                                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
+                                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-200 ${
                                                         isFollowing
                                                             ? 'bg-muted text-muted-foreground hover:bg-muted/80'
-                                                            : 'bg-[#FF3F33] text-white hover:bg-[#E6392E]'
+                                                            : 'bg-primary text-primary-foreground hover:bg-primary/90'
                                                     } ${followLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                 >
                                                     {followLoading ? (
-                                                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                                        <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
                                                     ) : isFollowing ? (
                                                         <>
-                                                            <UserMinus className="w-4 h-4" />
+                                                            <UserMinus className="w-3 h-3" />
                                                             Takibi Bırak
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <UserPlus className="w-4 h-4" />
+                                                            <UserPlus className="w-3 h-3" />
                                                             Takip Et
                                                         </>
                                                     )}
