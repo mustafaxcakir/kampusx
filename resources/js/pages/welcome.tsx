@@ -1,14 +1,13 @@
 import { type SharedData } from '@/types';
-import { Head, Link, usePage, useForm, router } from '@inertiajs/react';
-import { Heart, Truck, Shield, MapPin, Calendar, User } from 'lucide-react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { Truck, Shield, MapPin, Calendar, User } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 export default function Welcome() {
     const { auth } = usePage<SharedData>().props;
-    const { products, errors, favoritedProductIds } = usePage<{ products: any[]; errors: any; favoritedProductIds: number[] }>().props;
+    const { products } = usePage<{ products: any[] }>().props;
     const [loading, setLoading] = useState(true);
     const [showAllProducts, setShowAllProducts] = useState(false);
-    const [favoritedProducts, setFavoritedProducts] = useState<Set<number>>(new Set(favoritedProductIds || []));
 
     const formatPrice = (price: number) => {
         return Number(price) % 1 === 0 
@@ -51,23 +50,7 @@ export default function Welcome() {
         return conditions[condition] || condition;
     };
 
-    const toggleFavorite = (productId: number) => {
-        const isFavorited = favoritedProducts.has(productId);
-        
-        if (isFavorited) {
-            // Favorilerden çıkar
-            router.delete(route('favorites.remove', { product: productId }));
-            setFavoritedProducts(prev => {
-                const newSet = new Set(prev);
-                newSet.delete(productId);
-                return newSet;
-            });
-        } else {
-            // Favorilere ekle
-            router.post(route('favorites.add', { product: productId }));
-            setFavoritedProducts(prev => new Set([...prev, productId]));
-        }
-    };
+
 
     return (
         <>
@@ -192,41 +175,25 @@ export default function Welcome() {
                                     style={{ willChange: 'transform' }}
                                 >
                                     <div className="p-4 flex-1 flex flex-col gap-2">
-                                        <div className="h-32 w-full bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
-                                            {product.images && product.images.length > 0 ? (
-                                                <img
-                                                    src={`/storage/${product.images[0]}`}
-                                                    alt={product.title}
-                                                    className="object-cover w-full h-full"
-                                                    loading="lazy"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center">
-                                                    <span className="text-gray-400 text-xs">Fotoğraf yok</span>
-                                                </div>
-                                            )}
-                                        </div>
+                                                                                            <div className="h-32 w-full bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
+                                                        {product.images && product.images.length > 0 ? (
+                                                            <img
+                                                                src={`/storage/${product.images[0]}`}
+                                                                alt={product.title}
+                                                                className="object-contain w-full h-full"
+                                                                loading="lazy"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center">
+                                                                <span className="text-gray-400 text-xs">Fotoğraf yok</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                         
                                         <div className="flex items-start justify-between">
                                             <h3 className="font-semibold text-card-foreground line-clamp-2 truncate text-base flex-1">
                                                 {product.title}
                                             </h3>
-                                            {auth.user && auth.user.id !== product.user?.id && (
-                                                <button 
-                                                    className={`flex-shrink-0 ml-2 p-1 rounded transition-colors ${
-                                                        favoritedProducts.has(product.id)
-                                                            ? 'text-red-500 bg-red-50 dark:bg-red-900/20'
-                                                            : 'text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'
-                                                    }`}
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        e.stopPropagation();
-                                                        toggleFavorite(product.id);
-                                                    }}
-                                                >
-                                                    <Heart className={`w-4 h-4 ${favoritedProducts.has(product.id) ? 'fill-current' : ''}`} />
-                                                </button>
-                                            )}
                                         </div>
                                         
                                         <div className="text-xs text-gray-500 dark:text-gray-400">

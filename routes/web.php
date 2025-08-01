@@ -11,17 +11,8 @@ Route::get('/', function () {
         ->latest()
         ->get();
     
-    // Kullanıcının favori durumlarını kontrol et
-    $viewer = auth()->user();
-    $favoritedProductIds = [];
-    
-    if ($viewer) {
-        $favoritedProductIds = $viewer->favorites()->pluck('product_id')->toArray();
-    }
-    
     return Inertia::render('welcome', [
-        'products' => $products,
-        'favoritedProductIds' => $favoritedProductIds
+        'products' => $products
     ]);
 })->name('home');
 
