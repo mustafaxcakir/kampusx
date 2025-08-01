@@ -2,6 +2,7 @@ import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { Truck, Shield, MapPin, Calendar, User } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import Footer from '@/components/footer';
 
 export default function Welcome() {
     const { auth } = usePage<SharedData>().props;
@@ -66,9 +67,9 @@ export default function Welcome() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center h-16 gap-4">
                         {/* Logo */}
-                        <div className="flex items-center space-x-3">
+                        <Link href={route('home')} className="flex items-center space-x-3 hover:opacity-80 transition-opacity duration-200">
                             <span className="font-bold text-2xl text-foreground">KampusX</span>
-                        </div>
+                        </Link>
 
                         <div className="flex-1"></div>
 
@@ -255,33 +256,7 @@ export default function Welcome() {
                 </div>
             </section>
 
-            {/* FOOTER */}
-            <footer className="bg-gray-900 text-white py-12">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex flex-col md:flex-row justify-between items-center">
-                        <div className="flex items-center space-x-3 mb-4 md:mb-0">
-                            <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center">
-                                <span className="text-white font-bold text-sm">K</span>
-                            </div>
-                            <span className="font-bold text-xl">KampusX</span>
-                        </div>
-                        <div className="flex space-x-6 mb-4 md:mb-0">
-                            <Link href="#" className="text-gray-300 hover:text-white">
-                                Hakkımızda
-                            </Link>
-                            <Link href="#" className="text-gray-300 hover:text-white">
-                                İletişim
-                            </Link>
-                            <Link href="#" className="text-gray-300 hover:text-white">
-                                Gizlilik
-                            </Link>
-                        </div>
-                        <div className="text-gray-400 text-sm">
-                            © 2025 KampusX. Tüm hakları saklıdır.
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            <Footer />
         </>
     );
 }

@@ -2,6 +2,7 @@ import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { Calendar, MapPin, ArrowLeft, ChevronDown } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
+import Footer from '@/components/footer';
 
 interface CategoryPageProps {
     category: string;
@@ -86,9 +87,9 @@ export default function CategoryPage({ category, categoryName, products, allCate
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center h-16 gap-4">
                         {/* Logo */}
-                        <div className="flex items-center space-x-3">
+                        <Link href={route('home')} className="flex items-center space-x-3 hover:opacity-80 transition-opacity duration-200">
                             <span className="font-bold text-2xl text-foreground">KampusX</span>
-                        </div>
+                        </Link>
 
                         <div className="flex-1"></div>
 
@@ -313,6 +314,8 @@ export default function CategoryPage({ category, categoryName, products, allCate
                     )}
                 </div>
             </section>
+            
+            <Footer />
         </>
     );
 } 

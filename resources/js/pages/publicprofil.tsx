@@ -2,6 +2,7 @@ import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { Heart, Truck, Shield, MapPin, Calendar, User, Mail, MoreVertical, Star, Users, GraduationCap, Eye, Plus, Edit, Trash2, Phone, Globe, Lock, Users as UsersIcon } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import Footer from '@/components/footer';
 
 export default function PublicProfile() {
     const { auth } = usePage<SharedData>().props;
@@ -117,11 +118,9 @@ export default function PublicProfile() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center h-16 gap-4">
                         {/* Logo */}
-                        <div className="flex items-center space-x-3">
-                            <Link href="/" className="font-bold text-2xl text-foreground hover:text-muted-foreground">
-                                KampusX
-                            </Link>
-                        </div>
+                        <Link href={route('home')} className="flex items-center space-x-3 hover:opacity-80 transition-opacity duration-200">
+                            <span className="font-bold text-2xl text-foreground">KampusX</span>
+                        </Link>
 
                         <div className="flex-1"></div>
 
@@ -414,82 +413,7 @@ export default function PublicProfile() {
                 </div>
             </div>
 
-            {/* FOOTER */}
-            <footer className="bg-gray-900 text-white py-12">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
-                        {/* POPÜLER KATEGORİLER */}
-                        <div>
-                            <h4 className="font-semibold mb-4">POPÜLER KATEGORİLER</h4>
-                            <ul className="space-y-2 text-sm text-gray-300">
-                                <li><Link href="#" className="hover:text-white">İkinci El Cep Telefonu</Link></li>
-                                <li><Link href="#" className="hover:text-white">İkinci El Bilgisayar</Link></li>
-                                <li><Link href="#" className="hover:text-white">İkinci El Araba</Link></li>
-                                <li><Link href="#" className="hover:text-white">İkinci El Motosiklet</Link></li>
-                            </ul>
-                        </div>
-
-                        {/* POPÜLER SAYFALAR */}
-                        <div>
-                            <h4 className="font-semibold mb-4">POPÜLER SAYFALAR</h4>
-                            <ul className="space-y-2 text-sm text-gray-300">
-                                <li><Link href="#" className="hover:text-white">İkinci El Mobilya</Link></li>
-                                <li><Link href="#" className="hover:text-white">İkinci El Bisiklet</Link></li>
-                                <li><Link href="#" className="hover:text-white">İkinci El Bebek Arabası</Link></li>
-                                <li><Link href="#" className="hover:text-white">İkinci El Kask</Link></li>
-                            </ul>
-                        </div>
-
-                        {/* KAMPUSX */}
-                        <div>
-                            <h4 className="font-semibold mb-4">KAMPUSX</h4>
-                            <ul className="space-y-2 text-sm text-gray-300">
-                                <li><Link href="#" className="hover:text-white">Hakkımızda</Link></li>
-                                <li><Link href="#" className="hover:text-white">Yardım Ve Destek</Link></li>
-                                <li><Link href="#" className="hover:text-white">Güvenlik Önerileri</Link></li>
-                                <li><Link href="#" className="hover:text-white">İletişim</Link></li>
-                            </ul>
-                        </div>
-
-                        {/* BİZİ TAKİP ET */}
-                        <div>
-                            <h4 className="font-semibold mb-4">BİZİ TAKİP ET</h4>
-                            <div className="flex space-x-4 mb-4">
-                                <Link href="#" className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600">
-                                    <span className="text-xs">f</span>
-                                </Link>
-                                <Link href="#" className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600">
-                                    <span className="text-xs">t</span>
-                                </Link>
-                                <Link href="#" className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600">
-                                    <span className="text-xs">i</span>
-                                </Link>
-                                <Link href="#" className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600">
-                                    <span className="text-xs">y</span>
-                                </Link>
-                            </div>
-                            <div className="flex space-x-2">
-                                <div className="w-24 h-8 bg-gray-700 rounded"></div>
-                                <div className="w-24 h-8 bg-gray-700 rounded"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Bottom Bar */}
-                    <div className="border-t border-gray-800 pt-6">
-                        <div className="flex flex-col md:flex-row justify-between items-center">
-                            <div className="flex space-x-6 text-sm text-gray-400 mb-4 md:mb-0">
-                                <Link href="#" className="hover:text-white">Şartlar ve Koşullar</Link>
-                                <Link href="#" className="hover:text-white">Reklam Politikası</Link>
-                                <Link href="#" className="hover:text-white">Gizlilik Bildirimi</Link>
-                            </div>
-                            <div className="text-sm text-gray-400">
-                                Türkiye'de ikinci el eşya al ve sat. © 2006-2025 KampusX
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            <Footer />
         </>
     );
 }

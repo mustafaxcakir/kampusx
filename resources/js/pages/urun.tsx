@@ -2,6 +2,7 @@ import { type SharedData } from '@/types';
 import { Head, Link, usePage, useForm, router } from '@inertiajs/react';
 import { Heart, Truck, Shield, MapPin, Calendar, User, Mail, MoreVertical, Star, Users, GraduationCap, Eye, Plus, Edit, Trash2, Phone, Globe, Lock, Users as UsersIcon, ArrowLeft, Share2, MessageCircle, Tag, CheckCircle, Image as ImageIcon, HelpCircle, Send, X, ChevronLeft, ChevronRight, Flag, ZoomIn } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
+import Footer from '@/components/footer';
 
 export default function Urun() {
     const { auth } = usePage<SharedData>().props;
@@ -122,11 +123,9 @@ export default function Urun() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center h-16 gap-4">
                         {/* Logo */}
-                        <div className="flex items-center space-x-3">
-                            <Link href="/" className="font-bold text-2xl text-foreground hover:text-muted-foreground">
-                                KampusX
-                            </Link>
-                        </div>
+                        <Link href={route('home')} className="flex items-center space-x-3 hover:opacity-80 transition-opacity duration-200">
+                            <span className="font-bold text-2xl text-foreground">KampusX</span>
+                        </Link>
 
                         <div className="flex-1"></div>
 
@@ -780,6 +779,8 @@ export default function Urun() {
                     </div>
                 </div>
             )}
+            
+            <Footer />
         </>
     );
 }
