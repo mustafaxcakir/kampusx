@@ -163,18 +163,16 @@ export default function Favorilerim() {
                                         {formatPrice(product.price)}
                                     </div>
                                     
-                                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                        <div className="flex items-center gap-1">
-                                            <Calendar className="w-3 h-3" />
-                                            <span>{Math.ceil((Date.now() - new Date(product.created_at).getTime()) / (1000 * 60 * 60 * 24))} gün önce</span>
-                                        </div>
-                                        {product.university?.name && (
-                                            <div className="flex items-center gap-1">
-                                                <MapPin className="w-3 h-3" />
-                                                <span>{product.university.name}</span>
-                                            </div>
-                                        )}
+                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                        <Calendar className="w-3 h-3" />
+                                        <span>{Math.ceil((Date.now() - new Date(product.created_at).getTime()) / (1000 * 60 * 60 * 24))} gün önce</span>
                                     </div>
+                                    {product.university?.name && (
+                                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                            <MapPin className="w-3 h-3" />
+                                            <span>{product.university.name}</span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         ))}

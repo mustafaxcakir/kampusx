@@ -17,7 +17,7 @@ class Product extends Model
         'category',
         'condition',
         'images',
-        'location',
+        'university_id',
         'is_active',
     ];
 
@@ -30,6 +30,11 @@ class Product extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function university()
+    {
+        return $this->belongsTo(University::class);
     }
 
     public function questions()

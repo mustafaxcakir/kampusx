@@ -341,7 +341,7 @@ Route::get('/urun/{id}', function ($id) {
     }
     
     $page = request()->get('page', 1);
-    $product = \App\Models\Product::with(['user.university', 'questions.askedBy'])->findOrFail($id);
+    $product = \App\Models\Product::with(['user.university', 'university', 'questions.askedBy'])->findOrFail($id);
     $viewer = auth()->user();
     
     // Satıcı bilgileri

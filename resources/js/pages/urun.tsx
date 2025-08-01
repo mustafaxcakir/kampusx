@@ -555,10 +555,10 @@ export default function Urun() {
                                                 <span className="text-sm text-muted-foreground">Durum</span>
                                                 <span className="text-sm font-medium text-card-foreground">{getConditionText(product.condition)}</span>
                                             </div>
-                                            {product.location && (
+                                            {product.university?.name && (
                                                 <div className="flex items-center justify-between py-2 border-b border-sidebar-border/30">
-                                                    <span className="text-sm text-muted-foreground">Konum</span>
-                                                    <span className="text-sm font-medium text-card-foreground">{product.location}</span>
+                                                    <span className="text-sm text-muted-foreground">Üniversite</span>
+                                                    <span className="text-sm font-medium text-card-foreground">{product.university.name}</span>
                                                 </div>
                                             )}
                                             <div className="flex items-center justify-between py-2">

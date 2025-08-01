@@ -356,18 +356,16 @@ export default function PublicProfile() {
                                                     {listing.price}
                                                 </div>
                                                 
-                                                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                                    <div className="flex items-center gap-1">
-                                                        <Calendar className="w-3 h-3" />
-                                                        <span>{listing.daysAgo} gün önce</span>
-                                                    </div>
-                                                    {listing.university?.name && (
-                                                        <div className="flex items-center gap-1">
-                                                            <MapPin className="w-3 h-3" />
-                                                            <span>{listing.university.name}</span>
-                                                        </div>
-                                                    )}
+                                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                    <Calendar className="w-3 h-3" />
+                                                    <span>{listing.daysAgo} gün önce</span>
                                                 </div>
+                                                {listing.university?.name && (
+                                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                        <MapPin className="w-3 h-3" />
+                                                        <span>{listing.university.name}</span>
+                                                    </div>
+                                                )}
 
                                                 {/* Sadece kendi profilinde düzenleme butonları göster */}
                                                 {auth.user && auth.user.id === user.id && (
