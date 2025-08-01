@@ -42,6 +42,13 @@ Route::middleware('auth')->group(function () {
     })->name('profil');
     
     Route::post('/products', function () {
+        // Rate limiting: 1 dakikada maksimum 3 ürün ekleme
+        $key = 'product_create_' . auth()->id();
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 3)) {
+            return back()->withErrors(['error' => 'Çok fazla ürün eklemeye çalışıyorsunuz. Lütfen biraz bekleyin.']);
+        }
+        \Illuminate\Support\Facades\RateLimiter::hit($key, 60);
+        
         $validated = request()->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -67,12 +74,19 @@ Route::middleware('auth')->group(function () {
         if (request()->hasFile('images')) {
             $images = [];
             foreach (request()->file('images') as $image) {
-                // Dosya adını güvenli hale getir
-                $originalName = $image->getClientOriginalName();
-                $extension = $image->getClientOriginalExtension();
-                $safeName = time() . '_' . uniqid() . '.' . $extension;
+                // Güvenli dosya adı oluştur
+                $extension = strtolower($image->getClientOriginalExtension());
                 
-                // Dosyayı kaydet (GD extension yoksa normal kaydet)
+                // Sadece izin verilen uzantıları kabul et
+                $allowedExtensions = ['jpg', 'jpeg', 'png'];
+                if (!in_array($extension, $allowedExtensions)) {
+                    continue; // Geçersiz dosya türünü atla
+                }
+                
+                // Güvenli dosya adı oluştur
+                $safeName = 'product_' . time() . '_' . uniqid() . '.' . $extension;
+                
+                // Dosyayı kaydet
                 $path = $image->storeAs('products', $safeName, 'public');
                 $images[] = $path;
             }
@@ -91,6 +105,13 @@ Route::middleware('auth')->group(function () {
 
     // İlan güncelle
     Route::patch('/products/{product}', function ($productId) {
+        // Rate limiting: 1 dakikada maksimum 5 güncelleme
+        $key = 'product_update_' . auth()->id();
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 5)) {
+            return back()->withErrors(['error' => 'Çok fazla güncelleme yapıyorsunuz. Lütfen biraz bekleyin.']);
+        }
+        \Illuminate\Support\Facades\RateLimiter::hit($key, 60);
+        
         $user = auth()->user();
         $product = $user->products()->findOrFail($productId);
         $validated = request()->validate([
@@ -123,8 +144,13 @@ Route::middleware('auth')->group(function () {
             
             return back()->with('success', 'İlan başarıyla silindi!');
         } catch (\Exception $e) {
+            \Log::error('Product deletion error: ' . $e->getMessage(), [
+                'user_id' => auth()->id(),
+                'product_id' => $productId
+            ]);
+            
             if (request()->wantsJson()) {
-                return response()->json(['error' => $e->getMessage()], 500);
+                return response()->json(['error' => 'İlan silinirken bir hata oluştu'], 500);
             }
             
             return back()->with('error', 'İlan silinirken hata oluştu!');
@@ -133,6 +159,13 @@ Route::middleware('auth')->group(function () {
 
     // Soru-cevap route'ları
     Route::post('/products/{product}/questions', function ($productId) {
+        // Rate limiting: 1 dakikada maksimum 5 soru sorma
+        $key = 'question_ask_' . auth()->id();
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 5)) {
+            return back()->with('error', 'Çok fazla soru sordunuz. Lütfen biraz bekleyin.');
+        }
+        \Illuminate\Support\Facades\RateLimiter::hit($key, 60);
+        
         $validated = request()->validate([
             'question' => 'required|string|max:1000',
         ]);
@@ -192,6 +225,13 @@ Route::middleware('auth')->group(function () {
 
     // Favori işlemleri
     Route::post('/products/{product}/favorite', function ($productId) {
+        // Rate limiting: 1 dakikada maksimum 10 favori ekleme
+        $key = 'favorite_add_' . auth()->id();
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 10)) {
+            return back()->withErrors(['error' => 'Çok fazla deneme yaptınız. Lütfen biraz bekleyin.']);
+        }
+        \Illuminate\Support\Facades\RateLimiter::hit($key, 60);
+        
         $user = auth()->user();
         $product = \App\Models\Product::findOrFail($productId);
         
