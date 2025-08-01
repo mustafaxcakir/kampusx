@@ -8,7 +8,7 @@ export default function Welcome() {
     const { auth } = usePage<SharedData>().props;
     const { products } = usePage<{ products: any[] }>().props;
     const [loading, setLoading] = useState(true);
-    const [showAllProducts, setShowAllProducts] = useState(false);
+    const [visibleProducts, setVisibleProducts] = useState(10);
 
     const formatPrice = (price: number) => {
         const numPrice = Number(price);
@@ -158,7 +158,7 @@ export default function Welcome() {
                     ) : products && products.length > 0 ? (
                         <>
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
-                                {[...products].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, showAllProducts ? products.length : 10).map((product) => (
+                                {[...products].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, visibleProducts).map((product) => (
                                 <Link 
                                     key={product.id} 
                                     href={route('product.show', { id: product.id })}
@@ -207,13 +207,13 @@ export default function Welcome() {
                             </div>
                             
                             {/* Daha Fazla Ürün Butonu */}
-                            {!showAllProducts && products.length > 10 && (
+                            {visibleProducts < products.length && (
                                 <div className="flex justify-center mt-8">
                                     <button
-                                        onClick={() => setShowAllProducts(true)}
+                                        onClick={() => setVisibleProducts(prev => Math.min(prev + 10, products.length))}
                                         className="bg-primary text-primary-foreground px-8 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-200 shadow-sm"
                                     >
-                                        Daha Fazla Ürün Göster ({products.length - 10} ürün daha)
+                                        Daha Fazla Ürün Göster ({Math.min(10, products.length - visibleProducts)} ürün daha)
                                     </button>
                                 </div>
                             )}
