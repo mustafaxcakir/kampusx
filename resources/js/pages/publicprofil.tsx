@@ -1,13 +1,13 @@
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { Heart, Truck, Shield, MapPin, Calendar, User, Mail, MoreVertical, Star, Users, GraduationCap, Eye, Plus, Edit, Trash2, Phone, Globe, Lock, Users as UsersIcon } from 'lucide-react';
+import { Heart, Truck, Shield, MapPin, Calendar, User, Mail, MoreVertical, Star, Users, GraduationCap, Eye, Plus, Edit, Trash2, Phone, Globe, Lock, Users as UsersIcon, CheckCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Footer from '@/components/footer';
 
 export default function PublicProfile() {
     const { auth } = usePage<SharedData>().props;
     const { user, ads } = usePage<{ user: any; ads: any[] }>().props;
-    const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'sold' | 'rental'>('all');
+    const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'sold'>('all');
     const [visibleImages, setVisibleImages] = useState<Set<number>>(new Set());
     const [loading, setLoading] = useState(true);
     const [visibleListings, setVisibleListings] = useState(10);
@@ -35,7 +35,6 @@ export default function PublicProfile() {
         if (activeFilter === "all") return true;
         if (activeFilter === "active") return listing.status === "Satılıyor";
         if (activeFilter === "sold") return listing.status === "Satıldı";
-        if (activeFilter === "rental") return listing.status === "Kiralık";
         return true;
     });
 
@@ -45,8 +44,6 @@ export default function PublicProfile() {
                 return "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200";
             case "Satıldı":
                 return "bg-muted text-muted-foreground";
-            case "Kiralık":
-                return "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200";
             default:
                 return "bg-muted text-muted-foreground";
         }
@@ -292,16 +289,6 @@ export default function PublicProfile() {
                                     >
                                         Satıldı
                                     </button>
-                                    <button
-                                        onClick={() => setActiveFilter('rental')}
-                                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
-                                            activeFilter === 'rental'
-                                                ? 'bg-card text-card-foreground shadow-sm'
-                                                : 'text-muted-foreground hover:text-foreground'
-                                        }`}
-                                    >
-                                        Kiralık
-                                    </button>
                                 </div>
                             </div>
 
@@ -403,21 +390,29 @@ export default function PublicProfile() {
                             ) : (
                                 <div className="text-center py-12">
                                     <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <User className="h-12 w-12 text-muted-foreground" />
+                                        {activeFilter === 'sold' ? (
+                                            <CheckCircle className="h-12 w-12 text-muted-foreground" />
+                                        ) : (
+                                            <User className="h-12 w-12 text-muted-foreground" />
+                                        )}
                                     </div>
                                     <h3 className="text-xl font-semibold text-card-foreground mb-2">
-                                        Henüz bir İlanın yok
+                                        {activeFilter === 'sold' ? 'Henüz satılan yok' : 'Henüz bir İlanın yok'}
                                     </h3>
-                                    <p className="text-muted-foreground mb-8">
-                                        Artık kullanmadığın eşyaları elden çıkar
-                                    </p>
-                                    
-                                    <Link
-                                        href={route('ilanver')}
-                                        className="bg-[#FF3F33] text-white px-8 py-4 rounded-lg text-lg font-medium hover:bg-[#E6392E] transition-colors duration-200 inline-block"
-                                    >
-                                        Satmaya Başla
-                                    </Link>
+                                    {activeFilter !== 'sold' && (
+                                        <>
+                                            <p className="text-muted-foreground mb-8">
+                                                Artık kullanmadığın eşyaları elden çıkar
+                                            </p>
+                                            
+                                            <Link
+                                                href={route('ilanver')}
+                                                className="bg-[#FF3F33] text-white px-8 py-4 rounded-lg text-lg font-medium hover:bg-[#E6392E] transition-colors duration-200 inline-block"
+                                            >
+                                                Satmaya Başla
+                                            </Link>
+                                        </>
+                                    )}
                                 </div>
                             )}
                         </div>
