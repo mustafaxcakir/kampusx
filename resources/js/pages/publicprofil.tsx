@@ -10,6 +10,7 @@ export default function PublicProfile() {
     const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'sold' | 'rental'>('all');
     const [visibleImages, setVisibleImages] = useState<Set<number>>(new Set());
     const [loading, setLoading] = useState(true);
+    const [visibleListings, setVisibleListings] = useState(10);
     
     const formatPrice = (price: number) => {
         const numPrice = Number(price);
@@ -260,10 +261,10 @@ export default function PublicProfile() {
                                 <h2 className="text-2xl font-bold text-card-foreground">İlanlar</h2>
 
                                 {/* Filter Tabs */}
-                                <div className="flex space-x-1 bg-muted rounded-lg p-1">
+                                <div className="flex space-x-1 bg-muted rounded-lg p-1 overflow-x-auto">
                                     <button
                                         onClick={() => setActiveFilter('all')}
-                                        className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
                                             activeFilter === 'all'
                                                 ? 'bg-card text-card-foreground shadow-sm'
                                                 : 'text-muted-foreground hover:text-foreground'
@@ -273,7 +274,7 @@ export default function PublicProfile() {
                                     </button>
                                     <button
                                         onClick={() => setActiveFilter('active')}
-                                        className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
                                             activeFilter === 'active'
                                                 ? 'bg-card text-card-foreground shadow-sm'
                                                 : 'text-muted-foreground hover:text-foreground'
@@ -283,7 +284,7 @@ export default function PublicProfile() {
                                     </button>
                                     <button
                                         onClick={() => setActiveFilter('sold')}
-                                        className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
                                             activeFilter === 'sold'
                                                 ? 'bg-card text-card-foreground shadow-sm'
                                                 : 'text-muted-foreground hover:text-foreground'
@@ -293,7 +294,7 @@ export default function PublicProfile() {
                                     </button>
                                     <button
                                         onClick={() => setActiveFilter('rental')}
-                                        className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
                                             activeFilter === 'rental'
                                                 ? 'bg-card text-card-foreground shadow-sm'
                                                 : 'text-muted-foreground hover:text-foreground'
@@ -311,8 +312,9 @@ export default function PublicProfile() {
                                     <p className="text-muted-foreground">İlanlar yükleniyor...</p>
                                 </div>
                             ) : filteredListings.length > 0 ? (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
-                                    {filteredListings.map((listing) => (
+                                <>
+                                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+                                    {filteredListings.slice(0, visibleListings).map((listing) => (
                                         <Link 
                                             key={listing.id} 
                                             href={route('product.show', { id: listing.id })}
@@ -365,22 +367,21 @@ export default function PublicProfile() {
                                                         <span>{listing.university.name}</span>
                                                     </div>
                                                 )}
-
                                                 {/* Sadece kendi profilinde düzenleme butonları göster */}
                                                 {auth.user && auth.user.id === user.id && (
                                                     <div className="flex gap-2 mt-2" onClick={(e) => e.stopPropagation()}>
                                                         <Link 
                                                             href={route('ilanlarim')}
-                                                            className="flex-1 px-3 py-2 border border-sidebar-border rounded-md text-sm hover:bg-accent transition-colors text-foreground text-center"
+                                                            className="flex-1 px-2 py-2 border border-sidebar-border rounded-md text-xs hover:bg-accent transition-colors text-foreground text-center"
                                                         >
-                                                            <Edit className="w-4 h-4 mr-1 inline" />
+                                                            <Edit className="w-3 h-3 mr-1 inline" />
                                                             Düzenle
                                                         </Link>
                                                         <Link 
                                                             href={route('ilanlarim')}
-                                                            className="px-3 py-2 border border-sidebar-border rounded-md text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                                            className="px-2 py-2 border border-sidebar-border rounded-md text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                                                         >
-                                                            <Trash2 className="w-4 h-4" />
+                                                            <Trash2 className="w-3 h-3" />
                                                         </Link>
                                                     </div>
                                                 )}
@@ -388,6 +389,17 @@ export default function PublicProfile() {
                                         </Link>
                                     ))}
                                 </div>
+                                {visibleListings < filteredListings.length && (
+                                    <div className="flex justify-center mt-8">
+                                        <button
+                                            onClick={() => setVisibleListings(prev => Math.min(prev + 10, filteredListings.length))}
+                                            className="bg-primary text-primary-foreground px-8 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-200 shadow-sm"
+                                        >
+                                            Daha Fazla İlan Göster ({Math.min(10, filteredListings.length - visibleListings)} ilan daha)
+                                        </button>
+                                    </div>
+                                )}
+                                </>
                             ) : (
                                 <div className="text-center py-12">
                                     <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
