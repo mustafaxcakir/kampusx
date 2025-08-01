@@ -212,7 +212,7 @@ export default function CategoryPage({ category, categoryName, products, allCate
             </section>
 
             {/* Products Grid */}
-            <section className="py-8 bg-muted/50">
+            <section className="py-8 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {products.data && products.data.length > 0 ? (
                         <>
