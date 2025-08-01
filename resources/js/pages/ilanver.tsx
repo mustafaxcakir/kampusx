@@ -41,6 +41,7 @@ const conditions = [
 ];
 
 export default function IlanVer() {
+    const { universities, userUniversity } = usePage<{ universities: any[]; userUniversity: number }>().props;
     const [selectedImages, setSelectedImages] = useState<File[]>([]);
     const [imagePreview, setImagePreview] = useState<string[]>([]);
     const [uploadingImages, setUploadingImages] = useState<{ [key: string]: boolean }>({});
@@ -63,7 +64,7 @@ export default function IlanVer() {
         price: '',
         category: '',
         condition: '',
-        location: '',
+        university_id: userUniversity ? userUniversity.toString() : '',
         images: [] as File[],
     });
 
@@ -289,25 +290,38 @@ export default function IlanVer() {
                                                         form.setData('price', e.target.value);
                                                     }
                                                 }}
-                                                placeholder="100"
+                                                placeholder="1000"
                                                 className="dark:bg-gray-800 dark:border-gray-700"
                                             />
+                                            {form.data.price && (
+                                                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                                    Fiyat: {Number(form.data.price).toLocaleString('tr-TR')} ₺
+                                                </div>
+                                            )}
                                             <InputError message={form.errors.price} className="mt-1" />
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="location" className="text-gray-900 dark:text-gray-100">
+                                            <Label htmlFor="university_id" className="text-gray-900 dark:text-gray-100">
                                                 <MapPin className="h-4 w-4 inline mr-1" />
-                                                Konum
+                                                Üniversite *
                                             </Label>
-                                            <Input
-                                                id="location"
-                                                value={form.data.location}
-                                                onChange={(e) => form.setData('location', e.target.value)}
-                                                placeholder="Örn: A Blok, Merkez Kampüs"
-                                                className="dark:bg-gray-800 dark:border-gray-700"
-                                            />
-                                            <InputError message={form.errors.location} className="mt-1" />
+                                            <Select
+                                                value={form.data.university_id}
+                                                onValueChange={(value) => form.setData('university_id', value)}
+                                            >
+                                                <SelectTrigger className="dark:bg-gray-800 dark:border-gray-700">
+                                                    <SelectValue placeholder="Üniversite seçin" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {universities.map((university) => (
+                                                        <SelectItem key={university.id} value={university.id.toString()}>
+                                                            {university.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <InputError message={form.errors.university_id} className="mt-1" />
                                         </div>
                                     </div>
                                 </CardContent>

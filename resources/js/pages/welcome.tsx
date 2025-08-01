@@ -198,28 +198,19 @@ export default function Welcome() {
                                             </h3>
                                         </div>
                                         
-                                        <div className="text-xs text-gray-500 dark:text-gray-400">
-                                            {getCategoryText(product.category)} • {getConditionText(product.condition)}
-                                        </div>
-                                        
                                         <div className="font-bold text-primary mt-auto">
                                             {formatPrice(product.price)}
-                                        </div>
-                                        
-                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                            <User className="w-3 h-3" />
-                                            <span>{product.user?.name} {product.user?.surname}</span>
                                         </div>
                                         
                                         <div className="flex items-center justify-between text-xs text-muted-foreground">
                                             <div className="flex items-center gap-1">
                                                 <Calendar className="w-3 h-3" />
-                                                <span>{new Date(product.created_at).toLocaleDateString('tr-TR')}</span>
+                                                <span>{Math.ceil((Date.now() - new Date(product.created_at).getTime()) / (1000 * 60 * 60 * 24))} gün önce</span>
                                             </div>
-                                            {product.location && (
+                                            {product.university?.name && (
                                                 <div className="flex items-center gap-1">
                                                     <MapPin className="w-3 h-3" />
-                                                    <span>{product.location}</span>
+                                                    <span>{product.university.name}</span>
                                                 </div>
                                             )}
                                         </div>

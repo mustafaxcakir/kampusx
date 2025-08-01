@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Pencil, Trash2, Package } from 'lucide-react';
+import { Pencil, Trash2, Package, Calendar, MapPin } from 'lucide-react';
 import InputError from '@/components/input-error';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -245,10 +245,20 @@ const getCategoryText = (category: string) => {
                                             </div>
                                         )}
                                     </div>
-                                    <div className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">{product.description}</div>
-                                    <div className="text-xs text-gray-500 dark:text-gray-400">{getCategoryText(product.category)} • {getConditionText(product.condition)}</div>
                                     <div className="font-bold text-primary mt-auto">
                                         {formatPrice(product.price)}
+                                    </div>
+                                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                        <div className="flex items-center gap-1">
+                                            <Calendar className="w-3 h-3" />
+                                            <span>{Math.ceil((Date.now() - new Date(product.created_at).getTime()) / (1000 * 60 * 60 * 24))} gün önce</span>
+                                        </div>
+                                        {product.university?.name && (
+                                            <div className="flex items-center gap-1">
+                                                <MapPin className="w-3 h-3" />
+                                                <span>{product.university.name}</span>
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="flex gap-2 mt-2">
                                         <Button size="sm" variant="outline" onClick={() => openEditModal(product)}>

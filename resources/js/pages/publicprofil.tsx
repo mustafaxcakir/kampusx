@@ -25,10 +25,8 @@ export default function PublicProfile() {
         price: formatPrice(ad.price),
         status: ad.is_active ? "Satılıyor" : "Satıldı",
         image: ad.images && ad.images.length > 0 ? `/storage/${ad.images[0]}` : null,
-        category: ad.category,
-        date: new Date(ad.created_at).toLocaleDateString('tr-TR'),
-        condition: ad.condition,
-        location: ad.location,
+        daysAgo: Math.ceil((Date.now() - new Date(ad.created_at).getTime()) / (1000 * 60 * 60 * 24)),
+        university: ad.university,
     }));
 
     const filteredListings = listings.filter((listing) => {
@@ -354,10 +352,6 @@ export default function PublicProfile() {
                                                     </span>
                                                 </div>
                                                 
-                                                <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                    {listing.category} • {listing.condition}
-                                                </div>
-                                                
                                                 <div className="font-bold text-primary mt-auto">
                                                     {listing.price}
                                                 </div>
@@ -365,12 +359,12 @@ export default function PublicProfile() {
                                                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                                                     <div className="flex items-center gap-1">
                                                         <Calendar className="w-3 h-3" />
-                                                        <span>{listing.date}</span>
+                                                        <span>{listing.daysAgo} gün önce</span>
                                                     </div>
-                                                    {listing.location && (
+                                                    {listing.university?.name && (
                                                         <div className="flex items-center gap-1">
                                                             <MapPin className="w-3 h-3" />
-                                                            <span>{listing.location}</span>
+                                                            <span>{listing.university.name}</span>
                                                         </div>
                                                     )}
                                                 </div>

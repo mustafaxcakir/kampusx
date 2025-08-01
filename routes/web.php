@@ -6,7 +6,7 @@ use Inertia\Inertia;
 
 
 Route::get('/', function () {
-    $products = \App\Models\Product::with('user')
+    $products = \App\Models\Product::with(['user', 'university'])
         ->where('is_active', true)
         ->latest()
         ->get();
@@ -22,7 +22,12 @@ Route::middleware('auth')->group(function () {
     })->name('dashboard');
     
     Route::get('ilanver', function () {
-        return Inertia::render('ilanver');
+        $user = auth()->user();
+        $universities = \App\Models\University::orderBy('name')->get(['id', 'name']);
+        return Inertia::render('ilanver', [
+            'universities' => $universities,
+            'userUniversity' => $user->university_id
+        ]);
     })->name('ilanver');
     
     Route::get('ilanlarim', function () {
@@ -55,7 +60,7 @@ Route::middleware('auth')->group(function () {
             'price' => 'required|numeric|min:0|max:99999999',
             'category' => 'required|string',
             'condition' => 'required|string|in:new,like_new,used',
-            'location' => 'nullable|string|max:255',
+            'university_id' => 'required|exists:universities,id',
             'images' => 'nullable|array|max:5', // Maksimum 5 fotoğraf
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg|dimensions:min_width=100,min_height=100',
         ]);
@@ -67,7 +72,7 @@ Route::middleware('auth')->group(function () {
             'price' => $validated['price'],
             'category' => $validated['category'],
             'condition' => $validated['condition'],
-            'location' => $validated['location'],
+            'university_id' => $validated['university_id'],
         ]);
 
         // Fotoğrafları güvenli şekilde kaydet
@@ -99,7 +104,7 @@ Route::middleware('auth')->group(function () {
     // Kullanıcının kendi ilanlarını getir
     Route::get('/my-products', function () {
         $user = auth()->user();
-        $products = $user->products()->latest()->get();
+        $products = $user->products()->with('university')->latest()->get();
         return response()->json($products);
     })->name('products.mine');
 
@@ -120,7 +125,7 @@ Route::middleware('auth')->group(function () {
             'price' => 'required|numeric|min:0|max:99999999',
             'category' => 'required|string',
             'condition' => 'required|string|in:new,like_new,used',
-            'location' => 'nullable|string|max:255',
+            'university_id' => 'required|exists:universities,id',
         ]);
         $product->update($validated);
         
@@ -267,7 +272,7 @@ Route::middleware('auth')->group(function () {
     // Favorilerim sayfası
     Route::get('/favorilerim', function () {
         $user = auth()->user();
-        $favorites = $user->favoriteProducts()->with('user')->latest()->get();
+        $favorites = $user->favoriteProducts()->with(['user', 'university'])->latest()->get();
         
         return Inertia::render('favorilerim', [
             'favorites' => $favorites
@@ -298,7 +303,7 @@ Route::get('profil/{unique_id}', function ($unique_id) {
     $viewer = auth()->user();
     
     // Kullanıcının ürünlerini getir
-    $ads = $user->products()->latest()->get();
+    $ads = $user->products()->with('university')->latest()->get();
     
     return Inertia::render('publicprofil', [
         'user' => [
