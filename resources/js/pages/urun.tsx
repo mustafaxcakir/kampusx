@@ -133,7 +133,7 @@ export default function Urun() {
                             {auth.user ? (
                                 <Link
                                     href={route('dashboard')}
-                                    className="bg-[#075B5E] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#064A4D] transition-colors duration-200 shadow-sm"
+                                    className="bg-[#101828] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#0D141F] transition-colors duration-200 shadow-sm"
                                 >
                                     Dashboard
                                 </Link>
@@ -579,7 +579,7 @@ export default function Urun() {
 
                                     {/* Action Buttons */}
                                     <div className="space-y-2">
-                                        <button className="w-full bg-[#075B5E] text-white font-medium py-3 px-4 rounded-lg hover:bg-[#064A4D] transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer">
+                                        <button className="w-full bg-[#101828] text-white font-medium py-3 px-4 rounded-lg hover:bg-[#0D141F] transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer">
                                             <MessageCircle className="w-4 h-4" />
                                             Satıcı ile İletişim
                                         </button>
@@ -595,7 +595,7 @@ export default function Urun() {
                                             ) : (
                                                 <button 
                                                     onClick={() => router.post(route('favorites.add', { product: product.id }))}
-                                                    className="w-full bg-[#075B5E] text-white font-medium py-3 px-4 rounded-lg hover:bg-[#064A4D] transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer"
+                                                    className="w-full bg-[#101828] text-white font-medium py-3 px-4 rounded-lg hover:bg-[#0D141F] transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer"
                                                 >
                                                     <Heart className="w-4 h-4" />
                                                     Favorilere Ekle
@@ -615,7 +615,7 @@ export default function Urun() {
                             <div className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 p-6">
                                 <div className="flex items-center gap-4 mb-4">
                                     <div className="relative">
-                                        <div className="w-12 h-12 bg-[#075B5E] rounded-lg flex items-center justify-center">
+                                        <div className="w-12 h-12 bg-[#101828] rounded-lg flex items-center justify-center">
                                             <span className="text-white font-bold text-lg">
                                                 {seller.name.charAt(0).toUpperCase()}
                                             </span>
@@ -652,7 +652,7 @@ export default function Urun() {
 
                                 <Link
                                     href={route('public.profile', { unique_id: seller.unique_id })}
-                                    className="w-full bg-[#075B5E] text-white font-medium py-3 px-4 rounded-lg hover:bg-[#064A4D] transition-colors duration-200 flex items-center justify-center gap-2"
+                                    className="w-full bg-[#101828] text-white font-medium py-3 px-4 rounded-lg hover:bg-[#0D141F] transition-colors duration-200 flex items-center justify-center gap-2"
                                 >
                                     <User className="w-4 h-4" />
                                     Profili Görüntüle

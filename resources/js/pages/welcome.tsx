@@ -77,7 +77,7 @@ export default function Welcome() {
                             {auth.user ? (
                                 <Link
                                     href={route('dashboard')}
-                                    className="bg-[#075B5E] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#064A4D] transition-colors duration-200 shadow-sm"
+                                    className="bg-[#101828] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#0D141F] transition-colors duration-200 shadow-sm"
                                 >
                                     Dashboard
                                 </Link>
@@ -136,7 +136,7 @@ export default function Welcome() {
             {/* HERO BANNER */}
             <section className="py-8 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="bg-[#075B5E] rounded-lg text-white py-12 px-6">
+                    <div className="bg-[#101828] rounded-lg text-white py-12 px-6">
                         <h1 className="text-3xl font-bold mb-2">
                             Aynı Kampüs, Aynı İhtiyaç, Yeni Sahibini Bul!
                         </h1>
@@ -226,7 +226,7 @@ export default function Welcome() {
                                 {auth.user ? (
                                     <Link
                                         href={route('ilanver')}
-                                        className="bg-[#075B5E] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#064A4D] transition-colors duration-200 inline-block"
+                                        className="bg-[#101828] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#0D141F] transition-colors duration-200 inline-block"
                                     >
                                         İlan Ver
                                     </Link>

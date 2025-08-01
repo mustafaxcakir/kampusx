@@ -97,7 +97,7 @@ export default function CategoryPage({ category, categoryName, products, allCate
                             {auth.user ? (
                                 <Link
                                     href={route('dashboard')}
-                                    className="bg-[#075B5E] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#064A4D] transition-colors duration-200 shadow-sm"
+                                    className="bg-[#101828] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#0D141F] transition-colors duration-200 shadow-sm"
                                 >
                                     Dashboard
                                 </Link>
@@ -297,7 +297,7 @@ export default function CategoryPage({ category, categoryName, products, allCate
                                 {auth.user ? (
                                     <Link
                                         href={route('ilanver')}
-                                        className="bg-[#075B5E] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#064A4D] transition-colors duration-200 inline-block"
+                                        className="bg-[#101828] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#0D141F] transition-colors duration-200 inline-block"
                                     >
                                         İlan Ver
                                     </Link>

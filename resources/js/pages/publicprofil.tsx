@@ -128,7 +128,7 @@ export default function PublicProfile() {
                             {auth.user ? (
                                 <Link
                                     href={route('dashboard')}
-                                    className="bg-[#075B5E] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#064A4D] transition-colors duration-200 shadow-sm"
+                                    className="bg-[#101828] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#0D141F] transition-colors duration-200 shadow-sm"
                                 >
                                     Dashboard
                                 </Link>
@@ -195,7 +195,7 @@ export default function PublicProfile() {
                             <div className="flex flex-col lg:flex-row gap-6">
                                 {/* Profile Photo */}
                                 <div className="flex flex-col items-center lg:items-start">
-                                    <div className="w-24 h-24 lg:w-28 lg:h-28 bg-[#075B5E] rounded-full flex items-center justify-center mb-4 flex-shrink-0">
+                                    <div className="w-24 h-24 lg:w-28 lg:h-28 bg-[#101828] rounded-full flex items-center justify-center mb-4 flex-shrink-0">
                                         <span className="text-white font-bold text-2xl lg:text-3xl">
                                             {user.name.charAt(0).toUpperCase()}
                                         </span>
