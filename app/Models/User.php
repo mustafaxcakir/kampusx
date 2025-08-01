@@ -74,6 +74,27 @@ class User extends Authenticatable
         return $this->belongsToMany(Product::class, 'favorites');
     }
 
+    // Takip sistemi ilişkileri
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'follows', 'following_id', 'follower_id');
+    }
+
+    public function following()
+    {
+        return $this->belongsToMany(User::class, 'follows', 'follower_id', 'following_id');
+    }
+
+    public function isFollowing(User $user): bool
+    {
+        return $this->following()->where('following_id', $user->id)->exists();
+    }
+
+    public function isFollowedBy(User $user): bool
+    {
+        return $this->followers()->where('follower_id', $user->id)->exists();
+    }
+
     /**
      * Belirli bir alanın görünürlüğünü kontrol eder
      */

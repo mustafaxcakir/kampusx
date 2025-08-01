@@ -350,9 +350,10 @@ Route::get('profil/{unique_id}', function ($unique_id) {
             'created_at' => $user->created_at,
             'stats' => [
                 'ratings' => 0,
-                'followers' => 0,
-                'following' => 0
+                'followers' => $user->followers()->count(),
+                'following' => $user->following()->count()
             ],
+            'is_following' => $viewer ? $viewer->isFollowing($user) : false,
             // Gizlilik bilgileri (sadece kendi profilinde gösterilir)
             'privacy_info' => $viewer && $viewer->id === $user->id ? [
                 'email_privacy' => $user->email_privacy,
@@ -465,4 +466,11 @@ Route::get('/kategori/{category}', function ($category) {
         'allCategories' => $validCategories
     ]);
 })->name('category.show');
+
+// Takip sistemi route'ları
+Route::middleware('auth')->group(function () {
+    Route::post('/follow/{unique_id}', [App\Http\Controllers\FollowController::class, 'follow'])->name('follow');
+    Route::delete('/unfollow/{unique_id}', [App\Http\Controllers\FollowController::class, 'unfollow'])->name('unfollow');
+    Route::post('/toggle-follow/{unique_id}', [App\Http\Controllers\FollowController::class, 'toggleFollow'])->name('toggle.follow');
+});
 

@@ -1,6 +1,6 @@
 import { type SharedData } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
-import { Heart, Truck, Shield, MapPin, Calendar, User, Mail, MoreVertical, Star, Users, GraduationCap, Eye, Plus, Edit, Trash2, Phone, Globe, Lock, Users as UsersIcon, CheckCircle } from 'lucide-react';
+import { Head, Link, usePage, router } from '@inertiajs/react';
+import { Heart, Truck, Shield, MapPin, Calendar, User, Mail, MoreVertical, Star, Users, GraduationCap, Eye, Plus, Edit, Trash2, Phone, Globe, Lock, Users as UsersIcon, CheckCircle, UserPlus, UserMinus } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Footer from '@/components/footer';
 
@@ -11,6 +11,10 @@ export default function PublicProfile() {
     const [visibleImages, setVisibleImages] = useState<Set<number>>(new Set());
     const [loading, setLoading] = useState(true);
     const [visibleListings, setVisibleListings] = useState(10);
+    const [isFollowing, setIsFollowing] = useState(user.is_following || false);
+    const [followersCount, setFollowersCount] = useState(user.stats.followers || 0);
+    const [followingCount, setFollowingCount] = useState(user.stats.following || 0);
+    const [followLoading, setFollowLoading] = useState(false);
     
     const formatPrice = (price: number) => {
         const numPrice = Number(price);
@@ -101,6 +105,43 @@ export default function PublicProfile() {
                 return <Lock className="w-4 h-4 text-red-600" />;
             default:
                 return null;
+        }
+    };
+
+    const handleToggleFollow = async () => {
+        if (!auth.user) {
+            router.visit(route('login'));
+            return;
+        }
+
+        if (auth.user.unique_id === user.unique_id) {
+            return; // Kendini takip edemez
+        }
+
+        setFollowLoading(true);
+        
+        try {
+            const response = await fetch(route('toggle.follow', { unique_id: user.unique_id }), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                },
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                setIsFollowing(data.is_following);
+                setFollowersCount(data.followers_count);
+                setFollowingCount(data.following_count);
+            } else {
+                console.error('Takip işlemi başarısız:', data.message);
+            }
+        } catch (error) {
+            console.error('Takip işlemi hatası:', error);
+        } finally {
+            setFollowLoading(false);
         }
     };
 
@@ -202,9 +243,52 @@ export default function PublicProfile() {
 
                                 {/* Name and Info */}
                                 <div className="flex-1">
-                                    <h1 className="text-2xl lg:text-3xl font-bold text-card-foreground mb-4">
-                                        {user.name} {user.surname}
-                                    </h1>
+                                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4">
+                                        <h1 className="text-2xl lg:text-3xl font-bold text-card-foreground">
+                                            {user.name} {user.surname}
+                                        </h1>
+                                        
+                                        <div className="flex items-center gap-4">
+                                            {/* Takipçi İstatistikleri - Herkes görebilir */}
+                                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                                <div className="flex items-center gap-1">
+                                                    <Users className="w-4 h-4" />
+                                                    <span>{followersCount} takipçi</span>
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    <UserPlus className="w-4 h-4" />
+                                                    <span>{followingCount} takip</span>
+                                                </div>
+                                            </div>
+                                            
+                                            {/* Takip Butonu - Sadece başka kullanıcıların profilinde göster */}
+                                            {auth.user && auth.user.unique_id !== user.unique_id && (
+                                                <button
+                                                    onClick={handleToggleFollow}
+                                                    disabled={followLoading}
+                                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
+                                                        isFollowing
+                                                            ? 'bg-muted text-muted-foreground hover:bg-muted/80'
+                                                            : 'bg-[#FF3F33] text-white hover:bg-[#E6392E]'
+                                                    } ${followLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                >
+                                                    {followLoading ? (
+                                                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                                    ) : isFollowing ? (
+                                                        <>
+                                                            <UserMinus className="w-4 h-4" />
+                                                            Takibi Bırak
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <UserPlus className="w-4 h-4" />
+                                                            Takip Et
+                                                        </>
+                                                    )}
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                             <User className="w-4 h-4 flex-shrink-0" />
