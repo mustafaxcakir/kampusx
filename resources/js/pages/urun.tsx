@@ -163,26 +163,26 @@ export default function Urun() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center overflow-x-auto py-3 scrollbar-hide">
                         <div className="flex items-center space-x-6 min-w-max">
-                            <button className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                            <Link href={route('home')} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
                                 TÜM KATEGORİLER
-                            </button>
-                            <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                            </Link>
+                            <Link href={route('category.show', { category: 'books' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
                                 Kitap
                             </Link>
-                            <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                            <Link href={route('category.show', { category: 'electronics' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
                                 Elektronik
                             </Link>
-                            <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                            <Link href={route('category.show', { category: 'clothing' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
                                 Giyim
                             </Link>
-                            <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                            <Link href={route('category.show', { category: 'sports' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
                                 Spor
                             </Link>
-                            <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                            <Link href={route('category.show', { category: 'home' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
                                 Ev & Yaşam
                             </Link>
-                            <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
-                                Takas
+                            <Link href={route('category.show', { category: 'other' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                                Diğer
                             </Link>
                         </div>
                     </div>
