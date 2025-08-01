@@ -390,4 +390,33 @@ Route::get('/urun/{id}', function ($id) {
     ]);
 })->name('product.show');
 
+// Kategori sayfaları
+Route::get('/kategori/{category}', function ($category) {
+    $validCategories = [
+        'electronics' => 'Elektronik',
+        'books' => 'Kitap', 
+        'clothing' => 'Giyim',
+        'sports' => 'Spor',
+        'home' => 'Ev & Yaşam',
+        'automotive' => 'Otomotiv',
+        'other' => 'Diğer'
+    ];
+    
+    if (!array_key_exists($category, $validCategories)) {
+        abort(404, 'Kategori bulunamadı');
+    }
+    
+    $products = \App\Models\Product::with(['user', 'university'])
+        ->where('category', $category)
+        ->where('is_active', true)
+        ->latest()
+        ->paginate(20);
+    
+    return Inertia::render('kategori', [
+        'category' => $category,
+        'categoryName' => $validCategories[$category],
+        'products' => $products,
+        'allCategories' => $validCategories
+    ]);
+})->name('category.show');
 
