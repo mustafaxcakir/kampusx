@@ -134,33 +134,21 @@ export default function Welcome() {
             </nav>
 
             {/* HERO BANNER */}
-            <section className="bg-[#075B5E] py-12">
+            <section className="py-8 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between">
-                        <div className="text-white">
-                            <h1 className="text-3xl font-bold mb-2">
-                                KampusX ile hızlı sat!
-                            </h1>
-                            <p className="text-xl mb-4">
-                                İlanını öne çıkar, daha çok alıcıya ulaş.
-                            </p>
-                            <button className="bg-[#FF3F33] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#E6392E]">
-                                Premium İlan Ver
-                            </button>
-                        </div>
-                        <div className="hidden md:block">
-                            <div className="bg-card rounded-lg p-4 shadow-lg border border-sidebar-border/70">
-                                <div className="w-32 h-32 bg-muted rounded-lg mb-2"></div>
-                                <p className="text-sm text-muted-foreground">Tertemiz, az kullanılmış</p>
-                                <p className="text-sm font-medium text-card-foreground">MacBook Pro</p>
-                            </div>
-                        </div>
+                    <div className="bg-[#075B5E] rounded-lg text-white py-12 px-6">
+                        <h1 className="text-3xl font-bold mb-2">
+                            Aynı Kampüs, Aynı İhtiyaç, Yeni Sahibini Bul!
+                        </h1>
+                        <p className="text-xl mb-4">
+                            Öğrenciden Öğrenciye Güvenli Alışveriş
+                        </p>
                     </div>
                 </div>
             </section>
 
             {/* PRODUCTS GRID */}
-            <section className="py-8 bg-muted/50">
+            <section className="py-8 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-12 text-center">
