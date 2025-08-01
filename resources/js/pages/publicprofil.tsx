@@ -10,13 +10,19 @@ export default function PublicProfile() {
     const [visibleImages, setVisibleImages] = useState<Set<number>>(new Set());
     const [loading, setLoading] = useState(true);
     
+    const formatPrice = (price: number) => {
+        const numPrice = Number(price);
+        return numPrice.toLocaleString('tr-TR', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        }) + ' ₺';
+    };
+    
     // Gerçek ürünleri kullan
     const listings = ads.map(ad => ({
         id: ad.id,
         title: ad.title,
-        price: Number(ad.price) % 1 === 0 
-            ? Number(ad.price).toFixed(0) + ' ₺'
-            : Number(ad.price).toFixed(2) + ' ₺',
+        price: formatPrice(ad.price),
         status: ad.is_active ? "Satılıyor" : "Satıldı",
         image: ad.images && ad.images.length > 0 ? `/storage/${ad.images[0]}` : null,
         category: ad.category,

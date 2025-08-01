@@ -103,9 +103,11 @@ export default function Urun() {
     };
 
     const formatPrice = (price: number) => {
-        return Number(price) % 1 === 0 
-            ? Number(price).toFixed(0) + ' ₺'
-            : Number(price).toFixed(2) + ' ₺';
+        const numPrice = Number(price);
+        return numPrice.toLocaleString('tr-TR', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        }) + ' ₺';
     };
 
     return (

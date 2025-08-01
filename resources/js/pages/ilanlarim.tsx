@@ -52,14 +52,22 @@ const getCategoryText = (category: string) => {
     return categories[category] || category;
 };
 
-const getConditionText = (condition: string) => {
-    const conditions: { [key: string]: string } = {
-        'new': 'Yeni',
-        'like_new': 'Az Kullanılmış',
-        'used': 'Kullanılmış'
+    const getConditionText = (condition: string) => {
+        const conditions: { [key: string]: string } = {
+            'new': 'Yeni',
+            'like_new': 'Az Kullanılmış',
+            'used': 'Kullanılmış'
+        };
+        return conditions[condition] || condition;
     };
-    return conditions[condition] || condition;
-};
+
+    const formatPrice = (price: number) => {
+        const numPrice = Number(price);
+        return numPrice.toLocaleString('tr-TR', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        }) + ' ₺';
+    };
 
             export default function Ilanlarim() {
                 const [products, setProducts] = useState<any[]>([]);
@@ -240,10 +248,7 @@ const getConditionText = (condition: string) => {
                                     <div className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">{product.description}</div>
                                     <div className="text-xs text-gray-500 dark:text-gray-400">{getCategoryText(product.category)} • {getConditionText(product.condition)}</div>
                                     <div className="font-bold text-primary mt-auto">
-                                        {Number(product.price) % 1 === 0 
-                                            ? Number(product.price).toFixed(0) 
-                                            : Number(product.price).toFixed(2)
-                                        } ₺
+                                        {formatPrice(product.price)}
                                     </div>
                                     <div className="flex gap-2 mt-2">
                                         <Button size="sm" variant="outline" onClick={() => openEditModal(product)}>
@@ -376,10 +381,7 @@ const getConditionText = (condition: string) => {
                                 <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
                                     <h4 className="font-medium text-gray-900 dark:text-gray-100">{deleteProduct.title}</h4>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        {Number(deleteProduct.price) % 1 === 0 
-                                            ? Number(deleteProduct.price).toFixed(0) 
-                                            : Number(deleteProduct.price).toFixed(2)
-                                        } ₺
+                                        {formatPrice(deleteProduct.price)}
                                     </p>
                                 </div>
                             )}

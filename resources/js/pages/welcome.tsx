@@ -10,9 +10,11 @@ export default function Welcome() {
     const [showAllProducts, setShowAllProducts] = useState(false);
 
     const formatPrice = (price: number) => {
-        return Number(price) % 1 === 0 
-            ? Number(price).toFixed(0) + ' ₺'
-            : Number(price).toFixed(2) + ' ₺';
+        const numPrice = Number(price);
+        return numPrice.toLocaleString('tr-TR', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        }) + ' ₺';
     };
 
     // Loading state'ini yönet
