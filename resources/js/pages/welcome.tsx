@@ -105,7 +105,7 @@ export default function Welcome() {
             {/* CATEGORIES NAVIGATION */}
             <nav className="bg-background border-b border-sidebar-border/70">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center overflow-x-auto py-3 scrollbar-hide">
+                    <div className="flex items-center overflow-x-auto py-3 scrollbar-hide relative">
                         <div className="flex items-center space-x-6 min-w-max">
                             <Link href={route('home')} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
                                 TÜM KATEGORİLER
@@ -157,7 +157,7 @@ export default function Welcome() {
                         </div>
                     ) : products && products.length > 0 ? (
                         <>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+                            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
                                 {[...products].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, visibleProducts).map((product) => (
                                 <Link 
                                     key={product.id} 
