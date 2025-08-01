@@ -199,7 +199,16 @@ const getCategoryText = (category: string) => {
             <Head title="İlanlarım" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold text-card-foreground">İlanlarım</h1>
+                    <div>
+                        <h1 className="text-2xl font-bold text-card-foreground">İlanlarım</h1>
+                        {products.length > 0 && (
+                            <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                                <span>Toplam: {products.length}</span>
+                                <span>Aktif: {products.filter(p => p.is_active).length}</span>
+                                <span>Satıldı: {products.filter(p => !p.is_active).length}</span>
+                            </div>
+                        )}
+                    </div>
                 </div>
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -245,8 +254,15 @@ const getCategoryText = (category: string) => {
                                             </div>
                                         )}
                                     </div>
-                                    <div className="font-bold text-primary mt-auto">
-                                        {formatPrice(product.price)}
+                                    <div className="flex items-center justify-between">
+                                        <div className="font-bold text-primary">
+                                            {formatPrice(product.price)}
+                                        </div>
+                                        {!product.is_active && (
+                                            <span className="px-2 py-1 bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400 text-xs font-medium rounded-full">
+                                                Satıldı
+                                            </span>
+                                        )}
                                     </div>
                                     <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                         <Calendar className="w-3 h-3" />
@@ -259,9 +275,11 @@ const getCategoryText = (category: string) => {
                                         </div>
                                     )}
                                     <div className="flex gap-2 mt-2">
-                                        <Button size="sm" variant="outline" onClick={() => openEditModal(product)}>
-                                            <Pencil className="w-4 h-4 mr-1" /> Düzenle
-                                        </Button>
+                                        {product.is_active && (
+                                            <Button size="sm" variant="outline" onClick={() => openEditModal(product)}>
+                                                <Pencil className="w-4 h-4 mr-1" /> Düzenle
+                                            </Button>
+                                        )}
                                         <Button size="sm" variant="destructive" onClick={() => openDeleteModal(product)}>
                                             <Trash2 className="w-4 h-4 mr-1" /> Sil
                                         </Button>

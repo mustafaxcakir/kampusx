@@ -390,6 +390,20 @@ Route::get('/urun/{id}', function ($id) {
     ]);
 })->name('product.show');
 
+// Ürünü satıldı olarak işaretle
+Route::patch('/urun/{id}/mark-as-sold', function ($id) {
+    $product = \App\Models\Product::findOrFail($id);
+    
+    // Sadece ürün sahibi işaretleyebilir
+    if (auth()->id() !== $product->user_id) {
+        abort(403, 'Bu işlemi yapmaya yetkiniz yok');
+    }
+    
+    $product->update(['is_active' => false]);
+    
+    return back()->with('success', 'Ürün başarıyla satıldı olarak işaretlendi');
+})->middleware('auth')->name('product.mark-as-sold');
+
 // Kategori sayfaları
 Route::get('/kategori/{category}', function ($category) {
     $validCategories = [

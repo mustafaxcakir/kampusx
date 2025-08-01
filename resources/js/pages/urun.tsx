@@ -537,9 +537,16 @@ export default function Urun() {
                                                 {formatPrice(product.price)}
                                             </span>
                                         </div>
-                                        <h1 className="text-2xl font-bold text-card-foreground leading-tight">
-                                            {product.title}
-                                        </h1>
+                                        <div className="flex items-center gap-3">
+                                            <h1 className="text-2xl font-bold text-card-foreground leading-tight">
+                                                {product.title}
+                                            </h1>
+                                            {!product.is_active && (
+                                                <span className="px-3 py-1 bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400 text-sm font-medium rounded-full">
+                                                    Satıldı
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
 
                                     {/* İlan Özellikleri */}
@@ -579,10 +586,25 @@ export default function Urun() {
 
                                     {/* Action Buttons */}
                                     <div className="space-y-2">
-                                        <button className="w-full bg-[#101828] text-white font-medium py-3 px-4 rounded-lg hover:bg-[#0D141F] transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer">
-                                            <MessageCircle className="w-4 h-4" />
-                                            Satıcı ile İletişim
-                                        </button>
+                                        {/* Satıcı ise Satıldı butonu göster (sadece aktif ürünler için) */}
+                                        {auth.user && auth.user.id === product.user_id && product.is_active && (
+                                            <button 
+                                                onClick={() => router.patch(route('product.mark-as-sold', { id: product.id }))}
+                                                className="w-full bg-green-600 text-white font-medium py-3 px-4 rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer"
+                                            >
+                                                <CheckCircle className="w-4 h-4" />
+                                                Satıldı Olarak İşaretle
+                                            </button>
+                                        )}
+                                        
+                                        {/* Alıcı ise iletişim butonu göster */}
+                                        {auth.user && auth.user.id !== product.user_id && (
+                                            <button className="w-full bg-[#101828] text-white font-medium py-3 px-4 rounded-lg hover:bg-[#0D141F] transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer">
+                                                <MessageCircle className="w-4 h-4" />
+                                                Satıcı ile İletişim
+                                            </button>
+                                        )}
+                                        
                                         {auth.user && auth.user.id !== product.user_id ? (
                                             isFavorited ? (
                                                 <button 
