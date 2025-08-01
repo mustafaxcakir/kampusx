@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Pencil, Trash2, Package, Calendar, MapPin, X } from 'lucide-react';
 import InputError from '@/components/input-error';
 
@@ -261,7 +261,7 @@ const getCategoryText = (category: string) => {
                                     </Link>
                                 </div>
                             ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
                         {products.map(product => (
                             <div key={product.id} className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 overflow-hidden hover:shadow-md transition-shadow duration-200 flex flex-col" data-product-id={product.id} style={{ willChange: 'transform' }}>
                                 <div className="p-4 flex-1 flex flex-col gap-2">
@@ -285,12 +285,12 @@ const getCategoryText = (category: string) => {
                                             </div>
                                         )}
                                     </div>
-                                    <div className="flex items-center justify-between">
-                                        <div className="font-bold text-primary">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                        <div className="font-bold text-primary text-sm sm:text-base">
                                             {formatPrice(product.price)}
                                         </div>
                                         {!product.is_active && (
-                                            <span className="px-2 py-1 bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400 text-xs font-medium rounded-full">
+                                            <span className="px-2 py-1 bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400 text-xs font-medium rounded-full self-start sm:self-auto">
                                                 Satıldı
                                             </span>
                                         )}
@@ -302,16 +302,16 @@ const getCategoryText = (category: string) => {
                                     {product.university?.name && (
                                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                             <MapPin className="w-3 h-3" />
-                                            <span>{product.university.name}</span>
+                                            <span className="truncate">{product.university.name}</span>
                                         </div>
                                     )}
-                                    <div className="flex gap-2 mt-2">
+                                    <div className="flex flex-col sm:flex-row gap-2 mt-2">
                                         {product.is_active && (
-                                            <Button size="sm" variant="outline" onClick={() => openEditModal(product)}>
+                                            <Button size="sm" variant="outline" onClick={() => openEditModal(product)} className="w-full sm:w-auto">
                                                 <Pencil className="w-4 h-4 mr-1" /> Düzenle
                                             </Button>
                                         )}
-                                        <Button size="sm" variant="destructive" onClick={() => openDeleteModal(product)}>
+                                        <Button size="sm" variant="destructive" onClick={() => openDeleteModal(product)} className="w-full sm:w-auto">
                                             <Trash2 className="w-4 h-4 mr-1" /> Sil
                                         </Button>
                                     </div>
@@ -327,6 +327,9 @@ const getCategoryText = (category: string) => {
                 <DialogContent className="max-w-lg">
                     <DialogHeader>
                         <DialogTitle>İlanı Düzenle</DialogTitle>
+                        <DialogDescription>
+                            İlanınızın bilgilerini güncelleyin. Değişiklikler kaydedildikten sonra yayınlanacaktır.
+                        </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleEditSubmit} className="space-y-4">
                         <div className="space-y-2">
@@ -422,6 +425,9 @@ const getCategoryText = (category: string) => {
                             <Trash2 className="h-5 w-5 text-red-500" />
                             İlanı Sil
                         </DialogTitle>
+                        <DialogDescription>
+                            Bu işlem geri alınamaz. İlanınız kalıcı olarak silinecektir.
+                        </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4">
                         <div className="text-center">

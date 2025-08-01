@@ -117,7 +117,7 @@ export default function Favorilerim() {
                         <p className="text-muted-foreground">Favorileriniz yükleniyor...</p>
                     </div>
                 ) : favorites && favorites.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
                         {favorites.map((product) => (
                             <div key={product.id} className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 overflow-hidden hover:shadow-md transition-shadow flex flex-col" data-product-id={product.id}>
                                 <div className="p-4 flex-1 flex flex-col gap-2">
