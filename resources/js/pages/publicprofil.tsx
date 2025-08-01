@@ -266,7 +266,7 @@ export default function PublicProfile() {
                                                 <button
                                                     onClick={handleToggleFollow}
                                                     disabled={followLoading}
-                                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-200 ${
+                                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-200 cursor-pointer ${
                                                         isFollowing
                                                             ? 'bg-muted text-muted-foreground hover:bg-muted/80'
                                                             : 'bg-primary text-primary-foreground hover:bg-primary/90'
