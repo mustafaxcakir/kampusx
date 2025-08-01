@@ -1,6 +1,6 @@
 import { type SharedData } from '@/types';
 import { Head, Link, usePage, router } from '@inertiajs/react';
-import { Heart, Truck, Shield, MapPin, Calendar, User, Mail, MoreVertical, Star, Users, GraduationCap, Eye, Plus, Edit, Trash2, Phone, Globe, Lock, Users as UsersIcon, CheckCircle, UserPlus, UserMinus } from 'lucide-react';
+import { Heart, Truck, Shield, MapPin, Calendar, User, Mail, MoreVertical, Star, Users, GraduationCap, Eye, Plus, Edit, Trash2, Phone, Globe, Lock, Users as UsersIcon, CheckCircle, UserPlus, UserMinus, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Footer from '@/components/footer';
 
@@ -15,6 +15,14 @@ export default function PublicProfile() {
     const [followersCount, setFollowersCount] = useState(user.stats.followers || 0);
     const [followingCount, setFollowingCount] = useState(user.stats.following || 0);
     const [followLoading, setFollowLoading] = useState(false);
+    
+    // Popup state'leri
+    const [showFollowersPopup, setShowFollowersPopup] = useState(false);
+    const [showFollowingPopup, setShowFollowingPopup] = useState(false);
+    const [followers, setFollowers] = useState<any[]>([]);
+    const [following, setFollowing] = useState<any[]>([]);
+    const [followersLoading, setFollowersLoading] = useState(false);
+    const [followingLoading, setFollowingLoading] = useState(false);
     
     const formatPrice = (price: number) => {
         const numPrice = Number(price);
@@ -145,6 +153,42 @@ export default function PublicProfile() {
         }
     };
 
+    const handleShowFollowers = async () => {
+        setShowFollowersPopup(true);
+        setFollowersLoading(true);
+        
+        try {
+            const response = await fetch(route('followers', { unique_id: user.unique_id }));
+            const data = await response.json();
+            
+            if (data.success) {
+                setFollowers(data.followers);
+            }
+        } catch (error) {
+            console.error('Takipçiler yüklenirken hata:', error);
+        } finally {
+            setFollowersLoading(false);
+        }
+    };
+
+    const handleShowFollowing = async () => {
+        setShowFollowingPopup(true);
+        setFollowingLoading(true);
+        
+        try {
+            const response = await fetch(route('following', { unique_id: user.unique_id }));
+            const data = await response.json();
+            
+            if (data.success) {
+                setFollowing(data.following);
+            }
+        } catch (error) {
+            console.error('Takip edilenler yüklenirken hata:', error);
+        } finally {
+            setFollowingLoading(false);
+        }
+    };
+
     return (
         <>
             <Head title={`${user.name} ${user.surname} - KampusX Profil`}>
@@ -251,14 +295,20 @@ export default function PublicProfile() {
                                         <div className="flex items-center gap-4">
                                             {/* Takipçi İstatistikleri - Herkes görebilir */}
                                             <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                                <div className="flex items-center gap-1">
+                                                <button
+                                                    onClick={handleShowFollowers}
+                                                    className="flex items-center gap-1 hover:text-foreground transition-colors cursor-pointer"
+                                                >
                                                     <Users className="w-4 h-4" />
                                                     <span>{followersCount} takipçi</span>
-                                                </div>
-                                                <div className="flex items-center gap-1">
+                                                </button>
+                                                <button
+                                                    onClick={handleShowFollowing}
+                                                    className="flex items-center gap-1 hover:text-foreground transition-colors cursor-pointer"
+                                                >
                                                     <UserPlus className="w-4 h-4" />
                                                     <span>{followingCount} takip</span>
-                                                </div>
+                                                </button>
                                             </div>
                                             
                                             {/* Takip Butonu - Sadece başka kullanıcıların profilinde göster */}
@@ -503,6 +553,118 @@ export default function PublicProfile() {
                     </div>
                 </div>
             </div>
+
+            {/* Takipçiler Popup */}
+            {showFollowersPopup && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-card rounded-lg shadow-lg max-w-md w-full max-h-[80vh] overflow-hidden">
+                        <div className="flex items-center justify-between p-4 border-b border-sidebar-border/70">
+                            <h3 className="text-lg font-semibold text-card-foreground">Takipçiler</h3>
+                            <button
+                                onClick={() => setShowFollowersPopup(false)}
+                                className="text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        
+                        <div className="p-4 max-h-[60vh] overflow-y-auto">
+                            {followersLoading ? (
+                                <div className="flex items-center justify-center py-8">
+                                    <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                                </div>
+                            ) : followers.length > 0 ? (
+                                <div className="space-y-3">
+                                    {followers.map((follower) => (
+                                        <Link
+                                            key={follower.id}
+                                            href={route('public.profile', { unique_id: follower.unique_id })}
+                                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors"
+                                            onClick={() => setShowFollowersPopup(false)}
+                                        >
+                                            <div className="w-10 h-10 bg-[#101828] rounded-full flex items-center justify-center flex-shrink-0">
+                                                <span className="text-white font-bold text-sm">
+                                                    {follower.name.charAt(0).toUpperCase()}
+                                                </span>
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="font-medium text-card-foreground truncate">
+                                                    {follower.name} {follower.surname}
+                                                </div>
+                                                {follower.university_name && (
+                                                    <div className="text-sm text-muted-foreground truncate">
+                                                        {follower.university_name}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-8 text-muted-foreground">
+                                    Henüz takipçi yok
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Takip Edilenler Popup */}
+            {showFollowingPopup && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-card rounded-lg shadow-lg max-w-md w-full max-h-[80vh] overflow-hidden">
+                        <div className="flex items-center justify-between p-4 border-b border-sidebar-border/70">
+                            <h3 className="text-lg font-semibold text-card-foreground">Takip Edilenler</h3>
+                            <button
+                                onClick={() => setShowFollowingPopup(false)}
+                                className="text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        
+                        <div className="p-4 max-h-[60vh] overflow-y-auto">
+                            {followingLoading ? (
+                                <div className="flex items-center justify-center py-8">
+                                    <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                                </div>
+                            ) : following.length > 0 ? (
+                                <div className="space-y-3">
+                                    {following.map((followed) => (
+                                        <Link
+                                            key={followed.id}
+                                            href={route('public.profile', { unique_id: followed.unique_id })}
+                                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors"
+                                            onClick={() => setShowFollowingPopup(false)}
+                                        >
+                                            <div className="w-10 h-10 bg-[#101828] rounded-full flex items-center justify-center flex-shrink-0">
+                                                <span className="text-white font-bold text-sm">
+                                                    {followed.name.charAt(0).toUpperCase()}
+                                                </span>
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="font-medium text-card-foreground truncate">
+                                                    {followed.name} {followed.surname}
+                                                </div>
+                                                {followed.university_name && (
+                                                    <div className="text-sm text-muted-foreground truncate">
+                                                        {followed.university_name}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-8 text-muted-foreground">
+                                    Henüz kimseyi takip etmiyor
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <Footer />
         </>

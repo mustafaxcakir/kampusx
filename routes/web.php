@@ -474,3 +474,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/toggle-follow/{unique_id}', [App\Http\Controllers\FollowController::class, 'toggleFollow'])->name('toggle.follow');
 });
 
+// Takipçi ve takip edilen listeleri (auth gerektirmez)
+Route::get('/followers/{unique_id}', [App\Http\Controllers\FollowController::class, 'getFollowers'])->name('followers');
+Route::get('/following/{unique_id}', [App\Http\Controllers\FollowController::class, 'getFollowing'])->name('following');
+
