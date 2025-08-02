@@ -3,38 +3,48 @@ import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { LayoutGrid, Plus, ClipboardList, HelpCircle, Heart, User } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react';
+import { LayoutGrid, Plus, ClipboardList, HelpCircle, Heart, User, Bell } from 'lucide-react';
 import { FaXTwitter, FaInstagram, FaLinkedin, FaTiktok } from 'react-icons/fa6';
 import AppLogo from './app-logo';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-        icon: LayoutGrid,
-    },
-    {
-        title: 'İlan Ver',
-        href: '/ilanver',
-        icon: Plus,
-    },
-    {
-        title: 'İlanlarım',
-        href: '/ilanlarim',
-        icon: ClipboardList,
-    },
-    {
-        title: 'Favorilerim',
-        href: '/favorilerim',
-        icon: Heart,
-    },
-    {
-        title: 'Profilime Git',
-        href: '/profil',
-        icon: User,
-    },
-];
+export function AppSidebar() {
+    const page = usePage<{ auth: { user: { unread_notifications_count?: number } } }>();
+    const user = page.props.auth.user;
+
+    const mainNavItems: NavItem[] = [
+        {
+            title: 'Dashboard',
+            href: '/dashboard',
+            icon: LayoutGrid,
+        },
+        {
+            title: 'İlan Ver',
+            href: '/ilanver',
+            icon: Plus,
+        },
+        {
+            title: 'İlanlarım',
+            href: '/ilanlarim',
+            icon: ClipboardList,
+        },
+        {
+            title: 'Favorilerim',
+            href: '/favorilerim',
+            icon: Heart,
+        },
+        {
+            title: 'Bildirimler',
+            href: '/bildirimler',
+            icon: Bell,
+            badge: user.unread_notifications_count,
+        },
+        {
+            title: 'Profilime Git',
+            href: '/profil',
+            icon: User,
+        },
+    ];
 
 const footerNavItems: NavItem[] = [
     {
@@ -68,7 +78,6 @@ const socialNavItems: NavItem[] = [
 ];
 
 
-export function AppSidebar() {
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
