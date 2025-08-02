@@ -118,7 +118,7 @@ export default function CategoryPage({ category, categoryName, products, allCate
                                     </div>
                                     <Link
                                         href={route('dashboard')}
-                                        className="bg-[#101828] text-white px-3 md:px-6 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium hover:bg-[#0D141F] transition-colors duration-200 shadow-sm"
+                                        className="bg-[#101828] dark:bg-gray-800 text-white px-3 md:px-6 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium hover:bg-[#0D141F] dark:hover:bg-gray-700 transition-colors duration-200 shadow-sm"
                                     >
                                         Dashboard
                                     </Link>
@@ -133,7 +133,7 @@ export default function CategoryPage({ category, categoryName, products, allCate
                                 <div className="flex items-center space-x-2 md:space-x-3">
                                     <Link
                                         href={route('login')}
-                                        className="bg-[#101828] text-white px-3 md:px-6 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold hover:bg-[#0D141F] transition-colors duration-200 shadow-sm"
+                                        className="bg-[#101828] dark:bg-gray-800 text-white px-3 md:px-6 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold hover:bg-[#0D141F] dark:hover:bg-gray-700 transition-colors duration-200 shadow-sm"
                                     >
                                         Giriş Yap
                                     </Link>
@@ -190,20 +190,20 @@ export default function CategoryPage({ category, categoryName, products, allCate
                             <div className="relative university-dropdown">
                                 <button
                                     onClick={() => setShowUniversityDropdown(!showUniversityDropdown)}
-                                    className="flex items-center space-x-2 bg-white border border-sidebar-border/70 rounded-lg px-3 py-1.5 text-sm font-medium text-foreground hover:bg-accent transition-colors duration-200 min-w-[180px] justify-between"
+                                    className="flex items-center space-x-2 bg-white dark:bg-gray-800 border border-sidebar-border/70 rounded-lg px-3 py-1.5 text-sm font-medium text-foreground dark:text-gray-100 hover:bg-accent dark:hover:bg-gray-700 transition-colors duration-200 min-w-[180px] justify-between"
                                 >
                                     <span className="truncate">{getSelectedUniversityName()}</span>
                                     <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showUniversityDropdown ? 'rotate-180' : ''}`} />
                                 </button>
                                 
                                 {showUniversityDropdown && (
-                                    <div className="absolute top-full right-0 mt-1 w-full bg-white border border-sidebar-border/70 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
+                                    <div className="absolute top-full right-0 mt-1 w-full bg-white dark:bg-gray-800 border border-sidebar-border/70 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
                                         <button
                                             onClick={() => {
                                                 setSelectedUniversity(null);
                                                 setShowUniversityDropdown(false);
                                             }}
-                                            className={`w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors duration-200 ${selectedUniversity === null ? 'bg-accent text-foreground' : 'text-foreground'}`}
+                                            className={`w-full text-left px-3 py-2 text-sm hover:bg-accent dark:hover:bg-gray-700 transition-colors duration-200 ${selectedUniversity === null ? 'bg-accent dark:bg-gray-700 text-foreground dark:text-gray-100' : 'text-foreground dark:text-gray-100'}`}
                                         >
                                             Tüm Üniversiteler
                                         </button>
@@ -214,7 +214,7 @@ export default function CategoryPage({ category, categoryName, products, allCate
                                                     setSelectedUniversity(university.id);
                                                     setShowUniversityDropdown(false);
                                                 }}
-                                                className={`w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors duration-200 ${selectedUniversity === university.id ? 'bg-accent text-foreground' : 'text-foreground'}`}
+                                                className={`w-full text-left px-3 py-2 text-sm hover:bg-accent dark:hover:bg-gray-700 transition-colors duration-200 ${selectedUniversity === university.id ? 'bg-accent dark:bg-gray-700 text-foreground dark:text-gray-100' : 'text-foreground dark:text-gray-100'}`}
                                             >
                                                 {university.name}
                                             </button>
@@ -260,14 +260,14 @@ export default function CategoryPage({ category, categoryName, products, allCate
                             <div className="relative university-dropdown">
                                 <button
                                     onClick={() => setShowUniversityDropdown(!showUniversityDropdown)}
-                                    className="flex items-center space-x-2 bg-white border border-sidebar-border/70 rounded-lg px-3 py-1.5 text-sm font-medium text-foreground hover:bg-accent transition-colors duration-200 min-w-[140px] justify-between"
+                                    className="flex items-center space-x-2 bg-white dark:bg-gray-800 border border-sidebar-border/70 rounded-lg px-3 py-1.5 text-sm font-medium text-foreground dark:text-gray-100 hover:bg-accent dark:hover:bg-gray-700 transition-colors duration-200 min-w-[140px] justify-between"
                                 >
                                     <span className="truncate text-xs">{getSelectedUniversityName()}</span>
                                     <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${showUniversityDropdown ? 'rotate-180' : ''}`} />
                                 </button>
                                 
                                 {showUniversityDropdown && (
-                                    <div className="absolute top-full right-0 mt-1 w-full bg-white border border-sidebar-border/70 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                                    <div className="absolute top-full right-0 mt-1 w-full bg-white dark:bg-gray-800 border border-sidebar-border/70 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
                                         <button
                                             onClick={() => {
                                                 setSelectedUniversity(null);
@@ -347,7 +347,7 @@ export default function CategoryPage({ category, categoryName, products, allCate
             </section>
 
             {/* Products Grid */}
-            <section className="py-8 bg-white">
+            <section className="py-8 bg-white dark:bg-[#181818]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {filteredProducts && filteredProducts.length > 0 ? (
                         <>
@@ -356,7 +356,7 @@ export default function CategoryPage({ category, categoryName, products, allCate
                                     <Link 
                                         key={product.id} 
                                         href={route('product.show', { id: product.id })}
-                                        className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 overflow-hidden hover:shadow-md transition-shadow duration-200 flex flex-col block"
+                                        className="bg-card dark:bg-[#0a0a0a] rounded-xl shadow-sm border border-sidebar-border/70 overflow-hidden hover:shadow-md transition-shadow duration-200 flex flex-col block"
                                     >
                                         <div className="p-4 flex-1 flex flex-col gap-2">
                                             <div className="h-32 w-full bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
@@ -422,7 +422,7 @@ export default function CategoryPage({ category, categoryName, products, allCate
                         </>
                     ) : (
                         <div className="text-center py-12">
-                            <div className="bg-card rounded-lg p-8 border border-sidebar-border/70">
+                            <div className="bg-card dark:bg-[#181818] rounded-lg p-8 border border-sidebar-border/70">
                                 <h3 className="text-lg font-medium text-card-foreground mb-2">
                                     {selectedUniversity ? 'Seçilen üniversitede ürün bulunamadı' : 'Bu kategoride henüz ürün yok'}
                                 </h3>

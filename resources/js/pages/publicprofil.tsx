@@ -244,7 +244,7 @@ export default function PublicProfile() {
                                     </div>
                                     <Link
                                         href={route('dashboard')}
-                                        className="bg-[#101828] text-white px-3 md:px-6 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium hover:bg-[#0D141F] transition-colors duration-200 shadow-sm"
+                                        className="bg-[#101828] dark:bg-gray-800 text-white px-3 md:px-6 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium hover:bg-[#0D141F] dark:hover:bg-gray-700 transition-colors duration-200 shadow-sm"
                                     >
                                         Dashboard
                                     </Link>
@@ -259,7 +259,7 @@ export default function PublicProfile() {
                                 <div className="flex items-center space-x-2 md:space-x-3">
                                     <Link
                                         href={route('login')}
-                                        className="bg-[#101828] text-white px-3 md:px-6 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold hover:bg-[#0D141F] transition-colors duration-200 shadow-sm"
+                                        className="bg-[#101828] dark:bg-gray-800 text-white px-3 md:px-6 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold hover:bg-[#0D141F] dark:hover:bg-gray-700 transition-colors duration-200 shadow-sm"
                                     >
                                         Giriş Yap
                                     </Link>
@@ -316,7 +316,7 @@ export default function PublicProfile() {
                             <div className="relative">
                                 <button
                                     disabled
-                                    className="flex items-center space-x-2 bg-gray-100 border border-sidebar-border/70 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-400 cursor-not-allowed min-w-[180px] justify-between"
+                                    className="flex items-center space-x-2 bg-gray-100 dark:bg-gray-800 border border-sidebar-border/70 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-400 dark:text-gray-500 cursor-not-allowed min-w-[180px] justify-between"
                                 >
                                     <span className="truncate">Tüm Üniversiteler</span>
                                     <ChevronDown className="w-4 h-4" />
@@ -360,7 +360,7 @@ export default function PublicProfile() {
                             <div className="relative">
                                 <button
                                     disabled
-                                    className="flex items-center space-x-2 bg-gray-100 border border-sidebar-border/70 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-400 cursor-not-allowed min-w-[140px] justify-between"
+                                    className="flex items-center space-x-2 bg-gray-100 dark:bg-gray-800 border border-sidebar-border/70 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-400 dark:text-gray-500 cursor-not-allowed min-w-[140px] justify-between"
                                 >
                                     <span className="truncate text-xs">Tüm Üniversiteler</span>
                                     <ChevronDown className="w-3 h-3" />
