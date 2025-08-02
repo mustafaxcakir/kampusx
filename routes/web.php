@@ -365,6 +365,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/bildirimler/{notification}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/bildirimler/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
     Route::delete('/bildirimler/{notification}', [\App\Http\Controllers\NotificationController::class, 'delete'])->name('notifications.delete');
+    Route::delete('/bildirimler', [\App\Http\Controllers\NotificationController::class, 'deleteAll'])->name('notifications.deleteAll');
     Route::get('/api/notifications/unread-count', [\App\Http\Controllers\NotificationController::class, 'getUnreadCount'])->name('api.notifications.unreadCount');
 });
 

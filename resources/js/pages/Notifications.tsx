@@ -47,6 +47,12 @@ export default function Notifications({ notifications, unreadCount }: Props) {
         router.delete(`/bildirimler/${notificationId}`);
     };
 
+    const deleteAllNotifications = () => {
+        if (confirm('Tüm bildirimleri silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
+            router.delete('/bildirimler');
+        }
+    };
+
     const getNotificationIcon = (type: string) => {
         switch (type) {
             case 'follow':
@@ -96,12 +102,21 @@ export default function Notifications({ notifications, unreadCount }: Props) {
                         </p>
                     </div>
                     
-                    {unreadCount > 0 && (
-                        <Button onClick={markAllAsRead} variant="outline" size="sm">
-                            <Check className="w-4 h-4 mr-2" />
-                            Tümünü Okundu İşaretle
-                        </Button>
-                    )}
+                    <div className="flex items-center gap-2">
+                        {unreadCount > 0 && (
+                            <Button onClick={markAllAsRead} variant="outline" size="sm">
+                                <Check className="w-4 h-4 mr-2" />
+                                Tümünü Okundu İşaretle
+                            </Button>
+                        )}
+                        
+                        {notifications.data.length > 0 && (
+                            <Button onClick={deleteAllNotifications} variant="outline" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/20">
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Tümünü Temizle
+                            </Button>
+                        )}
+                    </div>
                 </div>
 
                 <Separator />

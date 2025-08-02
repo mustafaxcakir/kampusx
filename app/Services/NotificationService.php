@@ -90,4 +90,9 @@ class NotificationService
     {
         return $notification->delete();
     }
+
+    public static function deleteAllNotifications(User $user)
+    {
+        return $user->notifications()->delete();
+    }
 }

@@ -60,4 +60,12 @@ class NotificationController extends Controller
             'count' => $user->unreadNotificationsCount()
         ]);
     }
+
+    public function deleteAll()
+    {
+        $user = auth()->user();
+        NotificationService::deleteAllNotifications($user);
+
+        return back()->with('success', 'Tüm bildirimler silindi');
+    }
 }
