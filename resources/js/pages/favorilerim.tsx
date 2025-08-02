@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage, useForm } from '@inertiajs/react';
@@ -18,7 +17,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Favorilerim() {
     const { favorites } = usePage<{ favorites: any[] }>().props;
-    const [visibleImages, setVisibleImages] = useState<Set<number>>(new Set());
     const [loading, setLoading] = useState(true);
     
     const removeForm = useForm({});
@@ -29,40 +27,6 @@ export default function Favorilerim() {
             setLoading(false);
         }
     }, [favorites]);
-
-    // Intersection Observer ile görünür resimleri takip et
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                const newVisibleImages = new Set(visibleImages);
-                let hasChanges = false;
-
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        const productId = parseInt(entry.target.getAttribute('data-product-id') || '0');
-                        if (!newVisibleImages.has(productId)) {
-                            newVisibleImages.add(productId);
-                            hasChanges = true;
-                        }
-                    }
-                });
-
-                if (hasChanges) {
-                    setVisibleImages(newVisibleImages);
-                }
-            },
-            { 
-                threshold: 0.1,
-                rootMargin: '200px' // Daha fazla önceden yükle
-            }
-        );
-
-        // Tüm ürün kartlarını gözlemle
-        const cards = document.querySelectorAll('[data-product-id]');
-        cards.forEach(card => observer.observe(card));
-
-        return () => observer.disconnect();
-    }, [favorites, visibleImages]);
 
     const formatPrice = (price: number) => {
         const numPrice = Number(price);
@@ -119,22 +83,29 @@ export default function Favorilerim() {
                 ) : favorites && favorites.length > 0 ? (
                     <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
                         {favorites.map((product) => (
-                            <div key={product.id} className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 overflow-hidden hover:shadow-md transition-shadow flex flex-col" data-product-id={product.id}>
+                            <div key={product.id} className="bg-card rounded-xl shadow-sm border border-sidebar-border/70 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
                                 <div className="p-4 flex-1 flex flex-col gap-2">
-                                    <div className="h-32 w-full bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
+                                    <div className="h-32 w-full bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden relative">
                                         {product.images && product.images.length > 0 ? (
-                                            visibleImages.has(product.id) ? (
+                                            <>
                                                 <img
                                                     src={"/storage/" + product.images[0]}
                                                     alt={product.title}
                                                     className="object-cover w-full h-full hover:scale-105 transition-transform duration-200"
                                                     loading="lazy"
+                                                    onError={(e) => {
+                                                        const target = e.target as HTMLImageElement;
+                                                        target.style.display = 'none';
+                                                        const fallback = target.parentElement?.querySelector('.image-fallback');
+                                                        if (fallback) {
+                                                            fallback.classList.remove('hidden');
+                                                        }
+                                                    }}
                                                 />
-                                            ) : (
-                                                <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                                    <div className="w-4 h-4 border border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+                                                <div className="image-fallback hidden absolute inset-0 w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
+                                                    <span className="text-gray-400 text-xs">Fotoğraf yüklenemedi</span>
                                                 </div>
-                                            )
+                                            </>
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center">
                                                 <span className="text-gray-400 text-xs">Fotoğraf yok</span>
@@ -142,7 +113,7 @@ export default function Favorilerim() {
                                         )}
                                     </div>
                                     <div className="flex items-start justify-between">
-                                        <Link href={route('product.show', { id: product.id })} className="flex-1">
+                                        <Link href={`/urun/${product.id}`} className="flex-1">
                                             <h3 className="font-semibold text-card-foreground line-clamp-2 hover:text-primary transition-colors truncate text-base">
                                                 {product.title}
                                             </h3>
