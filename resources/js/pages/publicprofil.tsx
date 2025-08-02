@@ -1,6 +1,6 @@
 import { type SharedData } from '@/types';
 import { Head, Link, usePage, router } from '@inertiajs/react';
-import { Heart, Truck, Shield, MapPin, Calendar, User, Mail, MoreVertical, Star, Users, GraduationCap, Eye, Plus, Edit, Trash2, Phone, Globe, Lock, Users as UsersIcon, CheckCircle, UserPlus, UserMinus, X } from 'lucide-react';
+import { Heart, Truck, Shield, MapPin, Calendar, User, Mail, MoreVertical, Star, Users, GraduationCap, Eye, Plus, Edit, Trash2, Phone, Globe, Lock, Users as UsersIcon, CheckCircle, UserPlus, UserMinus, X, ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Footer from '@/components/footer';
 
@@ -23,6 +23,8 @@ export default function PublicProfile() {
     const [following, setFollowing] = useState<any[]>([]);
     const [followersLoading, setFollowersLoading] = useState(false);
     const [followingLoading, setFollowingLoading] = useState(false);
+    const [selectedUniversity, setSelectedUniversity] = useState<number | null>(null);
+    const [showUniversityDropdown, setShowUniversityDropdown] = useState(false);
     
     const formatPrice = (price: number) => {
         const numPrice = Number(price);
@@ -69,6 +71,24 @@ export default function PublicProfile() {
         }
     }, [ads]);
 
+    // Dropdown dışına tıklandığında kapat
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as Element;
+            if (!target.closest('.university-dropdown')) {
+                setShowUniversityDropdown(false);
+            }
+        };
+
+        if (showUniversityDropdown) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showUniversityDropdown]);
+
     // Intersection Observer ile görünür resimleri takip et
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -114,6 +134,12 @@ export default function PublicProfile() {
             default:
                 return null;
         }
+    };
+
+    const getSelectedUniversityName = () => {
+        if (selectedUniversity === null) return 'Tüm Üniversiteler';
+        const university = user.universities?.find((u: any) => u.id === selectedUniversity);
+        return university?.name || 'Tüm Üniversiteler';
     };
 
     const handleToggleFollow = async () => {
@@ -258,8 +284,9 @@ export default function PublicProfile() {
             {/* CATEGORIES NAVIGATION */}
             <nav className="bg-background border-b border-sidebar-border/70">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center overflow-x-auto py-3 scrollbar-hide">
-                        <div className="flex items-center space-x-6 min-w-max">
+                    {/* Desktop Layout */}
+                    <div className="hidden md:flex items-center justify-between py-3">
+                        <div className="flex items-center space-x-6">
                             <Link href={route('home')} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
                                 TÜM KATEGORİLER
                             </Link>
@@ -281,6 +308,64 @@ export default function PublicProfile() {
                             <Link href={route('category.show', { category: 'other' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
                                 Diğer
                             </Link>
+                        </div>
+                        
+                        {/* Desktop University Filter (Disabled) */}
+                        <div className="flex items-center space-x-4">
+                            <span className="text-sm font-medium text-muted-foreground">Üniversite:</span>
+                            <div className="relative">
+                                <button
+                                    disabled
+                                    className="flex items-center space-x-2 bg-gray-100 border border-sidebar-border/70 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-400 cursor-not-allowed min-w-[180px] justify-between"
+                                >
+                                    <span className="truncate">Tüm Üniversiteler</span>
+                                    <ChevronDown className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Mobile Layout */}
+                    <div className="md:hidden">
+                        {/* Mobile Categories */}
+                        <div className="flex items-center overflow-x-auto py-3 scrollbar-hide">
+                            <div className="flex items-center space-x-4 min-w-max">
+                                <Link href={route('home')} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                                    TÜM
+                                </Link>
+                                <Link href={route('category.show', { category: 'books' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                                    Kitap
+                                </Link>
+                                <Link href={route('category.show', { category: 'electronics' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                                    Elektronik
+                                </Link>
+                                <Link href={route('category.show', { category: 'clothing' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                                    Giyim
+                                </Link>
+                                <Link href={route('category.show', { category: 'sports' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                                    Spor
+                                </Link>
+                                <Link href={route('category.show', { category: 'home' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                                    Ev & Yaşam
+                                </Link>
+                                <Link href={route('category.show', { category: 'other' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                                    Diğer
+                                </Link>
+                            </div>
+                        </div>
+                        
+                        {/* Mobile University Filter (Disabled) */}
+                        <div className="flex items-center justify-between py-2 border-t border-sidebar-border/30">
+                            <span className="text-sm font-medium text-muted-foreground">Üniversite:</span>
+                            <div className="relative">
+                                <button
+                                    disabled
+                                    className="flex items-center space-x-2 bg-gray-100 border border-sidebar-border/70 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-400 cursor-not-allowed min-w-[140px] justify-between"
+                                >
+                                    <span className="truncate text-xs">Tüm Üniversiteler</span>
+                                    <ChevronDown className="w-3 h-3" />
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
