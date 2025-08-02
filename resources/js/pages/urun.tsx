@@ -131,26 +131,39 @@ export default function Urun() {
 
                         <div className="flex items-center space-x-4">
                             {auth.user ? (
-                                <Link
-                                    href={route('dashboard')}
-                                    className="bg-[#101828] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#0D141F] transition-colors duration-200 shadow-sm"
-                                >
-                                    Dashboard
-                                </Link>
+                                <div className="flex items-center space-x-3">
+                                    <Link
+                                        href={route('dashboard')}
+                                        className="bg-[#101828] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#0D141F] transition-colors duration-200 shadow-sm"
+                                    >
+                                        Dashboard
+                                    </Link>
+                                    <Link
+                                        href={route('ilanver')}
+                                        className="bg-blue-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors duration-200 shadow-sm"
+                                    >
+                                        İlan Ver
+                                    </Link>
+                                </div>
                             ) : (
                                 <div className="flex items-center space-x-3">
                                     <Link
                                         href={route('login')}
-                                        className="border border-sidebar-border text-foreground px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-accent hover:border-sidebar-border/80 transition-colors duration-200"
+                                        className="bg-[#101828] text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-[#0D141F] transition-colors duration-200 shadow-sm"
                                     >
                                         Giriş Yap
                                     </Link>
-                                    <Link
-                                        href={route('register')}
-                                        className="bg-[#FF3F33] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#E6392E] transition-colors duration-200 shadow-sm"
-                                    >
-                                        Üye Ol
-                                    </Link>
+                                    <div className="relative inline-flex items-center justify-center gap-4 group">
+                                        <div
+                                            className="absolute inset-0 duration-1000 opacity-60 transition-all bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 rounded-lg blur-lg filter group-hover:opacity-100 group-hover:duration-200"
+                                        ></div>
+                                        <Link
+                                            href={route('register')}
+                                            className="group relative inline-flex items-center justify-center text-sm rounded-lg bg-blue-600 px-6 py-2.5 font-bold text-white transition-all duration-200 hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 hover:shadow-blue-600/30"
+                                        >
+                                            Üye Ol
+                                        </Link>
+                                    </div>
                                 </div>
                             )}
                         </div>

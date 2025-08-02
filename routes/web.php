@@ -462,11 +462,14 @@ Route::get('/kategori/{category}', function ($category) {
         ->latest()
         ->paginate(20);
     
+    $universities = \App\Models\University::orderBy('name')->get(['id', 'name']);
+    
     return Inertia::render('kategori', [
         'category' => $category,
         'categoryName' => $validCategories[$category],
         'products' => $products,
-        'allCategories' => $validCategories
+        'allCategories' => $validCategories,
+        'universities' => $universities
     ]);
 })->name('category.show');
 

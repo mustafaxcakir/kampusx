@@ -13,15 +13,23 @@ interface CategoryPageProps {
 
 export default function CategoryPage({ category, categoryName, products, allCategories }: CategoryPageProps) {
     const { auth } = usePage<SharedData>().props;
+    const { universities } = usePage<{ universities: any[] }>().props;
     const [sortBy, setSortBy] = useState('latest');
     const [showSortDropdown, setShowSortDropdown] = useState(false);
+    const [selectedUniversity, setSelectedUniversity] = useState<number | null>(null);
+    const [showUniversityDropdown, setShowUniversityDropdown] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // Click outside to close dropdown
+    // Click outside to close dropdowns
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setShowSortDropdown(false);
+            }
+            
+            const target = event.target as Element;
+            if (!target.closest('.university-dropdown')) {
+                setShowUniversityDropdown(false);
             }
         };
 
@@ -43,15 +51,25 @@ export default function CategoryPage({ category, categoryName, products, allCate
         { value: 'latest', label: 'En Yeni' },
         { value: 'oldest', label: 'En Eski' },
         { value: 'price_low', label: 'Fiyat (Düşük → Yüksek)' },
-        { value: 'price_high', label: 'Fiyat (Yüksek → Düşük)' },
-        { value: 'name_asc', label: 'İsim (A-Z)' },
-        { value: 'name_desc', label: 'İsim (Z-A)' }
+        { value: 'price_high', label: 'Fiyat (Yüksek → Düşük)' }
     ];
 
     const getCurrentSortLabel = () => {
         const option = sortOptions.find(opt => opt.value === sortBy);
         return option ? option.label : 'Sıralama';
     };
+
+    const getSelectedUniversityName = () => {
+        if (selectedUniversity === null) return 'Tüm Üniversiteler';
+        const university = universities?.find(u => u.id === selectedUniversity);
+        return university?.name || 'Tüm Üniversiteler';
+    };
+
+    // Filtrelenmiş ürünleri hesapla
+    const filteredProducts = products?.data?.filter((product: any) => {
+        if (selectedUniversity === null) return true;
+        return product.university_id === selectedUniversity;
+    }) || [];
 
     const sortProducts = (products: any[]) => {
         if (!products) return [];
@@ -67,10 +85,6 @@ export default function CategoryPage({ category, categoryName, products, allCate
                 return sortedProducts.sort((a, b) => Number(a.price) - Number(b.price));
             case 'price_high':
                 return sortedProducts.sort((a, b) => Number(b.price) - Number(a.price));
-            case 'name_asc':
-                return sortedProducts.sort((a, b) => a.title.localeCompare(b.title, 'tr'));
-            case 'name_desc':
-                return sortedProducts.sort((a, b) => b.title.localeCompare(a.title, 'tr'));
             default:
                 return sortedProducts;
         }
@@ -95,26 +109,39 @@ export default function CategoryPage({ category, categoryName, products, allCate
 
                         <div className="flex items-center space-x-4">
                             {auth.user ? (
-                                <Link
-                                    href={route('dashboard')}
-                                    className="bg-[#101828] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#0D141F] transition-colors duration-200 shadow-sm"
-                                >
-                                    Dashboard
-                                </Link>
+                                <div className="flex items-center space-x-3">
+                                    <Link
+                                        href={route('dashboard')}
+                                        className="bg-[#101828] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#0D141F] transition-colors duration-200 shadow-sm"
+                                    >
+                                        Dashboard
+                                    </Link>
+                                    <Link
+                                        href={route('ilanver')}
+                                        className="bg-blue-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors duration-200 shadow-sm"
+                                    >
+                                        İlan Ver
+                                    </Link>
+                                </div>
                             ) : (
                                 <div className="flex items-center space-x-3">
                                     <Link
                                         href={route('login')}
-                                        className="border border-sidebar-border text-foreground px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-accent hover:border-sidebar-border/80 transition-colors duration-200"
+                                        className="bg-[#101828] text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-[#0D141F] transition-colors duration-200 shadow-sm"
                                     >
                                         Giriş Yap
                                     </Link>
-                                    <Link
-                                        href={route('register')}
-                                        className="bg-[#FF3F33] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#E6392E] transition-colors duration-200 shadow-sm"
-                                    >
-                                        Üye Ol
-                                    </Link>
+                                    <div className="relative inline-flex items-center justify-center gap-4 group">
+                                        <div
+                                            className="absolute inset-0 duration-1000 opacity-60 transition-all bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 rounded-lg blur-lg filter group-hover:opacity-100 group-hover:duration-200"
+                                        ></div>
+                                        <Link
+                                            href={route('register')}
+                                            className="group relative inline-flex items-center justify-center text-sm rounded-lg bg-blue-600 px-6 py-2.5 font-bold text-white transition-all duration-200 hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 hover:shadow-blue-600/30"
+                                        >
+                                            Üye Ol
+                                        </Link>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -125,8 +152,9 @@ export default function CategoryPage({ category, categoryName, products, allCate
             {/* CATEGORIES NAVIGATION */}
             <nav className="bg-background border-b border-sidebar-border/70">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center overflow-x-auto py-3 scrollbar-hide">
-                        <div className="flex items-center space-x-6 min-w-max">
+                    {/* Desktop Layout */}
+                    <div className="hidden md:flex items-center justify-between py-3">
+                        <div className="flex items-center space-x-6">
                             <Link href={route('home')} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
                                 TÜM KATEGORİLER
                             </Link>
@@ -148,6 +176,116 @@ export default function CategoryPage({ category, categoryName, products, allCate
                             <Link href={route('category.show', { category: 'other' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
                                 Diğer
                             </Link>
+                        </div>
+                        
+                        {/* Desktop University Filter */}
+                        <div className="flex items-center space-x-4">
+                            <span className="text-sm font-medium text-muted-foreground">Üniversite:</span>
+                            <div className="relative university-dropdown">
+                                <button
+                                    onClick={() => setShowUniversityDropdown(!showUniversityDropdown)}
+                                    className="flex items-center space-x-2 bg-white border border-sidebar-border/70 rounded-lg px-3 py-1.5 text-sm font-medium text-foreground hover:bg-accent transition-colors duration-200 min-w-[180px] justify-between"
+                                >
+                                    <span className="truncate">{getSelectedUniversityName()}</span>
+                                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showUniversityDropdown ? 'rotate-180' : ''}`} />
+                                </button>
+                                
+                                {showUniversityDropdown && (
+                                    <div className="absolute top-full right-0 mt-1 w-full bg-white border border-sidebar-border/70 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
+                                        <button
+                                            onClick={() => {
+                                                setSelectedUniversity(null);
+                                                setShowUniversityDropdown(false);
+                                            }}
+                                            className={`w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors duration-200 ${selectedUniversity === null ? 'bg-accent text-foreground' : 'text-foreground'}`}
+                                        >
+                                            Tüm Üniversiteler
+                                        </button>
+                                        {universities?.map((university) => (
+                                            <button
+                                                key={university.id}
+                                                onClick={() => {
+                                                    setSelectedUniversity(university.id);
+                                                    setShowUniversityDropdown(false);
+                                                }}
+                                                className={`w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors duration-200 ${selectedUniversity === university.id ? 'bg-accent text-foreground' : 'text-foreground'}`}
+                                            >
+                                                {university.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Mobile Layout */}
+                    <div className="md:hidden">
+                        {/* Mobile Categories */}
+                        <div className="flex items-center overflow-x-auto py-3 scrollbar-hide">
+                            <div className="flex items-center space-x-4 min-w-max">
+                                <Link href={route('home')} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                                    TÜM
+                                </Link>
+                                <Link href={route('category.show', { category: 'books' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                                    Kitap
+                                </Link>
+                                <Link href={route('category.show', { category: 'electronics' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                                    Elektronik
+                                </Link>
+                                <Link href={route('category.show', { category: 'clothing' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                                    Giyim
+                                </Link>
+                                <Link href={route('category.show', { category: 'sports' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                                    Spor
+                                </Link>
+                                <Link href={route('category.show', { category: 'home' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                                    Ev & Yaşam
+                                </Link>
+                                <Link href={route('category.show', { category: 'other' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                                    Diğer
+                                </Link>
+                            </div>
+                        </div>
+                        
+                        {/* Mobile University Filter */}
+                        <div className="flex items-center justify-between py-2 border-t border-sidebar-border/30">
+                            <span className="text-sm font-medium text-muted-foreground">Üniversite:</span>
+                            <div className="relative university-dropdown">
+                                <button
+                                    onClick={() => setShowUniversityDropdown(!showUniversityDropdown)}
+                                    className="flex items-center space-x-2 bg-white border border-sidebar-border/70 rounded-lg px-3 py-1.5 text-sm font-medium text-foreground hover:bg-accent transition-colors duration-200 min-w-[140px] justify-between"
+                                >
+                                    <span className="truncate text-xs">{getSelectedUniversityName()}</span>
+                                    <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${showUniversityDropdown ? 'rotate-180' : ''}`} />
+                                </button>
+                                
+                                {showUniversityDropdown && (
+                                    <div className="absolute top-full right-0 mt-1 w-full bg-white border border-sidebar-border/70 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                                        <button
+                                            onClick={() => {
+                                                setSelectedUniversity(null);
+                                                setShowUniversityDropdown(false);
+                                            }}
+                                            className={`w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors duration-200 ${selectedUniversity === null ? 'bg-accent text-foreground' : 'text-foreground'}`}
+                                        >
+                                            Tüm Üniversiteler
+                                        </button>
+                                        {universities?.map((university) => (
+                                            <button
+                                                key={university.id}
+                                                onClick={() => {
+                                                    setSelectedUniversity(university.id);
+                                                    setShowUniversityDropdown(false);
+                                                }}
+                                                className={`w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors duration-200 ${selectedUniversity === university.id ? 'bg-accent text-foreground' : 'text-foreground'}`}
+                                            >
+                                                {university.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -196,15 +334,6 @@ export default function CategoryPage({ category, categoryName, products, allCate
                                         </div>
                                     )}
                                 </div>
-                                
-                                <div className="hidden sm:block">
-                                    <div className="bg-card rounded-lg p-3 border border-sidebar-border/70">
-                                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                            <span>Kategori:</span>
-                                            <span className="font-medium text-foreground">{categoryName}</span>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -214,10 +343,10 @@ export default function CategoryPage({ category, categoryName, products, allCate
             {/* Products Grid */}
             <section className="py-8 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    {products.data && products.data.length > 0 ? (
+                    {filteredProducts && filteredProducts.length > 0 ? (
                         <>
                             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
-                                {sortProducts(products.data).map((product: any) => (
+                                {sortProducts(filteredProducts).map((product: any) => (
                                     <Link 
                                         key={product.id} 
                                         href={route('product.show', { id: product.id })}
@@ -289,10 +418,10 @@ export default function CategoryPage({ category, categoryName, products, allCate
                         <div className="text-center py-12">
                             <div className="bg-card rounded-lg p-8 border border-sidebar-border/70">
                                 <h3 className="text-lg font-medium text-card-foreground mb-2">
-                                    Bu kategoride henüz ürün yok
+                                    {selectedUniversity ? 'Seçilen üniversitede ürün bulunamadı' : 'Bu kategoride henüz ürün yok'}
                                 </h3>
                                 <p className="text-muted-foreground mb-4">
-                                    İlk ürünü siz ekleyin!
+                                    {selectedUniversity ? 'Farklı bir üniversite seçin veya tüm üniversiteleri görüntüleyin.' : 'İlk ürünü siz ekleyin!'}
                                 </p>
                                 {auth.user ? (
                                     <Link
