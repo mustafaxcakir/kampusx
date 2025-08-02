@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Follow;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -34,6 +35,9 @@ class FollowController extends Controller
             'follower_id' => Auth::id(),
             'following_id' => $user->id,
         ]);
+
+        // Bildirim oluştur
+        NotificationService::createFollowNotification(Auth::user(), $user);
 
         return response()->json([
             'success' => true,
@@ -94,6 +98,9 @@ class FollowController extends Controller
                 'follower_id' => Auth::id(),
                 'following_id' => $user->id,
             ]);
+            
+            // Bildirim oluştur
+            NotificationService::createFollowNotification(Auth::user(), $user);
             
             $message = 'Kullanıcı takip edildi.';
         }

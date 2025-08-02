@@ -21,7 +21,45 @@ Route::get('/', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
+        $user = auth()->user();
+        
+        // İstatistikler
+        $stats = [
+            'active_products' => $user->products()->where('is_active', true)->count(),
+            'total_favorites' => $user->products()->withCount('favorites')->get()->sum('favorites_count'),
+            'followers_count' => $user->followers()->count(),
+            'unanswered_questions' => $user->products()->withCount(['questions' => function($query) {
+                $query->whereNull('answer');
+            }])->get()->sum('questions_count'),
+        ];
+        
+        // Son bildirimler (son 5 tanesi)
+        $recentNotifications = $user->notifications()
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+        
+        // Son aktiviteler (son 5 ürün)
+        $recentProducts = $user->products()
+            ->with('university')
+            ->orderBy('updated_at', 'desc')
+            ->limit(5)
+            ->get();
+        
+        // Popüler ürünler (en çok favori alan)
+        $popularProducts = \App\Models\Product::with(['user', 'university'])
+            ->withCount('favorites')
+            ->where('is_active', true)
+            ->orderBy('favorites_count', 'desc')
+            ->limit(5)
+            ->get();
+        
+        return Inertia::render('dashboard', [
+            'stats' => $stats,
+            'recentNotifications' => $recentNotifications,
+            'recentProducts' => $recentProducts,
+            'popularProducts' => $popularProducts,
+        ]);
     })->name('dashboard');
     
     Route::get('ilanver', function () {
@@ -321,6 +359,13 @@ Route::middleware('auth')->group(function () {
         
         return response()->json($favorites);
     })->name('api.favorites');
+
+    // Bildirimler
+    Route::get('/bildirimler', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/bildirimler/{notification}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/bildirimler/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
+    Route::delete('/bildirimler/{notification}', [\App\Http\Controllers\NotificationController::class, 'delete'])->name('notifications.delete');
+    Route::get('/api/notifications/unread-count', [\App\Http\Controllers\NotificationController::class, 'getUnreadCount'])->name('api.notifications.unreadCount');
 });
 
 require __DIR__.'/settings.php';

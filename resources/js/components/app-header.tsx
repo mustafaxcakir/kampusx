@@ -11,7 +11,7 @@ import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search, Plus, ClipboardList, Heart, User } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Menu, Search, Plus, ClipboardList, Heart, User, Bell } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 
@@ -149,6 +149,18 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                             <Button variant="ghost" size="icon" className="group h-9 w-9 cursor-pointer">
                                 <Search className="!size-5 opacity-80 group-hover:opacity-100" />
                             </Button>
+                            
+                            {/* Bildirimler */}
+                            <Link href="/bildirimler" className="relative">
+                                <Button variant="ghost" size="icon" className="group h-9 w-9 cursor-pointer">
+                                    <Bell className="!size-5 opacity-80 group-hover:opacity-100" />
+                                    {auth.user.unread_notifications_count > 0 && (
+                                        <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-xs text-white flex items-center justify-center font-medium">
+                                            {auth.user.unread_notifications_count > 99 ? '99+' : auth.user.unread_notifications_count}
+                                        </span>
+                                    )}
+                                </Button>
+                            </Link>
                             <div className="hidden lg:flex">
                                 {rightNavItems.map((item) => (
                                     <TooltipProvider key={item.title} delayDuration={0}>

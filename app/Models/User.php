@@ -95,6 +95,26 @@ class User extends Authenticatable
         return $this->followers()->where('follower_id', $user->id)->exists();
     }
 
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    public function unreadNotifications()
+    {
+        return $this->notifications()->unread();
+    }
+
+    public function readNotifications()
+    {
+        return $this->notifications()->read();
+    }
+
+    public function unreadNotificationsCount()
+    {
+        return $this->notifications()->unread()->count();
+    }
+
     /**
      * Belirli bir alanın görünürlüğünü kontrol eder
      */
