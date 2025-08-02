@@ -104,7 +104,13 @@ export default function Welcome() {
 
                         <div className="flex items-center space-x-4">
                             {auth.user ? (
-                                <div className="flex items-center space-x-3">
+                                <div className="flex items-center space-x-4">
+                                    <div className="hidden md:block">
+                                        <span className="text-sm text-muted-foreground">Hoşgeldin,</span>
+                                        <span className="text-sm font-medium text-foreground ml-1">
+                                            {auth.user.name} {auth.user.surname}
+                                        </span>
+                                    </div>
                                     <Link
                                         href={route('dashboard')}
                                         className="bg-[#101828] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#0D141F] transition-colors duration-200 shadow-sm"
