@@ -10,6 +10,18 @@ class NotificationService
 {
     public static function createFollowNotification(User $follower, User $following)
     {
+        // Son 24 saat içinde aynı kullanıcı aynı kişiyi takip bildirimi var mı kontrol et
+        $recentNotification = Notification::where('user_id', $following->id)
+            ->where('type', 'follow')
+            ->where('data->follower_id', $follower->id)
+            ->where('created_at', '>=', now()->subHours(24))
+            ->first();
+
+        // Eğer son 24 saat içinde bildirim varsa, yeni bildirim oluşturma
+        if ($recentNotification) {
+            return null;
+        }
+
         return Notification::create([
             'user_id' => $following->id,
             'type' => 'follow',
@@ -24,6 +36,19 @@ class NotificationService
 
     public static function createFavoriteNotification(User $user, Product $product)
     {
+        // Son 24 saat içinde aynı kullanıcı aynı ürün için favori bildirimi var mı kontrol et
+        $recentNotification = Notification::where('user_id', $product->user_id)
+            ->where('type', 'favorite')
+            ->where('data->user_id', $user->id)
+            ->where('data->product_id', $product->id)
+            ->where('created_at', '>=', now()->subHours(24))
+            ->first();
+
+        // Eğer son 24 saat içinde bildirim varsa, yeni bildirim oluşturma
+        if ($recentNotification) {
+            return null;
+        }
+
         return Notification::create([
             'user_id' => $product->user_id,
             'type' => 'favorite',
@@ -40,6 +65,19 @@ class NotificationService
 
     public static function createQuestionNotification(User $user, Product $product, $question)
     {
+        // Son 24 saat içinde aynı kullanıcı aynı ürün için soru bildirimi var mı kontrol et
+        $recentNotification = Notification::where('user_id', $product->user_id)
+            ->where('type', 'question')
+            ->where('data->user_id', $user->id)
+            ->where('data->product_id', $product->id)
+            ->where('created_at', '>=', now()->subHours(24))
+            ->first();
+
+        // Eğer son 24 saat içinde bildirim varsa, yeni bildirim oluşturma
+        if ($recentNotification) {
+            return null;
+        }
+
         return Notification::create([
             'user_id' => $product->user_id,
             'type' => 'question',
