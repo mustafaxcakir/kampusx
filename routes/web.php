@@ -11,8 +11,11 @@ Route::get('/', function () {
         ->latest()
         ->get();
     
+    $universities = \App\Models\University::orderBy('name')->get(['id', 'name']);
+    
     return Inertia::render('welcome', [
-        'products' => $products
+        'products' => $products,
+        'universities' => $universities
     ]);
 })->name('home');
 

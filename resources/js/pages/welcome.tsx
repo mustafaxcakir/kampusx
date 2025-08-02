@@ -1,14 +1,16 @@
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { Truck, Shield, MapPin, Calendar, User } from 'lucide-react';
+import { Truck, Shield, MapPin, Calendar, User, ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Footer from '@/components/footer';
 
 export default function Welcome() {
     const { auth } = usePage<SharedData>().props;
-    const { products } = usePage<{ products: any[] }>().props;
+    const { products, universities } = usePage<{ products: any[], universities: any[] }>().props;
     const [loading, setLoading] = useState(true);
     const [visibleProducts, setVisibleProducts] = useState(10);
+    const [selectedUniversity, setSelectedUniversity] = useState<number | null>(null);
+    const [showUniversityDropdown, setShowUniversityDropdown] = useState(false);
 
     const formatPrice = (price: number) => {
         const numPrice = Number(price);
@@ -25,11 +27,34 @@ export default function Welcome() {
         }
     }, [products]);
 
+    // Üniversite seçimi değiştiğinde visible products'ı sıfırla
+    useEffect(() => {
+        setVisibleProducts(10);
+    }, [selectedUniversity]);
 
+    // Dropdown dışına tıklandığında kapat
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as Element;
+            if (!target.closest('.university-dropdown')) {
+                setShowUniversityDropdown(false);
+            }
+        };
 
+        if (showUniversityDropdown) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
 
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showUniversityDropdown]);
 
-
+    // Filtrelenmiş ürünleri hesapla
+    const filteredProducts = products?.filter(product => {
+        if (selectedUniversity === null) return true;
+        return product.university_id === selectedUniversity;
+    }) || [];
 
     const getCategoryText = (category: string) => {
         const categories: { [key: string]: string } = {
@@ -53,7 +78,11 @@ export default function Welcome() {
         return conditions[condition] || condition;
     };
 
-
+    const getSelectedUniversityName = () => {
+        if (selectedUniversity === null) return 'Tüm Üniversiteler';
+        const university = universities?.find(u => u.id === selectedUniversity);
+        return university?.name || 'Tüm Üniversiteler';
+    };
 
     return (
         <>
@@ -105,8 +134,9 @@ export default function Welcome() {
             {/* CATEGORIES NAVIGATION */}
             <nav className="bg-background border-b border-sidebar-border/70">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center overflow-x-auto py-3 scrollbar-hide relative">
-                        <div className="flex items-center space-x-6 min-w-max">
+                    {/* Desktop Layout */}
+                    <div className="hidden md:flex items-center justify-between py-3">
+                        <div className="flex items-center space-x-6">
                             <Link href={route('home')} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
                                 TÜM KATEGORİLER
                             </Link>
@@ -128,6 +158,116 @@ export default function Welcome() {
                             <Link href={route('category.show', { category: 'other' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
                                 Diğer
                             </Link>
+                        </div>
+                        
+                        {/* Desktop University Filter */}
+                        <div className="flex items-center space-x-4">
+                            <span className="text-sm font-medium text-muted-foreground">Üniversite:</span>
+                            <div className="relative university-dropdown">
+                                <button
+                                    onClick={() => setShowUniversityDropdown(!showUniversityDropdown)}
+                                    className="flex items-center space-x-2 bg-white border border-sidebar-border/70 rounded-lg px-3 py-1.5 text-sm font-medium text-foreground hover:bg-accent transition-colors duration-200 min-w-[180px] justify-between"
+                                >
+                                    <span className="truncate">{getSelectedUniversityName()}</span>
+                                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showUniversityDropdown ? 'rotate-180' : ''}`} />
+                                </button>
+                                
+                                {showUniversityDropdown && (
+                                    <div className="absolute top-full right-0 mt-1 w-full bg-white border border-sidebar-border/70 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
+                                        <button
+                                            onClick={() => {
+                                                setSelectedUniversity(null);
+                                                setShowUniversityDropdown(false);
+                                            }}
+                                            className={`w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors duration-200 ${selectedUniversity === null ? 'bg-accent text-foreground' : 'text-foreground'}`}
+                                        >
+                                            Tüm Üniversiteler
+                                        </button>
+                                        {universities?.map((university) => (
+                                            <button
+                                                key={university.id}
+                                                onClick={() => {
+                                                    setSelectedUniversity(university.id);
+                                                    setShowUniversityDropdown(false);
+                                                }}
+                                                className={`w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors duration-200 ${selectedUniversity === university.id ? 'bg-accent text-foreground' : 'text-foreground'}`}
+                                            >
+                                                {university.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Mobile Layout */}
+                    <div className="md:hidden">
+                        {/* Mobile Categories */}
+                        <div className="flex items-center overflow-x-auto py-3 scrollbar-hide">
+                            <div className="flex items-center space-x-4 min-w-max">
+                                <Link href={route('home')} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                                    TÜM
+                                </Link>
+                                <Link href={route('category.show', { category: 'books' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                                    Kitap
+                                </Link>
+                                <Link href={route('category.show', { category: 'electronics' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                                    Elektronik
+                                </Link>
+                                <Link href={route('category.show', { category: 'clothing' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                                    Giyim
+                                </Link>
+                                <Link href={route('category.show', { category: 'sports' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                                    Spor
+                                </Link>
+                                <Link href={route('category.show', { category: 'home' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                                    Ev & Yaşam
+                                </Link>
+                                <Link href={route('category.show', { category: 'other' })} className="text-sm font-medium text-muted-foreground hover:text-foreground whitespace-nowrap">
+                                    Diğer
+                                </Link>
+                            </div>
+                        </div>
+                        
+                        {/* Mobile University Filter */}
+                        <div className="flex items-center justify-between py-2 border-t border-sidebar-border/30">
+                            <span className="text-sm font-medium text-muted-foreground">Üniversite:</span>
+                            <div className="relative university-dropdown">
+                                <button
+                                    onClick={() => setShowUniversityDropdown(!showUniversityDropdown)}
+                                    className="flex items-center space-x-2 bg-white border border-sidebar-border/70 rounded-lg px-3 py-1.5 text-sm font-medium text-foreground hover:bg-accent transition-colors duration-200 min-w-[140px] justify-between"
+                                >
+                                    <span className="truncate text-xs">{getSelectedUniversityName()}</span>
+                                    <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${showUniversityDropdown ? 'rotate-180' : ''}`} />
+                                </button>
+                                
+                                {showUniversityDropdown && (
+                                    <div className="absolute top-full right-0 mt-1 w-full bg-white border border-sidebar-border/70 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                                        <button
+                                            onClick={() => {
+                                                setSelectedUniversity(null);
+                                                setShowUniversityDropdown(false);
+                                            }}
+                                            className={`w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors duration-200 ${selectedUniversity === null ? 'bg-accent text-foreground' : 'text-foreground'}`}
+                                        >
+                                            Tüm Üniversiteler
+                                        </button>
+                                        {universities?.map((university) => (
+                                            <button
+                                                key={university.id}
+                                                onClick={() => {
+                                                    setSelectedUniversity(university.id);
+                                                    setShowUniversityDropdown(false);
+                                                }}
+                                                className={`w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors duration-200 ${selectedUniversity === university.id ? 'bg-accent text-foreground' : 'text-foreground'}`}
+                                            >
+                                                {university.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -155,10 +295,10 @@ export default function Welcome() {
                             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
                             <p className="text-muted-foreground">Ürünler yükleniyor...</p>
                         </div>
-                    ) : products && products.length > 0 ? (
+                    ) : filteredProducts && filteredProducts.length > 0 ? (
                         <>
                             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
-                                {[...products].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, visibleProducts).map((product) => (
+                                {[...filteredProducts].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, visibleProducts).map((product) => (
                                 <Link 
                                     key={product.id} 
                                     href={route('product.show', { id: product.id })}
@@ -207,13 +347,13 @@ export default function Welcome() {
                             </div>
                             
                             {/* Daha Fazla Ürün Butonu */}
-                            {visibleProducts < products.length && (
+                            {visibleProducts < filteredProducts.length && (
                                 <div className="flex justify-center mt-8">
                                     <button
-                                        onClick={() => setVisibleProducts(prev => Math.min(prev + 10, products.length))}
+                                        onClick={() => setVisibleProducts(prev => Math.min(prev + 10, filteredProducts.length))}
                                         className="bg-primary text-primary-foreground px-8 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-200 shadow-sm"
                                     >
-                                        Daha Fazla Ürün Göster ({Math.min(10, products.length - visibleProducts)} ürün daha)
+                                        Daha Fazla Ürün Göster ({Math.min(10, filteredProducts.length - visibleProducts)} ürün daha)
                                     </button>
                                 </div>
                             )}
@@ -221,8 +361,12 @@ export default function Welcome() {
                     ) : (
                         <div className="text-center py-12">
                             <div className="bg-card rounded-lg p-8 border border-sidebar-border/70">
-                                <h3 className="text-lg font-medium text-card-foreground mb-2">Henüz ürün yok</h3>
-                                <p className="text-muted-foreground mb-4">İlk ürünü siz ekleyin!</p>
+                                <h3 className="text-lg font-medium text-card-foreground mb-2">
+                                    {selectedUniversity ? 'Seçilen üniversitede ürün bulunamadı' : 'Henüz ürün yok'}
+                                </h3>
+                                <p className="text-muted-foreground mb-4">
+                                    {selectedUniversity ? 'Farklı bir üniversite seçin veya tüm üniversiteleri görüntüleyin.' : 'İlk ürünü siz ekleyin!'}
+                                </p>
                                 {auth.user ? (
                                     <Link
                                         href={route('ilanver')}
