@@ -15,8 +15,12 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                             <Link href={item.href} prefetch>
                                 {item.icon && <item.icon />}
                                 <span>{item.title}</span>
-                                {item.badge && item.badge > 0 && (
-                                    <Badge className="ml-auto text-xs bg-red-500 hover:bg-red-600 text-white border-0 rounded-full min-w-[20px] h-5 px-1.5 flex items-center justify-center">
+                                {item.badge !== undefined && (
+                                    <Badge className={`ml-auto text-xs border-0 rounded-full min-w-[20px] h-5 px-1.5 flex items-center justify-center ${
+                                        item.badge > 0 
+                                            ? 'bg-red-500 hover:bg-red-600 text-white' 
+                                            : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+                                    }`}>
                                         {item.badge > 99 ? '99+' : item.badge}
                                     </Badge>
                                 )}

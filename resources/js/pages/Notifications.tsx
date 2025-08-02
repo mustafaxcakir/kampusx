@@ -216,19 +216,99 @@ export default function Notifications({ notifications, unreadCount }: Props) {
                 </div>
 
                 {/* Pagination */}
-                {notifications.last_page > 1 && (
-                    <div className="flex items-center justify-center gap-2 mt-6">
-                        {Array.from({ length: notifications.last_page }, (_, i) => i + 1).map((page) => (
-                            <Button
-                                key={page}
-                                variant={page === notifications.current_page ? "default" : "outline"}
-                                size="sm"
-                                onClick={() => router.get('/bildirimler', { page })}
-                                className="w-8 h-8 p-0"
-                            >
-                                {page}
-                            </Button>
-                        ))}
+                {notifications.total > 20 && (
+                    <div className="flex items-center justify-between mt-8 px-2">
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                            {notifications.total} bildirimden {(notifications.current_page - 1) * notifications.per_page + 1} - {Math.min(notifications.current_page * notifications.per_page, notifications.total)} arası gösteriliyor
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                            {/* Previous button */}
+                            {notifications.current_page > 1 && (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => router.get('/bildirimler', { page: notifications.current_page - 1 })}
+                                    className="flex items-center gap-2"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                    Önceki
+                                </Button>
+                            )}
+                            
+                            {/* Page numbers */}
+                            <div className="flex items-center gap-1">
+                                {/* First page */}
+                                {notifications.current_page > 3 && (
+                                    <>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => router.get('/bildirimler', { page: 1 })}
+                                            className="w-8 h-8 p-0"
+                                        >
+                                            1
+                                        </Button>
+                                        {notifications.current_page > 4 && (
+                                            <span className="text-gray-400 px-2">...</span>
+                                        )}
+                                    </>
+                                )}
+                                
+                                {/* Current page and neighbors */}
+                                {Array.from({ length: notifications.last_page }, (_, i) => i + 1)
+                                    .filter(page => 
+                                        page === 1 || 
+                                        page === notifications.last_page || 
+                                        Math.abs(page - notifications.current_page) <= 1
+                                    )
+                                    .map((page) => (
+                                        <Button
+                                            key={page}
+                                            variant={page === notifications.current_page ? "default" : "outline"}
+                                            size="sm"
+                                            onClick={() => router.get('/bildirimler', { page })}
+                                            className="w-8 h-8 p-0"
+                                        >
+                                            {page}
+                                        </Button>
+                                    ))}
+                                
+                                {/* Last page */}
+                                {notifications.current_page < notifications.last_page - 2 && (
+                                    <>
+                                        {notifications.current_page < notifications.last_page - 3 && (
+                                            <span className="text-gray-400 px-2">...</span>
+                                        )}
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => router.get('/bildirimler', { page: notifications.last_page })}
+                                            className="w-8 h-8 p-0"
+                                        >
+                                            {notifications.last_page}
+                                        </Button>
+                                    </>
+                                )}
+                            </div>
+                            
+                            {/* Next button */}
+                            {notifications.current_page < notifications.last_page && (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => router.get('/bildirimler', { page: notifications.current_page + 1 })}
+                                    className="flex items-center gap-2"
+                                >
+                                    Sonraki
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </Button>
+                            )}
+                        </div>
                     </div>
                 )}
             </div>
